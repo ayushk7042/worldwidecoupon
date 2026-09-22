@@ -326,7 +326,9 @@ export function Stat({
 /** Horizontally scrollable rail — the standard shape for every homepage row. */
 export function Rail({ children }: { children: ReactNode }) {
   return (
-    <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
+    // The vertical padding is what stops a card's hover lift being clipped by
+    // the horizontal scroll container.
+    <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 py-2 sm:mx-0 sm:px-1">
       {children}
     </div>
   );

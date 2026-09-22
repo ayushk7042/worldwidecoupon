@@ -21,16 +21,29 @@ export function LogoMark({
   title?: string;
   priority?: boolean;
 }) {
+  // The tag in the mark is near-black, so the dark theme gets the variant
+  // with a light tag and a green glyph.
   return (
-    <Image
-      src="/brand/mark.png"
-      alt={title}
-      width={size}
-      height={size}
-      priority={priority}
-      className={classNames("shrink-0 object-contain", className)}
-      aria-hidden={title ? undefined : true}
-    />
+    <>
+      <Image
+        src="/brand/mark.png"
+        alt={title}
+        width={size}
+        height={size}
+        priority={priority}
+        className={classNames("shrink-0 object-contain dark:hidden", className)}
+        aria-hidden={title ? undefined : true}
+      />
+      <Image
+        src="/brand/mark-dark.png"
+        alt=""
+        aria-hidden
+        width={size}
+        height={size}
+        priority={priority}
+        className={classNames("hidden shrink-0 object-contain dark:block", className)}
+      />
+    </>
   );
 }
 
