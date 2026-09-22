@@ -1,6 +1,26 @@
 import Link from "next/link";
+import { Logo } from "./Logo";
 import type { Category, Store } from "@/lib/types";
 import { AdSlot } from "@/components/ads/AdSlot";
+
+/** Brand marks, drawn inline so the footer costs no extra requests. */
+const SOCIALS = [
+  {
+    label: "Facebook",
+    href: "https://facebook.com",
+    path: "M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H8v3h2v7h3v-7h3l1-3h-4v-2c0-.6.4-1 1-1Z",
+  },
+  {
+    label: "X",
+    href: "https://x.com",
+    path: "M17.5 3h3l-6.6 7.5L21.8 21h-6l-4.7-6.1L5.7 21h-3l7-8L2.5 3h6.2l4.2 5.6L17.5 3Zm-1 16h1.6L7.6 4.7H5.9L16.5 19Z",
+  },
+  {
+    label: "Instagram",
+    href: "https://instagram.com",
+    path: "M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.3 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c0 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2 0-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c0-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4 1.3-.1 1.7-.1 4.9-.1Zm0 3.3a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13Zm0 10.7a4.2 4.2 0 1 1 0-8.4 4.2 4.2 0 0 1 0 8.4Zm6.8-10.9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z",
+  },
+];
 
 const COLUMNS = [
   {
@@ -44,19 +64,12 @@ export function Footer({
 
   return (
     <footer className="mt-16 border-t border-[var(--border-subtle)] bg-[var(--surface)]">
-      <div className="mx-auto max-w-7xl px-4 py-10">
+      <div className="shell py-10">
         <AdSlot position="footer" className="mb-10" />
 
         <div className="grid gap-8 lg:grid-cols-[1.4fr_repeat(3,1fr)]">
           <div>
-            <Link href="/" className="flex items-center gap-2">
-              <span className="flex size-9 items-center justify-center rounded-xl bg-brand-gradient text-lg font-black text-white">
-                W
-              </span>
-              <span className="text-[17px] font-extrabold tracking-tight">
-                Worldwide<span className="text-brand-gradient">Coupons</span>
-              </span>
-            </Link>
+            <Logo height={40} showTagline />
 
             <p className="mt-3 max-w-xs text-sm text-body">
               Hand-checked coupon codes and deals from the brands you already
@@ -64,20 +77,18 @@ export function Footer({
             </p>
 
             <div className="mt-4 flex gap-2">
-              {[
-                { label: "Facebook", href: "https://facebook.com" },
-                { label: "X", href: "https://x.com" },
-                { label: "Instagram", href: "https://instagram.com" },
-              ].map((social) => (
+              {SOCIALS.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer nofollow"
                   aria-label={social.label}
-                  className="flex size-9 items-center justify-center rounded-lg border border-[var(--border-subtle)] text-xs font-bold text-faint transition hover:border-brand-300 hover:text-brand-600"
+                  className="flex size-9 items-center justify-center rounded-xl border border-[var(--border-subtle)] text-[var(--text-muted)] transition hover:border-brand-400 hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-950/50"
                 >
-                  {social.label.charAt(0)}
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="size-4">
+                    <path d={social.path} />
+                  </svg>
                 </a>
               ))}
             </div>

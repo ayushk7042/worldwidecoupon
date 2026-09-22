@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { BrandImage } from "@/components/site/BrandImage";
 import { classNames, initials, tileColour } from "@/lib/format";
 import type { ImageRef } from "@/lib/types";
 
@@ -131,26 +132,28 @@ export function StoreLogo({
       style={{ width: size, height: size }}
     >
       {url ? (
-        // A plain <img>: these are third-party brand CDNs that frequently 404,
-        // and next/image turns a missing logo into a build-time error.
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        // Third-party brand CDNs 404 often, so the tile is the fallback rather
+        // than a broken-image icon.
+        <BrandImage
           src={url}
           alt={`${name} logo`}
-          width={size}
-          height={size}
-          loading="lazy"
-          decoding="async"
-          className="size-full object-contain p-1.5"
+          size={size}
+          fallback={<InitialsTile name={name} size={size} />}
         />
       ) : (
-        <span
-          className="flex size-full items-center justify-center font-bold text-white"
-          style={{ backgroundColor: tileColour(name), fontSize: size * 0.34 }}
-        >
-          {initials(name)}
-        </span>
+        <InitialsTile name={name} size={size} />
       )}
+    </span>
+  );
+}
+
+function InitialsTile({ name, size }: { name: string; size: number }) {
+  return (
+    <span
+      className="flex size-full items-center justify-center font-bold text-white"
+      style={{ backgroundColor: tileColour(name), fontSize: size * 0.34 }}
+    >
+      {initials(name)}
     </span>
   );
 }

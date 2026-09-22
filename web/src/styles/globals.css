@@ -1,54 +1,68 @@
 @import "tailwindcss";
 
+/**
+ * Dark mode follows the `dark` class that the theme script sets, not the OS
+ * media query. Without this every `dark:` utility would ignore the toggle in
+ * the header while the CSS variables under `.dark` switched anyway — which is
+ * exactly how the wordmark ended up black on a black header.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* =========================================================
    DESIGN TOKENS
 
-   One brand ramp (indigo → violet), one neutral ramp, and semantic aliases
-   on top. Components reference the semantic names only, so a rebrand is a
-   change to this block rather than a find-and-replace across the app.
+   The brand palette: a green ramp (#22C55E primary, #0E9F6E for hover and
+   active), a peach/pink accent ramp for soft surfaces and highlights, and a
+   charcoal neutral ramp. Components reference the semantic names only, so a
+   rebrand is a change to this block rather than a find-and-replace.
 ========================================================= */
 
 @theme {
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-200: #c7d2fe;
-  --color-brand-300: #a5b4fc;
-  --color-brand-400: #818cf8;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
-  --color-brand-800: #3730a3;
-  --color-brand-900: #312e81;
-  --color-brand-950: #1e1b4b;
+  --color-brand-50: #f0fdf5;
+  --color-brand-100: #dff7e9;
+  --color-brand-200: #b8efd0;
+  --color-brand-300: #7fe0ae;
+  --color-brand-400: #43cf86;
+  --color-brand-500: #22c55e;
+  --color-brand-600: #0e9f6e;
+  --color-brand-700: #0b7d58;
+  --color-brand-800: #0a6248;
+  --color-brand-900: #09503c;
+  --color-brand-950: #042f22;
 
-  --color-accent-400: #c084fc;
-  --color-accent-500: #a855f7;
-  --color-accent-600: #9333ea;
+  /* Peach and pink — backgrounds, cards and the brand-element icons. */
+  --color-accent-50: #fff7f4;
+  --color-accent-100: #ffe7e2;
+  --color-accent-200: #ffdcc7;
+  --color-accent-300: #fce7e9;
+  --color-accent-400: #f9a8c0;
+  --color-accent-500: #ec5c82;
+  --color-accent-600: #d93e6b;
 
   --color-ink-50: #f8fafc;
   --color-ink-100: #f1f5f9;
-  --color-ink-200: #e2e8f0;
-  --color-ink-300: #cbd5e1;
-  --color-ink-400: #94a3b8;
-  --color-ink-500: #64748b;
-  --color-ink-600: #475569;
-  --color-ink-700: #334155;
-  --color-ink-800: #1e293b;
-  --color-ink-900: #0f172a;
-  --color-ink-950: #020617;
+  --color-ink-200: #e5e7eb;
+  --color-ink-300: #d1d5db;
+  --color-ink-400: #9ca3af;
+  --color-ink-500: #6b7280;
+  --color-ink-600: #4b5563;
+  --color-ink-700: #374151;
+  --color-ink-800: #1f2937;
+  --color-ink-900: #111827;
+  --color-ink-950: #030712;
 
-  --color-success-50: #ecfdf5;
-  --color-success-500: #10b981;
-  --color-success-600: #059669;
-  --color-success-700: #047857;
+  --color-success-50: #f0fdf5;
+  --color-success-500: #22c55e;
+  --color-success-600: #0e9f6e;
+  --color-success-700: #0b7d58;
 
-  --color-warn-50: #fffbeb;
+  --color-warn-50: #fff8ed;
   --color-warn-500: #f59e0b;
   --color-warn-600: #d97706;
 
-  --color-danger-50: #fef2f2;
-  --color-danger-500: #ef4444;
-  --color-danger-600: #dc2626;
+  --color-danger-50: #fff1f3;
+  --color-danger-500: #f43f5e;
+  --color-danger-600: #e11d48;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, sans-serif;
@@ -59,9 +73,10 @@
   --radius-2xl: 1.125rem;
   --radius-3xl: 1.5rem;
 
-  --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 4px 16px -4px rgb(15 23 42 / 0.08);
-  --shadow-lift: 0 2px 4px 0 rgb(15 23 42 / 0.04), 0 12px 32px -8px rgb(15 23 42 / 0.16);
-  --shadow-glow: 0 8px 32px -8px rgb(99 102 241 / 0.45);
+  --shadow-card: 0 1px 2px 0 rgb(31 41 55 / 0.04), 0 4px 16px -4px rgb(31 41 55 / 0.08);
+  --shadow-lift: 0 2px 4px 0 rgb(31 41 55 / 0.04), 0 12px 32px -8px rgb(31 41 55 / 0.16);
+  --shadow-glow: 0 10px 30px -10px rgb(14 159 110 / 0.55);
+  --shadow-glow-strong: 0 18px 46px -14px rgb(14 159 110 / 0.7);
 
   --animate-shimmer: shimmer 2s linear infinite;
   --animate-rise: rise 0.35s cubic-bezier(0.16, 1, 0.3, 1);
@@ -95,30 +110,30 @@
     --surface: #ffffff;
     --surface-muted: #f8fafc;
     --surface-sunken: #f1f5f9;
-    --surface-inverse: #0f172a;
+    --surface-inverse: #111827;
 
-    --border-subtle: #e2e8f0;
-    --border-strong: #cbd5e1;
+    --border-subtle: #e5e7eb;
+    --border-strong: #d1d5db;
 
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #94a3b8;
+    --text-primary: #1f2937;
+    --text-secondary: #4b5563;
+    --text-muted: #6b7280;
     --text-inverse: #f8fafc;
   }
 
   .dark {
-    --surface: #0f172a;
-    --surface-muted: #131f36;
-    --surface-sunken: #1e293b;
+    --surface: #111827;
+    --surface-muted: #0b1220;
+    --surface-sunken: #1f2937;
     --surface-inverse: #f8fafc;
 
-    --border-subtle: #1e293b;
-    --border-strong: #334155;
+    --border-subtle: #1f2937;
+    --border-strong: #374151;
 
-    --text-primary: #f1f5f9;
-    --text-secondary: #cbd5e1;
-    --text-muted: #94a3b8;
-    --text-inverse: #0f172a;
+    --text-primary: #f3f4f6;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+    --text-inverse: #111827;
   }
 
   * {
@@ -199,8 +214,86 @@
   background-image: linear-gradient(
     135deg,
     var(--color-brand-600) 0%,
-    var(--color-brand-500) 45%,
-    var(--color-accent-500) 100%
+    var(--color-brand-500) 55%,
+    var(--color-brand-400) 100%
+  );
+}
+
+/**
+ * The page shell.
+ *
+ * Wider than Tailwind's 7xl so large screens are filled rather than framed by
+ * two bands of empty background, with the gutter growing as the screen does.
+ */
+@utility shell {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 100rem;
+  padding-inline: 1rem;
+
+  @media (min-width: 640px) {
+    padding-inline: 1.5rem;
+  }
+
+  @media (min-width: 1280px) {
+    padding-inline: 2.5rem;
+  }
+}
+
+/** The dark band behind the hero: deep ink with green light bleeding in. */
+@utility hero-mesh {
+  background-color: #0b1220;
+  background-image:
+    radial-gradient(48rem 28rem at 12% -10%, rgba(34, 197, 94, 0.38), transparent 70%),
+    radial-gradient(40rem 26rem at 88% 0%, rgba(14, 159, 110, 0.32), transparent 70%),
+    radial-gradient(32rem 22rem at 70% 110%, rgba(252, 231, 233, 0.16), transparent 70%),
+    linear-gradient(160deg, #0b1220 0%, #10261d 55%, #0b1220 100%);
+}
+
+/** A slow-moving brand aurora — the hero band's background. */
+@utility bg-aurora {
+  background-color: var(--surface);
+  background-image:
+    radial-gradient(38rem 22rem at 8% -20%, rgb(255 231 226 / 0.9), transparent 65%),
+    radial-gradient(34rem 20rem at 92% -10%, rgb(223 247 233 / 0.95), transparent 65%),
+    radial-gradient(30rem 18rem at 60% 120%, rgb(252 231 233 / 0.7), transparent 70%);
+}
+
+.dark .bg-aurora {
+  background-image:
+    radial-gradient(38rem 22rem at 8% -20%, rgb(14 159 110 / 0.22), transparent 65%),
+    radial-gradient(34rem 20rem at 92% -10%, rgb(34 197 94 / 0.16), transparent 65%),
+    radial-gradient(30rem 18rem at 60% 120%, rgb(236 92 130 / 0.12), transparent 70%);
+}
+
+/** A 1px gradient border: wrap the content in a `surface` child. */
+@utility gradient-ring {
+  background-image: linear-gradient(140deg, var(--color-brand-400), var(--color-accent-300) 55%, var(--color-brand-300));
+  padding: 1px;
+}
+
+/** Lift-on-hover, used by cards and tiles. */
+@utility hover-lift {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+/** Fades the right edge of a horizontal rail so it reads as scrollable. */
+@utility rail-fade {
+  mask-image: linear-gradient(to right, black calc(100% - 3rem), transparent);
+}
+
+/** The soft peach wash behind hero and promo sections. */
+@utility bg-peach-gradient {
+  background-image: linear-gradient(
+    135deg,
+    var(--color-accent-100) 0%,
+    var(--color-accent-200) 50%,
+    var(--color-brand-100) 100%
   );
 }
 
@@ -208,7 +301,7 @@
   background-image: linear-gradient(
     120deg,
     var(--color-brand-600),
-    var(--color-accent-500)
+    var(--color-brand-500)
   );
   background-clip: text;
   color: transparent;

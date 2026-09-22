@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
+import { LogoMark } from "@/components/site/Logo";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { classNames } from "@/lib/format";
 import type { AdminPermission } from "@/lib/types";
@@ -65,9 +66,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         )}
       >
         <div className="flex h-16 items-center gap-2 border-b border-[var(--border-subtle)] px-5">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-brand-gradient text-sm font-black text-white">
-            W
-          </span>
+          <LogoMark size={30} title="" />
           <span className="text-sm font-extrabold tracking-tight">Admin panel</span>
         </div>
 

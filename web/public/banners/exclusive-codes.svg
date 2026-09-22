@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300" role="img"
+     aria-label="Exclusive codes you will not find elsewhere — WorldwideCoupons">
+  <defs>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#0E9F6E" flood-opacity="0.22"/>
+    </filter>
+    <filter id="card" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#1F2937" flood-opacity="0.18"/>
+    </filter>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="26"/>
+    </filter>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.6" fill="#0E9F6E" opacity="0.14"/>
+    </pattern>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F0FDF5"/>
+      <stop offset="50%" stop-color="#DFF7E9"/>
+      <stop offset="100%" stop-color="#FCE7E9"/>
+    </linearGradient>
+    <linearGradient id="cta2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0E9F6E"/>
+      <stop offset="100%" stop-color="#22C55E"/>
+    </linearGradient>
+    <linearGradient id="chip" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1F2937"/>
+      <stop offset="100%" stop-color="#0B7D58"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="300" rx="28" fill="url(#bg2)"/>
+  <rect width="1200" height="300" rx="28" fill="url(#dots)" opacity="0.45"/>
+
+  <g filter="url(#blur)" opacity="0.6">
+    <circle cx="980" cy="250" r="130" fill="#FFFFFF"/>
+    <circle cx="240" cy="-10" r="110" fill="#FFFFFF"/>
+  </g>
+
+  <g transform="translate(60 46)">
+    <rect width="186" height="34" rx="17" fill="#0E9F6E"/>
+    <text x="22" y="22.5" font-size="13" font-weight="700" letter-spacing="1.8" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">MEMBERS ONLY</text>
+
+    <text x="0" y="90" font-size="44" font-weight="800" fill="#1F2937" letter-spacing="-1.4" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Exclusive codes you</text>
+    <text x="0" y="138" font-size="44" font-weight="800" fill="#0E9F6E" letter-spacing="-1.4" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">will not find elsewhere</text>
+
+    <text x="0" y="173" font-size="17" font-weight="500" fill="#4B5563" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Negotiated for this site, not on the brand&#8217;s own page.</text>
+
+    <g transform="translate(0 192)" filter="url(#soft)">
+      <rect width="206" height="54" rx="27" fill="url(#cta2)"/>
+      <text x="103" y="34.5" text-anchor="middle" font-size="17" font-weight="800" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">See exclusives &#8594;</text>
+    </g>
+
+    <g transform="translate(226 199)">
+      <text x="0" y="16" font-size="17" font-weight="800" fill="#1F2937" letter-spacing="-0.4" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Worldwide<tspan fill="#0E9F6E">Coupons</tspan></text>
+      <text x="0" y="34" font-size="10.5" font-weight="600" fill="#6B7280" letter-spacing="1.5" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">BETTER DEALS. BIGGER SAVINGS.</text>
+    </g>
+  </g>
+
+  <g filter="url(#card)">
+    <g transform="translate(706 48) rotate(-5)">
+      <rect width="300" height="96" rx="22" fill="url(#chip)"/>
+      <text x="28" y="38" font-size="12" font-weight="700" letter-spacing="1.6" fill="#8FE3B9" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">EXCLUSIVE CODE</text>
+      <text x="28" y="72" font-size="29" font-weight="800" letter-spacing="2.2" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">WWC-EXTRA20</text>
+      <circle cx="0" cy="48" r="12" fill="#DFF7E9"/>
+      <circle cx="300" cy="48" r="12" fill="#FCE7E9"/>
+    </g>
+
+    <g transform="translate(886 158) rotate(6)">
+      <rect width="150" height="58" rx="16" fill="#FFFFFF"/>
+      <text x="75" y="37" text-anchor="middle" font-size="21" font-weight="800" fill="#D93E6B" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">+20% OFF</text>
+    </g>
+
+    <g transform="translate(700 176) rotate(-3)">
+      <rect width="168" height="52" rx="14" fill="#FFFFFF"/>
+      <circle cx="30" cy="26" r="11" fill="#DFF7E9"/>
+      <text x="30" y="31" text-anchor="middle" font-size="12" font-weight="800" fill="#0E9F6E" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">&#10003;</text>
+      <text x="52" y="31" font-size="14" font-weight="700" fill="#1F2937" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Verified today</text>
+    </g>
+  </g>
+</svg>

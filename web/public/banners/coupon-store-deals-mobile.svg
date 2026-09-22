@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400" role="img"
+     aria-label="Save on 190 plus brands every day — WorldwideCoupons">
+  <defs>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#0E9F6E" flood-opacity="0.22"/>
+    </filter>
+    <filter id="card" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#1F2937" flood-opacity="0.18"/>
+    </filter>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="24"/>
+    </filter>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.6" fill="#0E9F6E" opacity="0.13"/>
+    </pattern>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFF1EC"/>
+      <stop offset="45%" stop-color="#FFE7E2"/>
+      <stop offset="100%" stop-color="#DFF7E9"/>
+    </linearGradient>
+    <linearGradient id="cta" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0E9F6E"/>
+      <stop offset="100%" stop-color="#22C55E"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="400" rx="26" fill="url(#bg)"/>
+  <rect width="800" height="400" rx="26" fill="url(#dots)" opacity="0.5"/>
+  <g filter="url(#blur)" opacity="0.55">
+    <circle cx="720" cy="40" r="120" fill="#FFFFFF"/>
+    <circle cx="90" cy="380" r="100" fill="#FFFFFF"/>
+  </g>
+
+  <g transform="translate(48 48)">
+    <rect width="216" height="38" rx="19" fill="#1F2937"/>
+    <circle cx="22" cy="19" r="6" fill="#22C55E"/>
+    <text x="40" y="25" font-size="14" font-weight="700" letter-spacing="1.8" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">COUPON STORE</text>
+  </g>
+
+  <text x="48" y="176" font-size="47" font-weight="800" fill="#1F2937" letter-spacing="-1.4" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Save on 190+</text>
+  <text x="48" y="230" font-size="47" font-weight="800" fill="#0E9F6E" letter-spacing="-1.4" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">brands, daily</text>
+  <text x="48" y="270" font-size="19" font-weight="500" fill="#4B5563" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Hand-checked codes. No dead links.</text>
+
+  <g transform="translate(48 292)" filter="url(#soft)">
+    <rect width="250" height="54" rx="27" fill="url(#cta)"/>
+    <text x="125" y="34.5" text-anchor="middle" font-size="18" font-weight="800" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Grab today&#8217;s deals &#8594;</text>
+  </g>
+
+  <g filter="url(#card)" transform="translate(540 92) rotate(-7)">
+    <rect width="200" height="74" rx="18" fill="#FFFFFF"/>
+    <circle cx="0" cy="37" r="10" fill="#FFE7E2"/>
+    <circle cx="200" cy="37" r="10" fill="#DFF7E9"/>
+    <text x="24" y="32" font-size="11" font-weight="700" letter-spacing="1.3" fill="#9CA3AF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">FLAT DISCOUNT</text>
+    <text x="24" y="58" font-size="25" font-weight="800" fill="#0E9F6E" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">50% OFF</text>
+  </g>
+
+  <g filter="url(#card)" transform="translate(556 216) rotate(5)">
+    <rect width="196" height="54" rx="16" fill="#1F2937"/>
+    <circle cx="30" cy="27" r="11" fill="#22C55E"/>
+    <text x="30" y="32" text-anchor="middle" font-size="12" font-weight="800" fill="#06281C" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">%</text>
+    <text x="52" y="32" font-size="14.5" font-weight="700" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">FREE SHIPPING</text>
+  </g>
+
+  <g transform="translate(752 62)">
+    <text x="0" y="0" text-anchor="end" font-size="19" font-weight="800" fill="#1F2937" letter-spacing="-0.4" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Worldwide<tspan fill="#0E9F6E">Coupons</tspan></text>
+    <text x="0" y="20" text-anchor="end" font-size="11" font-weight="600" fill="#6B7280" letter-spacing="1.5" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">BETTER DEALS. BIGGER SAVINGS.</text>
+  </g>
+
+</svg>

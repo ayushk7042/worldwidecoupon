@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useAdmin } from "@/components/admin/AdminProvider";
+import { LogoMark } from "@/components/site/Logo";
 import { Button } from "@/components/ui/Button";
 import { FormError, Input } from "@/components/ui/form";
 import { Card } from "@/components/ui/primitives";
@@ -55,10 +56,10 @@ export default function AdminLoginPage() {
     <div className="flex min-h-dvh items-center justify-center surface-muted px-4">
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <span className="mx-auto mb-3 flex size-12 items-center justify-center rounded-2xl bg-brand-gradient text-xl font-black text-white shadow-[var(--shadow-glow)]">
-            W
-          </span>
-          <h1 className="text-xl font-extrabold">WorldwideCoupons</h1>
+          <LogoMark size={52} className="mx-auto mb-3" />
+          <h1 className="text-xl font-extrabold">
+            Worldwide<span className="text-brand-600">Coupons</span>
+          </h1>
           <p className="mt-1 text-sm text-body">Sign in to the admin panel</p>
         </div>
 
