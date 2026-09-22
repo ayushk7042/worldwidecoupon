@@ -26,9 +26,9 @@
     <circle cx="1056" cy="60" r="150" fill="#22C55E" opacity="0.32" filter="url(#glow)"/>
   </g>
   <g transform="translate(64 54)">
-    <rect width="152" height="36" rx="18" fill="#10241C"/>
-    <circle cx="20" cy="18" r="5" fill="#22C55E"/>
-    <text x="36" y="23" font-size="13" font-weight="700" letter-spacing="1.7" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">COUPON STORE</text>
+    <rect width="170" height="34" rx="17" fill="#10241C"/>
+    <circle cx="19" cy="17" r="4.5" fill="#43CF86"/>
+    <text x="34" y="22.5" font-size="12.5" font-weight="700" letter-spacing="1.8" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">COUPON STORE</text>
   </g>
   <text x="64" y="166" font-size="50" font-weight="800" fill="#10241C" text-anchor="start" letter-spacing="-1.6" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Real savings,</text>
   <text x="64" y="222" font-size="50" font-weight="800" fill="#0E9F6E" text-anchor="start" letter-spacing="-1.6" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">not stale codes</text>

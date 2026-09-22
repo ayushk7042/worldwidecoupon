@@ -329,7 +329,7 @@ export default function AdminHomepagePage() {
                       label="Background"
                       value={banner.background ?? ""}
                       onChange={(event) => patch({ background: event.target.value })}
-                      placeholder="#FFE7E2 or a CSS gradient"
+                      placeholder="#F1E3D1 or a CSS gradient"
                     />
                   </div>
                 </div>

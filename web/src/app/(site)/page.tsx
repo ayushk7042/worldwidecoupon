@@ -830,27 +830,22 @@ function BrandCard({ store }: { store: Store }) {
   return (
     <Link
       href={`/store/${store.slug}`}
-      className="surface group flex flex-col items-center gap-2.5 rounded-2xl border border-[var(--border-subtle)] p-4 text-center shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]"
+      className="surface group flex flex-col items-center gap-2 rounded-2xl border border-[var(--border-subtle)] px-3 py-3.5 text-center shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]"
     >
       {/* The logo is the point of this card, so it gets the room. */}
-      <span className="flex size-16 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-1.5 transition-transform duration-200 group-hover:scale-105">
-        <StoreLogo name={store.name} logo={store.logo} size={52} rounded="rounded-xl" className="border-0" />
+      <span className="flex size-[4.5rem] items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-1.5 transition-transform duration-200 group-hover:scale-105">
+        <StoreLogo name={store.name} logo={store.logo} size={62} rounded="rounded-xl" className="border-0" />
       </span>
 
-      <span className="min-w-0 w-full">
-        <span className="block truncate text-sm font-bold transition-colors group-hover:text-brand-700 dark:group-hover:text-brand-300">
+      <span className="w-full min-w-0">
+        <span className="block truncate text-[13px] font-bold transition-colors group-hover:text-brand-700 dark:group-hover:text-brand-300">
           {store.name}
         </span>
         <span className="block text-[11px] font-semibold text-faint">
           {formatCount(store.activeCouponCount)} offers
+          {store.bestOffer ? ` · ${store.bestOffer}` : ""}
         </span>
       </span>
-
-      {store.bestOffer ? (
-        <span className="max-w-full truncate rounded-full bg-brand-50 px-2.5 py-0.5 text-[11px] font-bold text-brand-700 dark:bg-brand-950/70 dark:text-brand-300">
-          {store.bestOffer}
-        </span>
-      ) : null}
     </Link>
   );
 }
@@ -961,49 +956,41 @@ function CategoryRail({
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
         {categories.slice(0, 12).map((category, index) => (
           <Link
             key={category._id}
             href={`/category/${category.slug}`}
-            className="surface group relative flex items-center gap-3 overflow-hidden rounded-2xl border border-[var(--border-subtle)] p-3 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]"
+            className="surface group relative flex flex-col items-center gap-2 overflow-hidden rounded-2xl border border-[var(--border-subtle)] px-3 py-4 text-center shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]"
           >
-            {/* The tint slides in from the corner on hover. */}
             <span
               aria-hidden
               className={classNames(
-                "pointer-events-none absolute -right-10 -top-10 size-24 rounded-full opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100",
+                "pointer-events-none absolute inset-x-0 -top-12 h-24 opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100",
                 index % 2 ? "bg-accent-200" : "bg-brand-200"
               )}
             />
 
             <span
               className={classNames(
-                "relative flex size-12 shrink-0 items-center justify-center rounded-2xl text-brand-700 ring-1 ring-inset transition-transform duration-300 group-hover:scale-110 dark:text-brand-300",
+                "relative flex size-14 items-center justify-center rounded-2xl ring-1 ring-inset transition-transform duration-300 group-hover:scale-110",
                 index % 3 === 0
-                  ? "bg-gradient-to-br from-brand-100 to-brand-50 ring-brand-200/70 dark:from-brand-950 dark:to-brand-900/50 dark:ring-brand-800"
+                  ? "bg-gradient-to-br from-brand-100 to-brand-50 text-brand-700 ring-brand-200/70 dark:from-brand-950 dark:to-brand-900/50 dark:text-brand-300 dark:ring-brand-800"
                   : index % 3 === 1
-                    ? "bg-gradient-to-br from-accent-100 to-accent-50 ring-accent-200/70 dark:from-brand-950 dark:to-brand-900/50 dark:ring-brand-800"
-                    : "bg-gradient-to-br from-accent-300 to-accent-100 ring-accent-200/70 dark:from-brand-950 dark:to-brand-900/50 dark:ring-brand-800"
+                    ? "bg-gradient-to-br from-accent-100 to-accent-50 text-accent-600 ring-accent-200/70 dark:from-brand-950 dark:to-brand-900/50 dark:text-brand-300 dark:ring-brand-800"
+                    : "bg-gradient-to-br from-accent-300 to-accent-100 text-accent-600 ring-accent-200/70 dark:from-brand-950 dark:to-brand-900/50 dark:text-brand-300 dark:ring-brand-800"
               )}
             >
-              <CategoryIcon name={category.name} className="size-6" />
+              <CategoryIcon name={category.name} className="size-7" />
             </span>
 
-            <span className="relative min-w-0 flex-1">
-              <span className="block truncate text-sm font-bold transition-colors group-hover:text-brand-700 dark:group-hover:text-brand-300">
+            <span className="relative w-full min-w-0">
+              <span className="block w-full truncate text-[13px] font-bold transition-colors group-hover:text-brand-700 dark:group-hover:text-brand-300">
                 {category.name}
               </span>
-              <span className="block text-xs font-semibold text-faint">
+              <span className="mt-0.5 block text-[11px] font-semibold text-faint">
                 {formatCount(category.activeCouponCount)} offers
               </span>
-            </span>
-
-            <span
-              aria-hidden
-              className="relative shrink-0 text-sm text-faint opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100"
-            >
-              →
             </span>
           </Link>
         ))}

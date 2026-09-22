@@ -260,15 +260,15 @@ function Arrow({ side, onClick }: { side: "left" | "right"; onClick: () => void 
 /** Shipped artwork, used until an editor uploads real banners. */
 export const DEFAULT_BANNERS: HomepageBanner[] = [
   {
-    image: { url: "/banners/coupon-store-deals.svg", alt: "Coupon store deals from 190+ brands" },
+    image: { url: "/banners/coupon-store-deals.svg", alt: "Real savings, not stale codes" },
     mobileImage: { url: "/banners/coupon-store-deals-mobile.svg", alt: "" },
-    title: "Deals from 190+ brands",
+    title: "Real savings, not stale codes",
     link: "/coupons",
     order: 0,
     active: true,
   },
   {
-    image: { url: "/banners/exclusive-codes.svg", alt: "Exclusive codes, members first" },
+    image: { url: "/banners/exclusive-codes.svg", alt: "Codes you will not find anywhere else" },
     mobileImage: { url: "/banners/exclusive-codes-mobile.svg", alt: "" },
     title: "Exclusive codes",
     link: "/coupons?exclusive=true",
@@ -276,9 +276,9 @@ export const DEFAULT_BANNERS: HomepageBanner[] = [
     active: true,
   },
   {
-    image: { url: "/banners/free-shipping.svg", alt: "Free shipping offers this week" },
+    image: { url: "/banners/free-shipping.svg", alt: "Delivery on us, no minimum spend" },
     mobileImage: { url: "/banners/free-shipping-mobile.svg", alt: "" },
-    title: "Free shipping this week",
+    title: "Delivery on us",
     link: "/coupons?type=freeshipping",
     order: 2,
     active: true,

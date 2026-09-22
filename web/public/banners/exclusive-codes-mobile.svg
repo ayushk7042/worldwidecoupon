@@ -26,8 +26,9 @@
     <circle cx="720" cy="370" r="130" fill="#FCE7E9" opacity="0.9" filter="url(#glow)"/>
   </g>
   <g transform="translate(48 34)">
-    <rect width="152" height="36" rx="18" fill="#FFFFFF"/>
-    <text x="22" y="23" font-size="13" font-weight="700" letter-spacing="1.7" fill="#8FE3B9" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">MEMBERS ONLY</text>
+    <rect width="170" height="34" rx="17" fill="#FFFFFF"/>
+    <circle cx="19" cy="17" r="4.5" fill="#0E9F6E"/>
+    <text x="34" y="22.5" font-size="12.5" font-weight="700" letter-spacing="1.8" fill="#0B3B2A" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">MEMBERS ONLY</text>
   </g>
   <text x="48" y="126" font-size="36" font-weight="800" fill="#FFFFFF" text-anchor="start" letter-spacing="-1.6" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Codes you will not</text>
   <text x="48" y="172" font-size="36" font-weight="800" fill="#43CF86" text-anchor="start" letter-spacing="-1.6" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">find anywhere else</text>

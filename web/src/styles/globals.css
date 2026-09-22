@@ -11,33 +11,34 @@
 /* =========================================================
    DESIGN TOKENS
 
-   The brand palette: a green ramp (#22C55E primary, #0E9F6E for hover and
-   active), a peach/pink accent ramp for soft surfaces and highlights, and a
-   charcoal neutral ramp. Components reference the semantic names only, so a
-   rebrand is a change to this block rather than a find-and-replace.
+   The brand palette: a mint ramp (#BBF1D2 primary tint) for buttons, links
+   and highlights, a coral/peach accent ramp (#FF9D9D, #FFC5AA) for soft
+   surfaces and badges, and a charcoal neutral ramp. Components reference the
+   semantic names only, so a rebrand is a change to this block rather than a
+   find-and-replace.
 ========================================================= */
 
 @theme {
-  --color-brand-50: #f0fdf5;
-  --color-brand-100: #dff7e9;
-  --color-brand-200: #b8efd0;
-  --color-brand-300: #7fe0ae;
-  --color-brand-400: #43cf86;
-  --color-brand-500: #22c55e;
-  --color-brand-600: #0e9f6e;
-  --color-brand-700: #0b7d58;
-  --color-brand-800: #0a6248;
-  --color-brand-900: #09503c;
-  --color-brand-950: #042f22;
+  --color-brand-50: #f2fdf7;
+  --color-brand-100: #e1faed;
+  --color-brand-200: #bbf1d2;
+  --color-brand-300: #93e6b8;
+  --color-brand-400: #66d89b;
+  --color-brand-500: #3fc881;
+  --color-brand-600: #2aa868;
+  --color-brand-700: #1f8552;
+  --color-brand-800: #19673f;
+  --color-brand-900: #14512f;
+  --color-brand-950: #0a2e1b;
 
-  /* Peach and pink — backgrounds, cards and the brand-element icons. */
-  --color-accent-50: #fff7f4;
-  --color-accent-100: #ffe7e2;
-  --color-accent-200: #ffdcc7;
-  --color-accent-300: #fce7e9;
-  --color-accent-400: #f9a8c0;
-  --color-accent-500: #ec5c82;
-  --color-accent-600: #d93e6b;
+  /* Coral and peach — backgrounds, cards and the brand-element icons. */
+  --color-accent-50: #fff7f5;
+  --color-accent-100: #ffe9e2;
+  --color-accent-200: #ffc5aa;
+  --color-accent-300: #ff9d9d;
+  --color-accent-400: #fa7d7d;
+  --color-accent-500: #f05f5f;
+  --color-accent-600: #d43f3f;
 
   --color-ink-50: #f8fafc;
   --color-ink-100: #f1f5f9;
@@ -73,10 +74,10 @@
   --radius-2xl: 1.125rem;
   --radius-3xl: 1.5rem;
 
-  --shadow-card: 0 1px 2px 0 rgb(31 41 55 / 0.04), 0 4px 16px -4px rgb(31 41 55 / 0.08);
-  --shadow-lift: 0 2px 4px 0 rgb(31 41 55 / 0.04), 0 12px 32px -8px rgb(31 41 55 / 0.16);
-  --shadow-glow: 0 10px 30px -10px rgb(14 159 110 / 0.55);
-  --shadow-glow-strong: 0 18px 46px -14px rgb(14 159 110 / 0.7);
+  --shadow-card: 0 1px 2px 0 rgb(16 30 25 / 0.05), 0 6px 20px -8px rgb(16 30 25 / 0.1);
+  --shadow-lift: 0 2px 6px 0 rgb(16 30 25 / 0.05), 0 18px 40px -14px rgb(16 30 25 / 0.2);
+  --shadow-glow: 0 10px 30px -10px rgb(42 168 104 / 0.55);
+  --shadow-glow-strong: 0 18px 46px -14px rgb(42 168 104 / 0.7);
 
   --animate-shimmer: shimmer 2s linear infinite;
   --animate-marquee: marquee 42s linear infinite;
@@ -112,34 +113,46 @@
 ========================================================= */
 
 @layer base {
+  /*
+   * The neutrals carry a trace of the brand green rather than being pure
+   * grey. It is the difference between a page that looks like a template and
+   * one that looks like it belongs to this logo.
+   */
   :root {
     --surface: #ffffff;
-    --surface-muted: #f8fafc;
-    --surface-sunken: #f1f5f9;
-    --surface-inverse: #111827;
+    --surface-muted: #f5f8f6;
+    --surface-sunken: #eef3f0;
+    --surface-inverse: #0f1714;
 
-    --border-subtle: #e5e7eb;
-    --border-strong: #d1d5db;
+    --border-subtle: #e4eae6;
+    --border-strong: #cdd8d2;
 
-    --text-primary: #1f2937;
-    --text-secondary: #4b5563;
-    --text-muted: #6b7280;
-    --text-inverse: #f8fafc;
+    --text-primary: #101e19;
+    --text-secondary: #44554e;
+    --text-muted: #77877f;
+    --text-inverse: #f5f8f6;
+  }
+
+  /* The light washes on `body` would grey out the dark theme. */
+  .dark body {
+    background-image:
+      radial-gradient(60rem 30rem at 100% -10%, rgb(14 159 110 / 0.14), transparent 60%),
+      radial-gradient(48rem 26rem at -10% 10%, rgb(34 197 94 / 0.08), transparent 60%);
   }
 
   .dark {
-    --surface: #111827;
-    --surface-muted: #0b1220;
-    --surface-sunken: #1f2937;
-    --surface-inverse: #f8fafc;
+    --surface: #101a16;
+    --surface-muted: #080e0c;
+    --surface-sunken: #17241f;
+    --surface-inverse: #f5f8f6;
 
-    --border-subtle: #1f2937;
-    --border-strong: #374151;
+    --border-subtle: #1c2a24;
+    --border-strong: #2a3b33;
 
-    --text-primary: #f3f4f6;
-    --text-secondary: #d1d5db;
-    --text-muted: #9ca3af;
-    --text-inverse: #111827;
+    --text-primary: #eaf2ed;
+    --text-secondary: #c2d0c9;
+    --text-muted: #8fa099;
+    --text-inverse: #101a16;
   }
 
   * {
@@ -153,6 +166,10 @@
 
   body {
     background: var(--surface-muted);
+    background-image:
+      radial-gradient(60rem 30rem at 100% -10%, rgb(223 247 233 / 0.55), transparent 60%),
+      radial-gradient(48rem 26rem at -10% 10%, rgb(255 231 226 / 0.45), transparent 60%);
+    background-attachment: fixed;
     color: var(--text-primary);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -246,30 +263,30 @@
   }
 }
 
-/** The dark band behind the hero: deep ink with green light bleeding in. */
+/** The dark band behind the hero: deep ink with mint light bleeding in. */
 @utility hero-mesh {
   background-color: #0b1220;
   background-image:
-    radial-gradient(48rem 28rem at 12% -10%, rgba(34, 197, 94, 0.38), transparent 70%),
-    radial-gradient(40rem 26rem at 88% 0%, rgba(14, 159, 110, 0.32), transparent 70%),
-    radial-gradient(32rem 22rem at 70% 110%, rgba(252, 231, 233, 0.16), transparent 70%),
-    linear-gradient(160deg, #0b1220 0%, #10261d 55%, #0b1220 100%);
+    radial-gradient(48rem 28rem at 12% -10%, rgba(63, 200, 129, 0.38), transparent 70%),
+    radial-gradient(40rem 26rem at 88% 0%, rgba(42, 168, 104, 0.32), transparent 70%),
+    radial-gradient(32rem 22rem at 70% 110%, rgba(255, 197, 170, 0.16), transparent 70%),
+    linear-gradient(160deg, #0b1220 0%, #0f2a1e 55%, #0b1220 100%);
 }
 
 /** A slow-moving brand aurora — the hero band's background. */
 @utility bg-aurora {
   background-color: var(--surface);
   background-image:
-    radial-gradient(38rem 22rem at 8% -20%, rgb(255 231 226 / 0.9), transparent 65%),
-    radial-gradient(34rem 20rem at 92% -10%, rgb(223 247 233 / 0.95), transparent 65%),
-    radial-gradient(30rem 18rem at 60% 120%, rgb(252 231 233 / 0.7), transparent 70%);
+    radial-gradient(38rem 22rem at 8% -20%, rgb(255 197 170 / 0.9), transparent 65%),
+    radial-gradient(34rem 20rem at 92% -10%, rgb(225 250 237 / 0.95), transparent 65%),
+    radial-gradient(30rem 18rem at 60% 120%, rgb(255 233 226 / 0.7), transparent 70%);
 }
 
 .dark .bg-aurora {
   background-image:
-    radial-gradient(38rem 22rem at 8% -20%, rgb(14 159 110 / 0.22), transparent 65%),
-    radial-gradient(34rem 20rem at 92% -10%, rgb(34 197 94 / 0.16), transparent 65%),
-    radial-gradient(30rem 18rem at 60% 120%, rgb(236 92 130 / 0.12), transparent 70%);
+    radial-gradient(38rem 22rem at 8% -20%, rgb(42 168 104 / 0.22), transparent 65%),
+    radial-gradient(34rem 20rem at 92% -10%, rgb(63 200 129 / 0.16), transparent 65%),
+    radial-gradient(30rem 18rem at 60% 120%, rgb(212 63 63 / 0.12), transparent 70%);
 }
 
 /** A 1px gradient border: wrap the content in a `surface` child. */

@@ -69,17 +69,27 @@ def text(x, y, body, size, weight=700, fill="#10241C", anchor="start", spacing=0
     )
 
 
-def pill(layout, x, y, label, bg, fg, dot=None, size=13, spacing=1.7):
-    width = 40 + len(label) * (size * 0.72)
-    height = 36
-    dot_markup = f'    <circle cx="20" cy="18" r="5" fill="{dot}"/>\n' if dot else ""
-    text_x = 36 if dot else 22
+def pill(layout, x, y, label, bg, fg, dot=None, size=12.5, spacing=1.8, outline=None):
+    """The eyebrow above a headline.
+
+    The width is measured from the glyphs and the tracking rather than
+    guessed, so the label never touches the rounded end of its own pill.
+    """
+    pad_left = 34 if dot else 20
+    pad_right = 20
+    text_width = len(label) * (size * 0.63 + spacing)
+    width = pad_left + text_width + pad_right
+    height = 34
+
+    dot_markup = f'    <circle cx="19" cy="17" r="4.5" fill="{dot}"/>\n' if dot else ""
+    stroke = f' stroke="{outline}" stroke-opacity="0.35" stroke-width="1.5"' if outline else ""
+
     layout.add(
         (x, y, width, height),
         f'  <g transform="translate({x} {y})">\n'
-        f'    <rect width="{width:.0f}" height="{height}" rx="18" fill="{bg}"/>\n'
+        f'    <rect width="{width:.0f}" height="{height}" rx="{height / 2:.0f}" fill="{bg}"{stroke}/>\n'
         f"{dot_markup}"
-        f'    <text x="{text_x}" y="23" font-size="{size}" font-weight="700" letter-spacing="{spacing}" '
+        f'    <text x="{pad_left}" y="22.5" font-size="{size}" font-weight="700" letter-spacing="{spacing}" '
         f'fill="{fg}" font-family="{FONT}">{label}</text>\n'
         f"  </g>",
     )
@@ -234,7 +244,7 @@ def deals(width, height, mobile):
         )
 
     x = 64 if not mobile else 48
-    pill(layout, x, 54 if not mobile else 40, "COUPON STORE", "#10241C", "#FFFFFF", dot="#22C55E")
+    pill(layout, x, 54 if not mobile else 40, "COUPON STORE", "#10241C", "#FFFFFF", dot="#43CF86")
 
     if not mobile:
         headline(layout, x, 166, "Real savings,", 50, "#10241C", 420)
@@ -269,7 +279,7 @@ def exclusive(width, height, mobile):
             f'    <circle cx="{width - 120}" cy="{height - 40}" r="150" fill="#FCE7E9" opacity="0.9" filter="url(#glow)"/>\n'
             '  </g>'
         )
-        pill(layout, 64, 54, "MEMBERS ONLY", "#FFFFFF", "#8FE3B9")
+        pill(layout, 64, 54, "MEMBERS ONLY", "#FFFFFF", "#0B3B2A", dot="#0E9F6E")
         headline(layout, 64, 168, "Codes you", 44, "#FFFFFF", 340)
         headline(layout, 64, 220, "will not find", 44, "#43CF86", 360)
         headline(layout, 64, 272, "anywhere else", 44, "#FFFFFF", 380)
@@ -286,7 +296,7 @@ def exclusive(width, height, mobile):
             f'    <circle cx="{width - 80}" cy="{height - 30}" r="130" fill="#FCE7E9" opacity="0.9" filter="url(#glow)"/>\n'
             '  </g>'
         )
-        pill(layout, 48, 34, "MEMBERS ONLY", "#FFFFFF", "#8FE3B9")
+        pill(layout, 48, 34, "MEMBERS ONLY", "#FFFFFF", "#0B3B2A", dot="#0E9F6E")
         headline(layout, 48, 126, "Codes you will not", 36, "#FFFFFF", 480)
         headline(layout, 48, 172, "find anywhere else", 36, "#43CF86", 480)
         ticket(layout, 48, 236, 420, 96, "WWC-EXTRA20", "20%")
@@ -307,19 +317,19 @@ def shipping(width, height, mobile):
     )
 
     x = 64 if not mobile else 48
-    pill(layout, x, 54 if not mobile else 38, "THIS WEEK ONLY", "#10241C", "#FFFFFF", dot="#FFDCC7")
+    pill(layout, x, 54 if not mobile else 38, "POSTAGE COVERED", "#10241C", "#FFFFFF", dot="#FFDCC7")
 
     if not mobile:
-        headline(layout, x, 166, "Free delivery,", 48, "#10241C", 400)
+        headline(layout, x, 166, "Delivery on us,", 48, "#10241C", 420)
         headline(layout, x, 220, "no minimum spend", 48, "#0E9F6E", 490)
         paragraph(layout, x, 260, "Hundreds of shops are covering the postage.", 17, 470)
         chips(layout, x, 278, ["No minimum spend", "Hundreds of stores"])
         button(layout, x, 322, "Browse the offers")
         parcel(layout, 858, 92, 246, 186)
-        note(layout, 610, 200, 216, 52, "Free delivery")
+        note(layout, 610, 200, 232, 52, "No code needed")
         lockup(layout, width - 64, height - 46)
     else:
-        headline(layout, x, 144, "Free delivery,", 40, "#10241C", 340)
+        headline(layout, x, 144, "Delivery on us,", 40, "#10241C", 360)
         headline(layout, x, 192, "no minimum", 40, "#0E9F6E", 320)
         paragraph(layout, x, 228, "Hundreds of shops, postage covered.", 16, 380)
         chips(layout, x, 244, ["No minimum", "This week"])
@@ -327,7 +337,7 @@ def shipping(width, height, mobile):
         parcel(layout, 560, 60, 200, 150)
         lockup(layout, width - 48, height - 42)
 
-    return layout.render("Free delivery with no minimum spend — WorldwideCoupons")
+    return layout.render("Delivery on us, no minimum spend — WorldwideCoupons")
 
 
 for name, builder in [
