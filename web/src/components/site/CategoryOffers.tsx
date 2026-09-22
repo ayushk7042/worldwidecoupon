@@ -81,12 +81,12 @@ export function CategoryOffers({ groups }: { groups: CategoryGroup[] }) {
       </div>
 
       {/* ---- the sliding strip of categories ---- */}
-      <div className="relative">
+      <div className="flex items-center gap-2">
         <button
           type="button"
           aria-label="Previous categories"
           onClick={() => nudge(-1)}
-          className="surface absolute -left-3 top-1/2 z-10 hidden size-8 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--border-subtle)] shadow-[var(--shadow-card)] transition hover:border-brand-300 hover:text-brand-600 lg:flex"
+          className="surface hidden size-9 shrink-0 items-center justify-center rounded-full border border-[var(--border-subtle)] shadow-[var(--shadow-card)] transition hover:border-brand-300 hover:text-brand-600 lg:flex"
         >
           <ChevronLeft aria-hidden className="size-4" />
         </button>
@@ -97,7 +97,7 @@ export function CategoryOffers({ groups }: { groups: CategoryGroup[] }) {
           onPointerMove={onPointerMove}
           onPointerUp={endDrag}
           onPointerLeave={endDrag}
-          className="no-scrollbar -mx-1 flex cursor-grab gap-2 overflow-x-auto scroll-smooth px-1 py-1 active:cursor-grabbing"
+          className="no-scrollbar flex min-w-0 flex-1 cursor-grab gap-2 overflow-x-auto scroll-smooth py-1 active:cursor-grabbing"
         >
           {groups.map((group, index) => (
             <button
@@ -109,7 +109,7 @@ export function CategoryOffers({ groups }: { groups: CategoryGroup[] }) {
               }}
               aria-pressed={index === active}
               className={classNames(
-                "flex shrink-0 items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-bold transition-all duration-200",
+                "flex shrink-0 select-none items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-bold transition-all duration-200",
                 index === active
                   ? "border-transparent bg-brand-gradient text-white shadow-[var(--shadow-glow)]"
                   : "surface border-[var(--border-subtle)] text-body hover:-translate-y-px hover:border-brand-300 hover:text-brand-600"
@@ -133,7 +133,7 @@ export function CategoryOffers({ groups }: { groups: CategoryGroup[] }) {
           type="button"
           aria-label="More categories"
           onClick={() => nudge(1)}
-          className="surface absolute -right-3 top-1/2 z-10 hidden size-8 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--border-subtle)] shadow-[var(--shadow-card)] transition hover:border-brand-300 hover:text-brand-600 lg:flex"
+          className="surface hidden size-9 shrink-0 items-center justify-center rounded-full border border-[var(--border-subtle)] shadow-[var(--shadow-card)] transition hover:border-brand-300 hover:text-brand-600 lg:flex"
         >
           <ChevronRight aria-hidden className="size-4" />
         </button>
@@ -152,49 +152,61 @@ export function CategoryOffers({ groups }: { groups: CategoryGroup[] }) {
   );
 }
 
-/** A small, loud card: logo, saving, one line of title, one button. */
+/** The same grammar as the list card, folded into a tile. */
 function CompactOffer({ coupon }: { coupon: CouponView }) {
   const store = storeOf(coupon);
 
   return (
-    <article className="surface group flex items-center gap-3 rounded-2xl border border-[var(--border-subtle)] p-3 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]">
-      <span className="flex size-16 shrink-0 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-1.5">
-        <StoreLogo
-          name={store?.name ?? "Store"}
-          logo={store?.logo}
-          size={54}
-          rounded="rounded-xl"
-          className="border-0"
-        />
-      </span>
+    <article className="surface group flex overflow-hidden rounded-2xl border border-[var(--border-subtle)] shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]">
+      <span
+        aria-hidden
+        className={classNames(
+          "w-1.5 shrink-0",
+          coupon.hasCode ? "bg-brand-gradient" : "bg-accent-300 dark:bg-accent-600/40"
+        )}
+      />
 
-      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-        <span className="flex items-center gap-2">
-          <span className="truncate text-[11px] font-bold text-faint">
-            {store?.name ?? "Featured"}
+      <div className="flex min-w-0 flex-1 flex-col gap-2 p-3">
+        <div className="flex items-center gap-2.5">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-[var(--border-subtle)] bg-white p-1">
+            <StoreLogo
+              name={store?.name ?? "Store"}
+              logo={store?.logo}
+              size={36}
+              rounded="rounded-lg"
+              className="border-0"
+            />
           </span>
-          <span className="ml-auto shrink-0 rounded-lg bg-brand-gradient px-2 py-0.5 text-[11px] font-extrabold text-white">
-            {coupon.badge}
+
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[11px] font-bold text-faint">
+              {store?.name ?? "Featured"}
+            </span>
+            <span className="block truncate font-display text-base font-extrabold leading-tight text-brand-600">
+              {coupon.badge}
+            </span>
           </span>
-        </span>
+        </div>
 
         <Link
           href={`/coupon/${coupon.slug}`}
-          className="line-clamp-2 text-[13px] font-semibold leading-snug transition group-hover:text-brand-700 dark:group-hover:text-brand-300"
+          className="line-clamp-2 min-h-[2.4rem] text-[13px] font-semibold leading-snug transition group-hover:text-brand-700 dark:group-hover:text-brand-300"
         >
           {coupon.title}
         </Link>
 
-        <span className="flex items-center gap-2">
+        <div className="flex items-center gap-2 border-t border-dashed border-[var(--border-strong)] pt-2.5">
+          <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-faint">
+            {coupon.verified ? "Verified" : "Live now"}
+            {coupon.uses ? ` · ${formatCount(coupon.uses)} used` : ""}
+          </span>
+
           <RevealButton
             coupon={coupon}
             size="sm"
             label={coupon.hasCode ? "Copy code" : "Get deal"}
           />
-          <span className="truncate text-[11px] font-semibold text-faint">
-            {coupon.verified ? "Verified" : "Live now"}
-          </span>
-        </span>
+        </div>
       </div>
     </article>
   );

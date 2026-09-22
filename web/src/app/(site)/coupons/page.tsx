@@ -1,4 +1,4 @@
-import { ArrowRight, Clock3, Filter, Star, Ticket, X } from "lucide-react";
+import { ArrowRight, Check, Clock3, Filter, Star, Ticket, X } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { AdSlot } from "@/components/ads/AdSlot";
@@ -223,8 +223,27 @@ export default async function CouponsPage({
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
         {/* ---- filters ---- */}
-        <aside className="space-y-3 lg:sticky lg:top-28 lg:self-start">
-          <FilterGroup title="Offer type">
+        <aside className="lg:sticky lg:top-28 lg:self-start">
+          <details className="group/filters lg:open" open>
+            <summary className="surface mb-3 flex cursor-pointer list-none items-center gap-2 rounded-2xl border border-[var(--border-subtle)] px-4 py-3 text-sm font-bold shadow-[var(--shadow-card)] marker:hidden lg:hidden">
+              <Filter aria-hidden className="size-4 text-brand-600" />
+              Filter offers
+              {chips.length ? (
+                <span className="rounded-full bg-brand-600 px-2 py-0.5 text-[11px] font-extrabold text-white">
+                  {chips.length}
+                </span>
+              ) : null}
+              <ArrowRight
+                aria-hidden
+                className="ml-auto size-4 rotate-90 text-faint transition-transform group-open/filters:-rotate-90"
+              />
+            </summary>
+
+            <div className="space-y-3">
+          <FilterGroup
+            title="Offer type"
+            clearHref={type || withCode ? hrefWith(params, { type: undefined, withCode: undefined }) : undefined}
+          >
             <FilterLink href={hrefWith(params, { type: undefined, withCode: undefined })} active={!type && !withCode}>
               Everything
             </FilterLink>
@@ -245,7 +264,14 @@ export default async function CouponsPage({
             ))}
           </FilterGroup>
 
-          <FilterGroup title="Highlights">
+          <FilterGroup
+            title="Highlights"
+            clearHref={
+              expiringSoon || exclusive
+                ? hrefWith(params, { expiringSoon: undefined, exclusive: undefined })
+                : undefined
+            }
+          >
             <FilterLink href={hrefWith(params, { expiringSoon: "true" })} active={expiringSoon === "true"}>
               <Clock3 aria-hidden className="mr-1.5 inline size-3.5" />
               Ending this week
@@ -257,7 +283,10 @@ export default async function CouponsPage({
           </FilterGroup>
 
           {categories.length ? (
-            <FilterGroup title="Category">
+            <FilterGroup
+              title="Category"
+              clearHref={category ? hrefWith(params, { category: undefined }) : undefined}
+            >
               <FilterLink href={hrefWith(params, { category: undefined })} active={!category}>
                 All categories
               </FilterLink>
@@ -276,7 +305,10 @@ export default async function CouponsPage({
           ) : null}
 
           {stores.length ? (
-            <FilterGroup title="Store">
+            <FilterGroup
+              title="Store"
+              clearHref={store ? hrefWith(params, { store: undefined }) : undefined}
+            >
               {stores.slice(0, 10).map((item) => (
                 <FilterLink
                   key={item._id}
@@ -297,7 +329,9 @@ export default async function CouponsPage({
             </FilterGroup>
           ) : null}
 
-          <AdSlot position="sidebar" />
+              <AdSlot position="sidebar" />
+            </div>
+          </details>
         </aside>
 
         {/* ---- results ---- */}
@@ -429,11 +463,28 @@ export default async function CouponsPage({
   );
 }
 
-function FilterGroup({ title, children }: { title: string; children: React.ReactNode }) {
+function FilterGroup({
+  title,
+  clearHref,
+  children,
+}: {
+  title: string;
+  /** Shown when this group has something selected. */
+  clearHref?: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="surface overflow-hidden rounded-2xl border border-[var(--border-subtle)] shadow-[var(--shadow-card)]">
-      <h2 className="border-b border-[var(--border-subtle)] px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.14em] text-faint">
+      <h2 className="flex items-center gap-2 border-b border-[var(--border-subtle)] px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.14em] text-faint">
         {title}
+        {clearHref ? (
+          <Link
+            href={clearHref}
+            className="ml-auto text-[10px] font-bold tracking-normal text-brand-600 normal-case transition hover:underline"
+          >
+            Clear
+          </Link>
+        ) : null}
       </h2>
       <div className="p-1.5">{children}</div>
     </section>
@@ -454,14 +505,28 @@ function FilterLink({
   return (
     <Link
       href={href}
+      aria-pressed={active}
       className={classNames(
-        "flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm transition",
+        "flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition",
         active
           ? "bg-brand-50 font-semibold text-brand-700 dark:bg-brand-950/60 dark:text-brand-300"
           : "text-body hover:surface-sunken"
       )}
     >
-      <span className="truncate">{children}</span>
+      {/* A tick box, so the sidebar reads as a set of filters rather than a
+          list of links that might go somewhere else. */}
+      <span
+        aria-hidden
+        className={classNames(
+          "flex size-4 shrink-0 items-center justify-center rounded-[5px] border transition",
+          active ? "border-brand-600 bg-brand-600 text-white" : "border-[var(--border-strong)]"
+        )}
+      >
+        {active ? <Check className="size-3" strokeWidth={3} /> : null}
+      </span>
+
+      <span className="min-w-0 flex-1 truncate">{children}</span>
+
       {count !== undefined ? (
         <span className="shrink-0 text-xs text-faint tabular-nums">{formatCount(count)}</span>
       ) : null}
