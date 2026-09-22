@@ -19,10 +19,10 @@ import {
   Truck,
   Wrench,
 } from "lucide-react";
-import { CategoryIcon } from "@/components/ui/icons";
 import { CouponCard } from "@/components/site/CouponCard";
 import { RevealButton } from "@/components/site/RevealButton";
 import { SaveButton } from "@/components/site/SaveButton";
+import { CategoryOffers } from "@/components/site/CategoryOffers";
 import { DEFAULT_BANNERS, HeroBanners } from "@/components/site/HeroBanners";
 import { ButtonLink } from "@/components/ui/Button";
 import { Badge, Card, EmptyState, Rail, SectionHeading, StoreLogo } from "@/components/ui/primitives";
@@ -132,6 +132,23 @@ export default async function HomePage() {
     .filter((entry) => entry.offers.length === 2)
     .slice(0, 3);
 
+  /* The category strip shows real offers, so each aisle needs its own six. */
+  const categoryGroups = (
+    await Promise.all(
+      [...data.categories]
+        .sort((a, b) => b.activeCouponCount - a.activeCouponCount)
+        .slice(0, 8)
+        .map((category) =>
+          apiPaged<CouponView>("/coupons", {
+            query: { category: category.slug, limit: 6, sort: "best" },
+            revalidate: 600,
+          })
+            .then((result) => ({ category, coupons: result.items }))
+            .catch(() => ({ category, coupons: [] as CouponView[] }))
+        )
+    )
+  ).filter((group) => group.coupons.length >= 3);
+
   const totalOffers = data.categories.reduce(
     (sum, category) => sum + (category.activeCouponCount ?? 0),
     0
@@ -180,7 +197,7 @@ export default async function HomePage() {
 
       <TrendingBrands stores={data.stores} />
 
-      <CategoryRail categories={data.categories} total={categoryCount} />
+      <CategoryOffers groups={categoryGroups} />
 
       <TopBrands picks={brandPicks} stores={data.stores} storeCount={storeCount} />
 
@@ -933,89 +950,6 @@ function TrendingBrands({ stores }: { stores: HomepagePayload["stores"] }) {
             ))}
           </div>
         </div>
-      </div>
-    </section>
-  );
-}
-
-/* =========================================================
-   CATEGORY GRID
-========================================================= */
-
-function CategoryRail({
-  categories,
-  total,
-}: {
-  categories: HomepagePayload["categories"];
-  total: number;
-}) {
-  if (!categories.length) return null;
-
-  return (
-    <section className="shell pt-12">
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-brand-600">
-            <span className="h-px w-6 bg-brand-400" />
-            Browse
-          </p>
-          <h2 className="mt-1 font-display text-xl font-extrabold sm:text-2xl">
-            Shop by category
-          </h2>
-          <p className="mt-1 text-sm text-body">
-            {formatCount(total || categories.length)} aisles, every one of them checked this week.
-          </p>
-        </div>
-
-        <Link
-          href="/categories"
-          className="group inline-flex items-center gap-1.5 rounded-full border border-[var(--border-subtle)] px-4 py-2 text-sm font-semibold text-body transition-all hover:-translate-y-px hover:border-brand-300 hover:text-brand-600 hover:shadow-[var(--shadow-card)]"
-        >
-          All categories
-          <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
-            →
-          </span>
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-        {categories.slice(0, 12).map((category, index) => (
-          <Link
-            key={category._id}
-            href={`/category/${category.slug}`}
-            className="surface group relative flex flex-col items-center gap-2 overflow-hidden rounded-2xl border border-[var(--border-subtle)] px-3 py-4 text-center shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]"
-          >
-            <span
-              aria-hidden
-              className={classNames(
-                "pointer-events-none absolute inset-x-0 -top-12 h-24 opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100",
-                index % 2 ? "bg-accent-200" : "bg-brand-200"
-              )}
-            />
-
-            <span
-              className={classNames(
-                "relative flex size-14 items-center justify-center rounded-2xl ring-1 ring-inset transition-transform duration-300 group-hover:scale-110",
-                index % 3 === 0
-                  ? "bg-gradient-to-br from-brand-100 to-brand-50 text-brand-700 ring-brand-200/70 dark:from-brand-950 dark:to-brand-900/50 dark:text-brand-300 dark:ring-brand-800"
-                  : index % 3 === 1
-                    ? "bg-gradient-to-br from-accent-100 to-accent-50 text-accent-600 ring-accent-200/70 dark:from-brand-950 dark:to-brand-900/50 dark:text-brand-300 dark:ring-brand-800"
-                    : "bg-gradient-to-br from-accent-300 to-accent-100 text-accent-600 ring-accent-200/70 dark:from-brand-950 dark:to-brand-900/50 dark:text-brand-300 dark:ring-brand-800"
-              )}
-            >
-              <CategoryIcon name={category.name} className="size-7" />
-            </span>
-
-            <span className="relative w-full min-w-0">
-              <span className="block w-full truncate text-[13px] font-bold transition-colors group-hover:text-brand-700 dark:group-hover:text-brand-300">
-                {category.name}
-              </span>
-              <span className="mt-0.5 block text-[11px] font-semibold text-faint">
-                {formatCount(category.activeCouponCount)} offers
-              </span>
-            </span>
-          </Link>
-        ))}
       </div>
     </section>
   );
