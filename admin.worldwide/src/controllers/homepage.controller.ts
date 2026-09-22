@@ -137,6 +137,10 @@ export const getHomepage = asyncHandler(async (_req, res) => {
       image: config?.heroImage ?? null,
       coupon: decorateCoupon(heroCoupon ?? featured[0] ?? newest[0] ?? null),
     },
+    banners: (config?.heroBanners ?? [])
+      .filter((banner) => banner.active !== false && (banner.image?.url || banner.title))
+      .slice()
+      .sort((a, b) => a.order - b.order),
     featured: decorateCoupons(featured),
     newest: decorateCoupons(newest),
     expiring: decorateCoupons(expiring),
@@ -162,6 +166,7 @@ export const updateConfig = asyncHandler(async (req, res) => {
     "heroHeading",
     "heroSubheading",
     "heroImage",
+    "heroBanners",
     "featuredCoupons",
     "featuredStores",
     "featuredCategories",

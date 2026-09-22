@@ -62,7 +62,9 @@ const schema = z.object({
   DEFAULT_TRACKING_PARAMS: z.string().default(""),
 
   /** Service used to guess a store logo from its domain. */
-  LOGO_SERVICE: z.string().default("https://logo.clearbit.com"),
+  LOGO_SERVICE: z
+    .string()
+    .default("https://www.google.com/s2/favicons?domain={domain}&sz=128"),
 
   ENABLE_CRON: bool(true),
   ENABLE_REQUEST_LOG: bool(true),

@@ -55,9 +55,20 @@ export function withTracking(base: unknown, params?: string | null): string {
 }
 
 /** Best-effort brand logo for a store we only know by domain. */
+/**
+ * Brand artwork for a domain.
+ *
+ * `LOGO_SERVICE` may be a template containing `{domain}` — needed by services
+ * that take the domain as a query parameter — or a plain prefix, which keeps
+ * the older `https://host/domain.com` style working.
+ */
 export function logoForDomain(domain: string | null): string | null {
   if (!domain) return null;
-  return `${env.LOGO_SERVICE.replace(/\/+$/, "")}/${domain}`;
+
+  const service = env.LOGO_SERVICE.trim();
+  if (service.includes("{domain}")) return service.replace(/\{domain\}/g, domain);
+
+  return `${service.replace(/\/+$/, "")}/${domain}`;
 }
 
 export function absoluteSiteUrl(path: string): string {

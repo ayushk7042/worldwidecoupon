@@ -16,6 +16,26 @@ export interface HomepageBlock {
   order: number;
 }
 
+/**
+ * One slide in the hero carousel.
+ *
+ * The artwork is the slide — text is optional and only drawn when a banner is
+ * uploaded without it, so a designed image is never covered by a heading.
+ */
+export interface HomepageBanner {
+  image?: ImageRef | null;
+  /** Used below 640px when supplied; the desktop image is cropped otherwise. */
+  mobileImage?: ImageRef | null;
+  title?: string;
+  subtitle?: string;
+  link?: string;
+  ctaLabel?: string;
+  /** CSS colour or gradient behind the artwork while it loads. */
+  background?: string;
+  order: number;
+  active: boolean;
+}
+
 export interface HomepageCategorySection {
   category: Types.ObjectId;
   heading?: string;
@@ -31,6 +51,7 @@ export interface Homepage {
   heroHeading?: string;
   heroSubheading?: string;
   heroImage?: ImageRef | null;
+  heroBanners: HomepageBanner[];
 
   featuredCoupons: Types.ObjectId[];
   featuredStores: Types.ObjectId[];
@@ -54,6 +75,21 @@ const blockSchema = new Schema<HomepageBlock>(
     link: String,
     image: { type: imageSchema, default: null },
     order: { type: Number, default: 0 },
+  },
+  { _id: false }
+);
+
+const bannerSchema = new Schema<HomepageBanner>(
+  {
+    image: { type: imageSchema, default: null },
+    mobileImage: { type: imageSchema, default: null },
+    title: String,
+    subtitle: String,
+    link: String,
+    ctaLabel: String,
+    background: String,
+    order: { type: Number, default: 0 },
+    active: { type: Boolean, default: true },
   },
   { _id: false }
 );
@@ -83,6 +119,7 @@ const homepageSchema = new Schema<Homepage>(
     heroHeading: String,
     heroSubheading: String,
     heroImage: { type: imageSchema, default: null },
+    heroBanners: { type: [bannerSchema], default: [] },
 
     featuredCoupons: [{ type: Schema.Types.ObjectId, ref: "Coupon" }],
     featuredStores: [{ type: Schema.Types.ObjectId, ref: "Store" }],
