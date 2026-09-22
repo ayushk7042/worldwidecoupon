@@ -22,7 +22,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://worldwidecoupons.c
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "WorldwideCoupons — Verified coupon codes & deals",
+    default: "WorldwideCoupons — verified coupon codes & deals",
     template: "%s | WorldwideCoupons",
   },
   description:

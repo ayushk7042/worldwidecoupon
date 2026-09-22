@@ -47,11 +47,27 @@
 
   <text x="64" y="184" font-size="52" font-weight="800" fill="#10241C" letter-spacing="-2" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Real savings,</text>
   <text x="64" y="244" font-size="52" font-weight="800" fill="#0E9F6E" letter-spacing="-2" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">not stale codes</text>
-  <text x="64" y="286" font-size="18" font-weight="500" fill="#4B5563" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Every offer opened and checked before it goes live.</text>
+  <text x="64" y="282" font-size="18" font-weight="500" fill="#4B5563" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Every offer opened and checked before it goes live.</text>
 
-  <g transform="translate(64 306)" filter="url(#lift)">
-    <rect width="238" height="56" rx="28" fill="url(#cta)"/>
-    <text x="119" y="36" text-anchor="middle" font-size="17" font-weight="800" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Browse 1,700+ offers</text>
+  <g transform="translate(64 288)">
+    <rect width="151" height="34" rx="17" fill="#0E9F6E" fill-opacity="0.10"/>
+    <circle cx="16" cy="17" r="4" fill="#0E9F6E"/>
+    <text x="28" y="22" font-size="12.5" font-weight="700" letter-spacing="0.4" fill="#0B7D58" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">1,700+ live offers</text>
+  </g>
+  <g transform="translate(224.79999999999998 298)">
+    <rect width="98" height="34" rx="17" fill="#0E9F6E" fill-opacity="0.10"/>
+    <circle cx="16" cy="17" r="4" fill="#0E9F6E"/>
+    <text x="28" y="22" font-size="12.5" font-weight="700" letter-spacing="0.4" fill="#0B7D58" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">190+ brands</text>
+  </g>
+  <g transform="translate(332.4 298)">
+    <rect width="113" height="34" rx="17" fill="#0E9F6E" fill-opacity="0.10"/>
+    <circle cx="16" cy="17" r="4" fill="#0E9F6E"/>
+    <text x="28" y="22" font-size="12.5" font-weight="700" letter-spacing="0.4" fill="#0B7D58" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Checked daily</text>
+  </g>
+
+  <g transform="translate(64 328)" filter="url(#lift)">
+    <rect width="238" height="50" rx="25" fill="url(#cta)"/>
+    <text x="119" y="33" text-anchor="middle" font-size="17" font-weight="800" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Browse 1,700+ offers</text>
   </g>
 
   <g transform="translate(700 92)" filter="url(#lift)">

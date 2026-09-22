@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  ChevronRight,
+  ArrowRight,
   Clock3,
   Flame,
   LayoutGrid,
@@ -192,7 +192,8 @@ export function Header({ categories }: { categories: Category[] }) {
                       href="/categories"
                       className="ml-auto inline-flex h-9 items-center gap-1 rounded-full bg-brand-gradient px-4 text-sm font-bold text-white transition hover:brightness-110"
                     >
-                      Browse every category →
+                      Browse every category
+                      <ArrowRight aria-hidden className="size-4" />
                     </Link>
                   </div>
                 </div>

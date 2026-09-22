@@ -6,10 +6,12 @@ import {
   BadgeCheck,
   Check,
   Clock3,
+  Copy,
   Flame,
   LayoutGrid,
   LockOpen,
-  MessagesSquare,
+  PiggyBank,
+  Search,
   Star,
   Store as StoreIcon,
   Tag,
@@ -22,7 +24,6 @@ import { CouponCard } from "@/components/site/CouponCard";
 import { RevealButton } from "@/components/site/RevealButton";
 import { SaveButton } from "@/components/site/SaveButton";
 import { DEFAULT_BANNERS, HeroBanners } from "@/components/site/HeroBanners";
-import { StoreCard } from "@/components/site/StoreCard";
 import { ButtonLink } from "@/components/ui/Button";
 import { Badge, Card, EmptyState, Rail, SectionHeading, StoreLogo } from "@/components/ui/primitives";
 import { apiPaged, apiSafe } from "@/lib/api";
@@ -40,7 +41,8 @@ import type { Category, CouponFeed, CouponView, HomepagePayload, Store } from "@
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Verified coupon codes & deals from 190+ stores",
+  // Absolute, so the tab reads as the brand rather than the page's headline.
+  title: { absolute: "WorldwideCoupons — verified coupon codes & deals" },
   description:
     "Every code on WorldwideCoupons is checked before it goes live. Copy, click through, and pay less at the brands you already shop with.",
   alternates: { canonical: "/" },
@@ -221,9 +223,29 @@ export default async function HomePage() {
             }
           />
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {data.stores.slice(0, 8).map((store) => (
-              <BrandCard key={store._id} store={store} />
+          <div className="grid gap-4 lg:grid-cols-[1.05fr_1fr]">
+            <FeaturedBrand store={data.stores[0]!} />
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {data.stores.slice(1, 7).map((store) => (
+                <BrandCard key={store._id} store={store} />
+              ))}
+            </div>
+          </div>
+
+          {/* A quick way into the rest of the directory, and a crawlable one. */}
+          <div className="mt-4 flex flex-wrap items-center gap-1.5 rounded-2xl border border-[var(--border-subtle)] px-4 py-3">
+            <span className="mr-1 text-[11px] font-bold uppercase tracking-[0.16em] text-faint">
+              Jump to
+            </span>
+            {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((letter) => (
+              <Link
+                key={letter}
+                href={`/stores?letter=${letter}`}
+                className="flex size-7 items-center justify-center rounded-lg text-xs font-bold text-body transition hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-950/60 dark:hover:text-brand-300"
+              >
+                {letter}
+              </Link>
             ))}
           </div>
         </section>
@@ -335,28 +357,6 @@ export default async function HomePage() {
         ) : null
       )}
 
-      {data.newest.length ? (
-        <section className="shell pt-14">
-          <SectionHeading
-            eyebrow="Fresh"
-            title="Just added"
-            action={
-              <Link
-                href="/coupons?sort=newest"
-                className="text-sm font-semibold text-brand-600 hover:underline"
-              >
-                See all new →
-              </Link>
-            }
-          />
-          <div className="grid gap-3 lg:grid-cols-2">
-            {data.newest.slice(0, 8).map((coupon) => (
-              <CouponCard key={coupon._id} coupon={coupon} />
-            ))}
-          </div>
-        </section>
-      ) : null}
-
       {data.blocks.length ? (
         <section className="shell pt-14">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -383,7 +383,7 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      <TrustStrip />
+      <HowItWorks />
 
       <div className="shell">
         <AdSlot position="home-bottom" className="mt-14" />
@@ -823,6 +823,68 @@ function RankedOffer({ coupon, rank }: { coupon: CouponView; rank: number }) {
   );
 }
 
+function FeaturedBrand({ store }: { store: Store }) {
+  return (
+    <article className="relative flex flex-col justify-between overflow-hidden rounded-3xl bg-brand-gradient p-6 text-white shadow-[var(--shadow-glow)]">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-70"
+        style={{
+          backgroundImage:
+            "radial-gradient(24rem 14rem at 10% -20%, rgba(255,255,255,0.35), transparent 70%), radial-gradient(20rem 12rem at 100% 120%, rgba(255,255,255,0.22), transparent 70%)",
+        }}
+      />
+
+      <div className="relative">
+        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/75">
+          Most opened this week
+        </p>
+
+        <div className="mt-4 flex items-center gap-3.5">
+          <span className="flex size-16 items-center justify-center rounded-2xl bg-white p-1 shadow-[var(--shadow-card)]">
+            <StoreLogo name={store.name} logo={store.logo} size={56} rounded="rounded-xl" />
+          </span>
+
+          <div className="min-w-0">
+            <h3 className="truncate font-display text-2xl font-extrabold">{store.name}</h3>
+            <p className="text-sm text-white/80">
+              {formatCount(store.activeCouponCount)} live offers
+              {store.codeCount ? ` · ${formatCount(store.codeCount)} promo codes` : ""}
+            </p>
+          </div>
+        </div>
+
+        {store.bestOffer ? (
+          <p className="mt-5 inline-flex rounded-2xl bg-white/15 px-4 py-2.5 text-sm font-bold ring-1 ring-inset ring-white/25">
+            Best right now · {store.bestOffer}
+          </p>
+        ) : null}
+
+        {store.description ? (
+          <p className="mt-4 line-clamp-2 max-w-md text-sm leading-relaxed text-white/80">
+            {store.description}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="relative mt-6 flex flex-wrap items-center gap-2">
+        <Link
+          href={`/store/${store.slug}`}
+          className="inline-flex h-11 items-center gap-1.5 rounded-2xl bg-white px-5 text-sm font-bold text-brand-700 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
+        >
+          See {store.name} offers
+          <ArrowRight aria-hidden className="size-4" />
+        </Link>
+
+        <span className="inline-flex items-center gap-1.5 rounded-2xl px-3 py-2 text-xs font-semibold text-white/80 ring-1 ring-inset ring-white/25">
+          <Flame aria-hidden className="size-3.5" />
+          {formatCount(store.clicks)} clicks
+        </span>
+      </div>
+    </article>
+  );
+}
+
 function BrandCard({ store }: { store: Store }) {
   return (
     <Link
@@ -1103,28 +1165,99 @@ function StatBar({
   );
 }
 
-function TrustStrip() {
-  const points = [
-    { Icon: BadgeCheck, title: "Checked, not scraped", body: "An editor opens every offer before it goes live." },
-    { Icon: Clock3, title: "Real expiry dates", body: "If we do not know when it ends, we say so." },
-    { Icon: LockOpen, title: "No account needed", body: "Codes are one click away. Signing in only saves them." },
-    { Icon: MessagesSquare, title: "You keep us honest", body: "Vote on what worked and we act on it." },
-  ];
+/* =========================================================
+   HOW IT WORKS
 
+   The three steps, then the one thing a shopper can do next. It replaces the
+   old wall of promises, which repeated what the hero already said.
+========================================================= */
+
+const STEPS = [
+  {
+    Icon: Search,
+    title: "Find the store",
+    body: "Search a brand or open a category. Every live offer for that shop sits on one page.",
+  },
+  {
+    Icon: Copy,
+    title: "Take the code",
+    body: "One click copies the code and opens the shop in a new tab, with the offer already applied.",
+  },
+  {
+    Icon: PiggyBank,
+    title: "Pay less",
+    body: "Paste at checkout. If it did not work, tell us and the offer comes down the same day.",
+  },
+];
+
+function HowItWorks() {
   return (
     <section className="shell pt-16">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {points.map((point) => (
-          <Card key={point.title} className="flex gap-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300">
-              <point.Icon aria-hidden className="size-5" strokeWidth={1.9} />
-            </span>
-            <span>
-              <span className="block text-sm font-bold">{point.title}</span>
-              <span className="mt-0.5 block text-sm text-body">{point.body}</span>
-            </span>
-          </Card>
-        ))}
+      <div className="surface relative overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-[var(--shadow-card)]">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -left-16 -top-20 size-72 rounded-full bg-brand-100 opacity-60 blur-3xl dark:bg-brand-900/40"
+        />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -bottom-24 -right-10 size-72 rounded-full bg-accent-100 opacity-70 blur-3xl dark:bg-brand-900/30"
+        />
+
+        <div className="relative grid gap-8 p-6 sm:p-9 lg:grid-cols-[1fr_20rem] lg:gap-10">
+          <div>
+            <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-brand-600">
+              <span className="h-px w-6 bg-brand-400" />
+              Three steps
+            </p>
+            <h2 className="mt-1 font-display text-xl font-extrabold sm:text-2xl">
+              How a coupon here actually works
+            </h2>
+
+            <ol className="mt-6 grid gap-5 sm:grid-cols-3">
+              {STEPS.map((step, index) => (
+                <li key={step.title} className="relative">
+                  <span className="flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-100 to-accent-100 text-brand-700 ring-1 ring-inset ring-brand-200/60 dark:from-brand-950 dark:to-brand-900/50 dark:text-brand-300 dark:ring-brand-800">
+                    <step.Icon aria-hidden className="size-5" strokeWidth={1.9} />
+                  </span>
+
+                  <p className="mt-3 flex items-center gap-2 text-sm font-bold">
+                    <span className="font-display text-brand-500">0{index + 1}</span>
+                    {step.title}
+                  </p>
+                  <p className="mt-1 text-sm leading-relaxed text-body">{step.body}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <div className="flex flex-col justify-center gap-3 rounded-3xl bg-brand-gradient p-6 text-white shadow-[var(--shadow-glow)]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/75">
+              Never miss a code
+            </p>
+            <p className="font-display text-xl font-extrabold leading-snug">
+              Save an offer and we will tell you before it expires.
+            </p>
+            <p className="text-sm text-white/80">
+              A free account keeps your codes in one place, across every device.
+            </p>
+
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Link
+                href="/account/register"
+                className="inline-flex h-11 items-center gap-1.5 rounded-2xl bg-white px-5 text-sm font-bold text-brand-700 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
+              >
+                Create a free account
+                <ArrowRight aria-hidden className="size-4" />
+              </Link>
+              <Link
+                href="/coupons"
+                className="inline-flex h-11 items-center rounded-2xl px-4 text-sm font-bold text-white ring-1 ring-inset ring-white/35 transition hover:bg-white/10"
+              >
+                Browse offers
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

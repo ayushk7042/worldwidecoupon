@@ -64,6 +64,17 @@
     <text x="100" y="36" text-anchor="middle" font-size="15" font-weight="700" fill="#0B7D58" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Members save more</text>
   </g>
 
+  <g transform="translate(64 316)">
+    <rect width="143" height="34" rx="17" fill="#FFFFFF" fill-opacity="0.14"/>
+    <circle cx="16" cy="17" r="4" fill="#43CF86"/>
+    <text x="28" y="22" font-size="12.5" font-weight="700" letter-spacing="0.4" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">No sign-up needed</text>
+  </g>
+  <g transform="translate(217.2 316)">
+    <rect width="113" height="34" rx="17" fill="#FFFFFF" fill-opacity="0.14"/>
+    <circle cx="16" cy="17" r="4" fill="#43CF86"/>
+    <text x="28" y="22" font-size="12.5" font-weight="700" letter-spacing="0.4" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Checked today</text>
+  </g>
+
   <g transform="translate(1136 352)">
     <text x="0" y="0" text-anchor="end" font-size="20" font-weight="800" fill="#10241C" letter-spacing="-0.4" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Worldwide<tspan fill="#0E9F6E">Coupons</tspan></text>
     <text x="0" y="21" text-anchor="end" font-size="10.5" font-weight="600" fill="#6B7280" letter-spacing="1.6" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">BETTER DEALS. BIGGER SAVINGS. WORLDWIDE.</text>
