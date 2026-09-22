@@ -81,7 +81,7 @@ export default async function CategoryPage({
             : undefined,
         }}
       >
-        <div className="mx-auto max-w-7xl px-4 py-8">
+        <div className="shell py-8">
           <Breadcrumbs trail={trail} />
 
           <div className="flex items-start gap-4">
@@ -107,7 +107,7 @@ export default async function CategoryPage({
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-8">
+      <div className="shell py-8">
         <AdSlot position="category-top" className="mb-6" category={category._id} />
 
         {category.children?.length ? (

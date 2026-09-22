@@ -2,13 +2,13 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { CouponCard } from "@/components/site/CouponCard";
-import { SearchBox } from "@/components/site/SearchBox";
-import { CategoryTile, StoreCard } from "@/components/site/StoreCard";
+import { DEFAULT_BANNERS, HeroBanners } from "@/components/site/HeroBanners";
+import { StoreCard } from "@/components/site/StoreCard";
 import { ButtonLink } from "@/components/ui/Button";
-import { Badge, Card, EmptyState, Rail, SectionHeading } from "@/components/ui/primitives";
-import { apiSafe } from "@/lib/api";
-import { formatCount } from "@/lib/format";
-import type { CouponFeed, HomepagePayload } from "@/lib/types";
+import { Card, EmptyState, Rail, SectionHeading, StoreLogo } from "@/components/ui/primitives";
+import { apiPaged, apiSafe } from "@/lib/api";
+import { classNames, formatCount, storeOf } from "@/lib/format";
+import type { Category, CouponFeed, CouponView, HomepagePayload, Store } from "@/lib/types";
 
 export const revalidate = 300;
 
@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 const EMPTY: HomepagePayload = {
   announcement: null,
   hero: { heading: null, subheading: null, image: null, coupon: null },
+  banners: [],
   featured: [],
   newest: [],
   expiring: [],
@@ -45,9 +46,22 @@ const EMPTY_FEED: CouponFeed = {
 export default async function HomePage() {
   // The curated payload drives the page; the feed adds the rails that are
   // ranked live — trending, exclusives and codes — which no editor curates.
-  const [data, feed] = await Promise.all([
+  const [data, feed, offerCount, storeCount, codeCount, categoryCount] = await Promise.all([
     apiSafe<HomepagePayload>("/homepage", EMPTY, { revalidate: 300 }),
     apiSafe<CouponFeed>("/coupons/feed", EMPTY_FEED, { revalidate: 300 }),
+    // One row each — all these two calls are after is the total in the envelope.
+    apiPaged<CouponView>("/coupons", { query: { limit: 1 }, revalidate: 900 })
+      .then((result) => result.pagination.total)
+      .catch(() => 0),
+    apiPaged<Store>("/stores", { query: { limit: 1 }, revalidate: 900 })
+      .then((result) => result.pagination.total)
+      .catch(() => 0),
+    apiPaged<CouponView>("/coupons", { query: { limit: 1, withCode: true }, revalidate: 900 })
+      .then((result) => result.pagination.total)
+      .catch(() => 0),
+    apiSafe<Category[]>("/categories", [], { query: { limit: 500 }, revalidate: 3600 })
+      .then((list) => list.length)
+      .catch(() => 0),
   ]);
 
   const totalOffers = data.categories.reduce(
@@ -82,39 +96,23 @@ export default async function HomePage() {
         </div>
       ) : null}
 
-      <Hero data={data} totalOffers={totalOffers} />
+      <HomeHero banners={data.banners} topPick={data.hero.coupon} stores={data.stores} />
 
-      <div className="mx-auto max-w-7xl px-4">
+      <CategoryRail categories={data.categories} />
+
+      <StatBar
+        offerCount={offerCount || totalOffers}
+        storeCount={storeCount}
+        categoryCount={categoryCount || data.categories.length}
+        codeCount={codeCount}
+      />
+
+      <div className="shell">
         <AdSlot position="home-top" className="mt-8" minHeight={0} />
       </div>
 
-      {data.categories.length ? (
-        <section className="mx-auto max-w-7xl px-4 pt-12">
-          <SectionHeading
-            eyebrow="Browse"
-            title="Shop by category"
-            action={
-              <Link href="/categories" className="text-sm font-semibold text-brand-600 hover:underline">
-                All categories →
-              </Link>
-            }
-          />
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-            {data.categories.slice(0, 12).map((category) => (
-              <CategoryTile
-                key={category._id}
-                name={category.name}
-                slug={category.slug}
-                icon={category.icon}
-                count={category.activeCouponCount}
-              />
-            ))}
-          </div>
-        </section>
-      ) : null}
-
       {data.featured.length ? (
-        <section className="mx-auto max-w-7xl px-4 pt-14">
+        <section className="shell pt-14">
           <SectionHeading
             eyebrow="Handpicked"
             title="Today's best offers"
@@ -125,7 +123,7 @@ export default async function HomePage() {
               </Link>
             }
           />
-          <div className="grid gap-3 lg:grid-cols-2">
+          <div className="grid gap-3 lg:grid-cols-2 2xl:grid-cols-3">
             {data.featured.slice(0, 6).map((coupon) => (
               <CouponCard key={coupon._id} coupon={coupon} />
             ))}
@@ -133,12 +131,12 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      <div className="mx-auto max-w-7xl px-4">
+      <div className="shell">
         <AdSlot position="home-infeed" className="mt-12" />
       </div>
 
       {data.stores.length ? (
-        <section className="mx-auto max-w-7xl px-4 pt-14">
+        <section className="shell pt-14">
           <SectionHeading
             eyebrow="Top brands"
             title="Stores people are saving at"
@@ -157,7 +155,7 @@ export default async function HomePage() {
       ) : null}
 
       {data.expiring.length ? (
-        <section className="mx-auto max-w-7xl px-4 pt-14">
+        <section className="shell pt-14">
           <SectionHeading
             eyebrow="Hurry"
             title="Ending this week"
@@ -172,7 +170,7 @@ export default async function HomePage() {
       ) : null}
 
       {feed.trending.length ? (
-        <section className="mx-auto max-w-7xl px-4 pt-14">
+        <section className="shell pt-14">
           <SectionHeading
             eyebrow="Moving fast"
             title="Trending right now"
@@ -187,7 +185,7 @@ export default async function HomePage() {
       ) : null}
 
       {feed.exclusive.length ? (
-        <section className="mx-auto max-w-7xl px-4 pt-14">
+        <section className="shell pt-14">
           <SectionHeading
             eyebrow="Only here"
             title="Exclusive codes"
@@ -201,12 +199,12 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      <div className="mx-auto max-w-7xl px-4">
+      <div className="shell">
         <AdSlot position="home-mid" className="mt-14" />
       </div>
 
       {feed.codes.length ? (
-        <section className="mx-auto max-w-7xl px-4 pt-14">
+        <section className="shell pt-14">
           <SectionHeading
             eyebrow="Copy and paste"
             title="Fresh promo codes"
@@ -230,7 +228,7 @@ export default async function HomePage() {
 
       {data.sections.map((section) =>
         section.category && section.coupons.length ? (
-          <section key={section.category._id} className="mx-auto max-w-7xl px-4 pt-14">
+          <section key={section.category._id} className="shell pt-14">
             <SectionHeading
               eyebrow={section.category.icon ?? undefined}
               title={section.heading || section.category.name}
@@ -253,7 +251,7 @@ export default async function HomePage() {
       )}
 
       {data.newest.length ? (
-        <section className="mx-auto max-w-7xl px-4 pt-14">
+        <section className="shell pt-14">
           <SectionHeading
             eyebrow="Fresh"
             title="Just added"
@@ -275,7 +273,7 @@ export default async function HomePage() {
       ) : null}
 
       {data.blocks.length ? (
-        <section className="mx-auto max-w-7xl px-4 pt-14">
+        <section className="shell pt-14">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {data.blocks.map((block) => (
               <Card key={block.title} hover className="flex flex-col gap-2">
@@ -302,7 +300,7 @@ export default async function HomePage() {
 
       <TrustStrip />
 
-      <div className="mx-auto max-w-7xl px-4">
+      <div className="shell">
         <AdSlot position="home-bottom" className="mt-14" />
       </div>
     </>
@@ -311,78 +309,271 @@ export default async function HomePage() {
 
 /* =========================================================
    HERO
+
+   Deliberately plain: a sliding banner an editor controls, a card for the
+   pick of the day, and four shortcuts. Everything else waits below the fold.
 ========================================================= */
 
-function Hero({ data, totalOffers }: { data: HomepagePayload; totalOffers: number }) {
-  const hero = data.hero.coupon;
+const QUICK_LINKS = [
+  { href: "/coupons?withCode=true", label: "Promo codes", icon: "🎟️", tone: "brand" },
+  { href: "/coupons?type=freeshipping", label: "Free shipping", icon: "🚚", tone: "accent" },
+  { href: "/coupons?exclusive=true", label: "Exclusives", icon: "⭐", tone: "brand" },
+  { href: "/coupons?expiringSoon=true", label: "Ending soon", icon: "⏳", tone: "accent" },
+] as const;
+
+function HomeHero({
+  banners,
+  topPick,
+  stores,
+}: {
+  banners: HomepagePayload["banners"];
+  topPick: CouponView | null;
+  stores: HomepagePayload["stores"];
+}) {
+  const store = topPick ? storeOf(topPick) : null;
 
   return (
-    <section className="relative overflow-hidden bg-brand-gradient">
-      {/* Two soft radial washes stop the flat gradient looking like a CSS demo. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-60"
-        style={{
-          backgroundImage:
-            "radial-gradient(60rem 30rem at 15% -10%, rgba(255,255,255,0.28), transparent), radial-gradient(40rem 24rem at 90% 120%, rgba(255,255,255,0.18), transparent)",
-        }}
-      />
+    <section className="bg-aurora relative overflow-hidden border-b border-[var(--border-subtle)]">
+      <div className="shell relative py-6 lg:py-9">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_21rem]">
+          {/* `self-start` keeps the frame the height of the artwork, so the
+              taller side column never leaves a band under the banner. */}
+          <div className="flex min-w-0 flex-col gap-3 self-start">
+            <HeroBanners
+              banners={banners.length ? banners : DEFAULT_BANNERS}
+              height="ratio"
+              bare
+              frameClassName="rounded-3xl border-0 bg-transparent shadow-[0_28px_60px_-28px_rgba(31,41,55,0.5)] ring-1 ring-ink-900/5 dark:ring-white/10"
+            />
 
-      <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-14 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:py-20">
-        <div className="text-white">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wide ring-1 ring-inset ring-white/25 backdrop-blur">
-            ✓ Every code checked by hand
-          </span>
+            {/* Brands people actually search for, so the band earns its height. */}
+            {stores.length ? (
+              <div className="surface flex items-center gap-2 overflow-hidden rounded-2xl border border-[var(--border-subtle)] px-3 py-2.5 shadow-[var(--shadow-card)]">
+                <span className="shrink-0 text-[11px] font-bold uppercase tracking-[0.14em] text-faint">
+                  Trending
+                </span>
 
-          <h1 className="mt-5 text-[2.1rem] font-extrabold leading-[1.1] sm:text-5xl lg:text-[3.4rem]">
-            {data.hero.heading ?? (
-              <>
-                Stop paying
-                <br />
-                full price.
-              </>
-            )}
-          </h1>
+                <div className="no-scrollbar flex min-w-0 items-center gap-2 overflow-x-auto">
+                  {stores.slice(0, 8).map((item) => (
+                    <Link
+                      key={item._id}
+                      href={`/store/${item.slug}`}
+                      className="group flex shrink-0 items-center gap-2 rounded-full border border-[var(--border-subtle)] py-1 pl-1 pr-3 text-xs font-semibold transition-all duration-200 hover:-translate-y-px hover:border-brand-300 hover:text-brand-700 hover:shadow-[var(--shadow-card)] dark:hover:text-brand-300"
+                    >
+                      <StoreLogo name={item.name} logo={item.logo} size={22} rounded="rounded-full" />
+                      <span className="max-w-28 truncate">{item.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
 
-          <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-white/85 sm:text-base">
-            {data.hero.subheading ??
-              `${formatCount(totalOffers)} live coupon codes and deals across 190+ stores. No sign-up, no spam, no made-up countdown timers.`}
+          <aside className="flex min-w-0 flex-col gap-3">
+            {topPick ? (
+              <div className="gradient-ring hover-lift rounded-3xl shadow-[var(--shadow-card)]">
+                <Link
+                  href={`/coupon/${topPick.slug}`}
+                  className="surface group flex h-full flex-col gap-3 rounded-[1.4rem] p-4"
+                >
+                  <span className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-gradient px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white shadow-[var(--shadow-glow)]">
+                      <span className="size-1.5 animate-pulse rounded-full bg-white" />
+                      Pick of the day
+                    </span>
+                    <span className="ml-auto font-display text-lg font-extrabold text-brand-600">
+                      {topPick.badge}
+                    </span>
+                  </span>
+
+                  <span className="flex items-center gap-2.5">
+                    <StoreLogo
+                      name={store?.name ?? "Store"}
+                      logo={store?.logo}
+                      size={40}
+                      rounded="rounded-2xl"
+                    />
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-bold">
+                        {store?.name ?? "Featured"}
+                      </span>
+                      <span className="block text-xs text-faint">
+                        {topPick.hasCode ? "Promo code" : "Deal"}
+                        {topPick.verified ? " · verified today" : ""}
+                      </span>
+                    </span>
+                  </span>
+
+                  <span className="line-clamp-2 text-sm font-semibold leading-snug text-body transition group-hover:text-brand-700 dark:group-hover:text-brand-300">
+                    {topPick.title}
+                  </span>
+
+                  <span className="mt-auto inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-brand-50 text-sm font-bold text-brand-700 transition-all duration-200 group-hover:bg-brand-gradient group-hover:text-white group-hover:shadow-[var(--shadow-glow)] dark:bg-brand-950/60 dark:text-brand-300">
+                    {topPick.hasCode ? "Get the code" : "Get the deal"}
+                    <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5">
+                      →
+                    </span>
+                  </span>
+                </Link>
+              </div>
+            ) : null}
+
+            <div className="surface grid grid-cols-4 gap-1 rounded-3xl border border-[var(--border-subtle)] p-2 shadow-[var(--shadow-card)]">
+              {QUICK_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="group flex flex-col items-center gap-1.5 rounded-2xl px-1 py-2.5 text-center transition-colors hover:bg-brand-50 dark:hover:bg-brand-950/50"
+                >
+                  <span
+                    className={classNames(
+                      "flex size-10 items-center justify-center rounded-full text-base transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:scale-110",
+                      link.tone === "brand"
+                        ? "bg-brand-100 dark:bg-brand-950/70"
+                        : "bg-accent-300 dark:bg-accent-600/25"
+                    )}
+                  >
+                    {link.icon}
+                  </span>
+                  <span className="w-full truncate text-[10px] font-bold leading-tight">
+                    {link.label}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   CATEGORY RAIL
+
+   The row of circles straight under the banner — the fastest way into the
+   catalogue, and the first colour the page shows.
+========================================================= */
+
+function CategoryRail({ categories }: { categories: HomepagePayload["categories"] }) {
+  if (!categories.length) return null;
+
+  return (
+    <section className="shell pt-10">
+      <div className="mb-5 flex items-end justify-between gap-3">
+        <div>
+          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-brand-600">
+            <span className="h-px w-6 bg-brand-400" />
+            Browse
           </p>
-
-          <div className="mt-7 max-w-xl">
-            <SearchBox size="lg" placeholder="Search a store — Amazon, Etsy, Macy's…" />
-          </div>
-
-          <div className="mt-6 flex flex-wrap gap-2.5">
-            {[
-              { href: "/coupons?withCode=true", label: "Promo codes" },
-              { href: "/coupons?type=freeshipping", label: "Free shipping" },
-              { href: "/coupons?sort=discount", label: "Biggest savings" },
-              { href: "/stores", label: "All stores" },
-            ].map((chip) => (
-              <Link
-                key={chip.href}
-                href={chip.href}
-                className="rounded-full bg-white/12 px-4 py-2 text-sm font-semibold text-white ring-1 ring-inset ring-white/25 backdrop-blur transition hover:bg-white/20"
-              >
-                {chip.label}
-              </Link>
-            ))}
-          </div>
+          <h2 className="mt-1 font-display text-xl font-extrabold sm:text-2xl">
+            Shop by category
+          </h2>
         </div>
 
-        <div className="space-y-4">
-          {/* The hero ad slot — the most valuable placement on the site. */}
-          <AdSlot position="home-hero" className="border-white/20 bg-white/10" />
+        <Link
+          href="/categories"
+          className="group inline-flex items-center gap-1.5 rounded-full border border-[var(--border-subtle)] px-4 py-2 text-sm font-semibold text-body transition-all hover:-translate-y-px hover:border-brand-300 hover:text-brand-600 hover:shadow-[var(--shadow-card)]"
+        >
+          All categories
+          <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
+            →
+          </span>
+        </Link>
+      </div>
 
-          {hero ? (
-            <div className="surface rounded-3xl border border-white/20 p-5 shadow-[var(--shadow-lift)]">
-              <div className="mb-3 flex items-center gap-2">
-                <Badge tone="warn">⚡ Offer of the day</Badge>
-              </div>
-              <CouponCard coupon={hero} hideSave />
+      <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
+        {categories.slice(0, 14).map((category, index) => (
+          <Link
+            key={category._id}
+            href={`/category/${category.slug}`}
+            className="group flex w-[6.5rem] shrink-0 flex-col items-center gap-2.5 text-center sm:w-28"
+          >
+            <span
+              className={classNames(
+                "relative flex size-[4.5rem] items-center justify-center rounded-full text-2xl transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[var(--shadow-lift)] sm:size-20",
+                index % 3 === 0
+                  ? "bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-950 dark:to-brand-900"
+                  : index % 3 === 1
+                    ? "bg-gradient-to-br from-accent-100 to-accent-200 dark:from-brand-950 dark:to-brand-900"
+                    : "bg-gradient-to-br from-accent-300 to-accent-100 dark:from-brand-950 dark:to-brand-900"
+              )}
+            >
+              <span className="transition-transform duration-300 group-hover:scale-110">
+                {category.icon ?? "🏷️"}
+              </span>
+              <span className="absolute -bottom-1 rounded-full bg-[var(--surface)] px-2 py-0.5 text-[10px] font-bold text-brand-700 shadow-[var(--shadow-card)] dark:text-brand-300">
+                {formatCount(category.activeCouponCount)}
+              </span>
+            </span>
+
+            <span className="w-full min-w-0">
+              <span className="block w-full truncate text-[13px] font-bold transition-colors group-hover:text-brand-600">
+                {category.name}
+              </span>
+            </span>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   STAT BAR
+========================================================= */
+
+function StatBar({
+  offerCount,
+  storeCount,
+  categoryCount,
+  codeCount,
+}: {
+  offerCount: number;
+  storeCount: number;
+  categoryCount: number;
+  codeCount: number;
+}) {
+  const stats = [
+    { value: formatCount(offerCount), label: "live offers", icon: "🏷️", note: "checked by hand" },
+    { value: formatCount(storeCount), label: "stores listed", icon: "🏬", note: "and growing" },
+    { value: formatCount(codeCount), label: "promo codes", icon: "🎟️", note: "ready to copy" },
+    { value: formatCount(categoryCount), label: "categories", icon: "🗂️", note: "to browse" },
+  ];
+
+  return (
+    <section className="shell pt-10">
+      <div className="relative overflow-hidden rounded-3xl bg-brand-gradient p-[1px] shadow-[var(--shadow-glow)]">
+        {/* A diagonal sheen keeps the slab from reading as flat green. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-70"
+          style={{
+            backgroundImage:
+              "radial-gradient(28rem 16rem at 12% -40%, rgba(255,255,255,0.35), transparent 70%), radial-gradient(22rem 14rem at 88% 140%, rgba(255,255,255,0.22), transparent 70%)",
+          }}
+        />
+
+        <div className="relative grid gap-px overflow-hidden rounded-[1.45rem] sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className="flex items-center gap-3.5 bg-white/[0.07] px-5 py-5 text-white backdrop-blur-sm transition-colors hover:bg-white/[0.14]"
+            >
+              <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-xl ring-1 ring-inset ring-white/25">
+                {stat.icon}
+              </span>
+              <span className="min-w-0">
+                <span className="block font-display text-2xl font-extrabold leading-none">
+                  {stat.value}
+                </span>
+                <span className="mt-1 block text-xs font-bold uppercase tracking-wide text-white/80">
+                  {stat.label}
+                </span>
+                <span className="block text-[11px] text-white/60">{stat.note}</span>
+              </span>
             </div>
-          ) : null}
+          ))}
         </div>
       </div>
     </section>
@@ -398,7 +589,7 @@ function TrustStrip() {
   ];
 
   return (
-    <section className="mx-auto max-w-7xl px-4 pt-16">
+    <section className="shell pt-16">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {points.map((point) => (
           <Card key={point.title} className="flex gap-3">

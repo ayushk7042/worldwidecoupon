@@ -103,7 +103,7 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
             : undefined,
         }}
       >
-        <div className="mx-auto max-w-7xl px-4 py-8">
+        <div className="shell py-8">
           <Breadcrumbs trail={trail} />
 
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
@@ -144,7 +144,7 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-8">
+      <div className="shell py-8">
         <AdSlot position="store-top" className="mb-6" store={store._id} />
 
         <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">

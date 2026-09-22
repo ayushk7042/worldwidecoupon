@@ -86,7 +86,7 @@ export default async function CouponPage({ params }: { params: Promise<{ slug: s
     <>
       <JsonLd data={[couponSchema(coupon), breadcrumbSchema(trail)]} />
 
-      <div className="mx-auto max-w-7xl px-4 py-8">
+      <div className="shell py-8">
         <Breadcrumbs trail={trail} />
 
         <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">

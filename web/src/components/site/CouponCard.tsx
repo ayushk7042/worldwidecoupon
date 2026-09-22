@@ -87,13 +87,15 @@ export function CouponCard({
   return (
     <article
       className={classNames(
-        "surface group relative flex gap-4 rounded-2xl border p-5 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-[var(--shadow-lift)] sm:gap-5",
+        // Below `sm` the three columns cannot all fit, so the card stacks:
+        // badge and logo on one row, then the copy, then the action.
+        "surface group relative flex flex-col gap-3 rounded-2xl border p-4 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-[var(--shadow-lift)] sm:flex-row sm:gap-5 sm:p-5",
         urgent ? "border-warn-500/40" : "border-[var(--border-subtle)]",
         coupon.isExpired && "opacity-65"
       )}
     >
       {/* The badge column doubles as the torn-stub edge of a paper voucher. */}
-      <div className="flex shrink-0 flex-col items-center gap-2">
+      <div className="flex shrink-0 flex-row items-center gap-3 sm:flex-col sm:gap-2">
         <DiscountBadge coupon={coupon} large />
         {showStore && store ? (
           <Link href={`/store/${store.slug}`} aria-label={store.name}>
@@ -112,7 +114,7 @@ export function CouponCard({
           {coupon.trending ? <Badge tone="warn">🔥 Trending</Badge> : null}
         </div>
 
-        <h3 className="text-base font-semibold leading-snug sm:text-[17px]">
+        <h3 className="text-base font-semibold leading-snug break-words sm:text-[17px]">
           <Link href={href} className="transition hover:text-brand-600">
             {coupon.title}
           </Link>
@@ -143,7 +145,7 @@ export function CouponCard({
         </div>
       </div>
 
-      <div className="flex shrink-0 flex-col items-end justify-center gap-2">
+      <div className="flex shrink-0 items-center justify-between gap-2 sm:flex-col sm:items-end sm:justify-center">
         <RevealButton coupon={coupon} />
         {!hideSave ? <SaveButton couponId={coupon._id} /> : null}
       </div>

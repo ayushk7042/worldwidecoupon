@@ -14,7 +14,7 @@ import {
   stores as storesApi,
 } from "@/lib/endpoints";
 import { readToken } from "@/lib/session";
-import type { HomepageBlock, HomepageConfig, ImageRef } from "@/lib/types";
+import type { HomepageBanner, HomepageBlock, HomepageConfig, ImageRef } from "@/lib/types";
 
 interface SectionState {
   category: string;
@@ -45,6 +45,7 @@ export default function AdminHomepagePage() {
   const [featuredCategories, setFeaturedCategories] = useState<string[]>([]);
   const [sections, setSections] = useState<SectionState[]>([]);
   const [blocks, setBlocks] = useState<HomepageBlock[]>([]);
+  const [banners, setBanners] = useState<HomepageBanner[]>([]);
   const [announcement, setAnnouncement] = useState({ text: "", link: "", active: false });
   const [dirty, setDirty] = useState(false);
 
@@ -69,6 +70,12 @@ export default function AdminHomepagePage() {
       }))
     );
     setBlocks(data.customBlocks ?? []);
+    setBanners(
+      (data.heroBanners ?? [])
+        .slice()
+        .sort((a, b) => a.order - b.order)
+        .map((banner, index) => ({ ...banner, order: index }))
+    );
     setAnnouncement({
       text: data.announcement?.text ?? "",
       link: data.announcement?.link ?? "",
@@ -92,6 +99,10 @@ export default function AdminHomepagePage() {
         .filter((section) => section.category)
         .map((section, index) => ({ ...section, order: index })),
       customBlocks: blocks.filter((block) => block.title.trim()),
+      heroBanners: banners
+        // A slide with neither artwork nor a headline would render as a gap.
+        .filter((banner) => banner.image?.url || banner.title?.trim())
+        .map((banner, index) => ({ ...banner, order: index })),
       announcement: {
         text: announcement.text.trim(),
         link: announcement.link.trim(),
@@ -209,6 +220,142 @@ export default function AdminHomepagePage() {
               touch();
             }}
           />
+        </FormSection>
+
+        <FormSection
+          title="Hero banners"
+          description="The carousel at the top of the homepage. Slides cycle every 5 seconds; the artwork carries the message, so text is only drawn when no image is set."
+          className="lg:col-span-2"
+        >
+          <div className="space-y-4">
+            {banners.map((banner, index) => {
+              const patch = (changes: Partial<HomepageBanner>) => {
+                setBanners((previous) =>
+                  previous.map((row, position) =>
+                    position === index ? { ...row, ...changes } : row
+                  )
+                );
+                touch();
+              };
+
+              const move = (delta: number) => {
+                const target = index + delta;
+                if (target < 0 || target >= banners.length) return;
+                setBanners((previous) => {
+                  const next = [...previous];
+                  const [row] = next.splice(index, 1);
+                  if (row) next.splice(target, 0, row);
+                  return next.map((item, position) => ({ ...item, order: position }));
+                });
+                touch();
+              };
+
+              return (
+                <div key={index} className="rounded-xl border border-[var(--border-subtle)] p-4">
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-[var(--surface-sunken)] px-2.5 py-1 text-xs font-bold text-faint">
+                      Slide {index + 1}
+                    </span>
+
+                    <Toggle
+                      checked={banner.active !== false}
+                      onChange={(value) => patch({ active: value })}
+                      label="Live"
+                    />
+
+                    <div className="ml-auto flex gap-1">
+                      <Button size="sm" variant="secondary" onClick={() => move(-1)}>
+                        ↑
+                      </Button>
+                      <Button size="sm" variant="secondary" onClick={() => move(1)}>
+                        ↓
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          setBanners((previous) => previous.filter((_, position) => position !== index));
+                          touch();
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 lg:grid-cols-2">
+                    <ImagePicker
+                      label="Banner artwork"
+                      hint="Wide image, about 1200×300. Shown on every screen when no mobile version is set."
+                      value={banner.image ?? null}
+                      onChange={(value) => patch({ image: value })}
+                    />
+                    <ImagePicker
+                      label="Mobile artwork (optional)"
+                      hint="Used below 640px — roughly 800×400 works well."
+                      value={banner.mobileImage ?? null}
+                      onChange={(value) => patch({ mobileImage: value })}
+                    />
+                  </div>
+
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <Input
+                      label="Link"
+                      value={banner.link ?? ""}
+                      onChange={(event) => patch({ link: event.target.value })}
+                      placeholder="/coupons?exclusive=true"
+                    />
+                    <Input
+                      label="Title"
+                      value={banner.title ?? ""}
+                      onChange={(event) => patch({ title: event.target.value })}
+                      placeholder="Used as the image alt text, and as the headline when there is no image"
+                    />
+                  </div>
+
+                  <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                    <Input
+                      label="Subtitle"
+                      value={banner.subtitle ?? ""}
+                      onChange={(event) => patch({ subtitle: event.target.value })}
+                    />
+                    <Input
+                      label="Button label"
+                      value={banner.ctaLabel ?? ""}
+                      onChange={(event) => patch({ ctaLabel: event.target.value })}
+                      placeholder="Shop deals"
+                    />
+                    <Input
+                      label="Background"
+                      value={banner.background ?? ""}
+                      onChange={(event) => patch({ background: event.target.value })}
+                      placeholder="#FFE7E2 or a CSS gradient"
+                    />
+                  </div>
+                </div>
+              );
+            })}
+
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => {
+                setBanners((previous) => [
+                  ...previous,
+                  { image: null, mobileImage: null, title: "", subtitle: "", link: "", ctaLabel: "", order: previous.length, active: true },
+                ]);
+                touch();
+              }}
+            >
+              + Add a banner
+            </Button>
+
+            {banners.length ? null : (
+              <p className="text-sm text-faint">
+                No banners yet — the homepage falls back to the three shipped designs until you add one.
+              </p>
+            )}
+          </div>
         </FormSection>
 
         <FormSection title="Featured offers" className="lg:col-span-2">

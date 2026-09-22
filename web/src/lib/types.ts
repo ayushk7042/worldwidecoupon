@@ -272,6 +272,20 @@ export interface HomepageBlock {
   order: number;
 }
 
+export interface HomepageBanner {
+  image?: ImageRef | null;
+  /** Shown below 640px when supplied; the desktop image is cropped otherwise. */
+  mobileImage?: ImageRef | null;
+  title?: string;
+  subtitle?: string;
+  link?: string;
+  ctaLabel?: string;
+  /** CSS colour or gradient drawn behind the artwork. */
+  background?: string;
+  order: number;
+  active: boolean;
+}
+
 export interface HomepagePayload {
   announcement: { text?: string; link?: string; active?: boolean } | null;
   hero: {
@@ -280,6 +294,7 @@ export interface HomepagePayload {
     image: ImageRef | null;
     coupon: CouponView | null;
   };
+  banners: HomepageBanner[];
   featured: CouponView[];
   newest: CouponView[];
   expiring: CouponView[];
@@ -296,6 +311,7 @@ export interface HomepageConfig {
   heroHeading?: string;
   heroSubheading?: string;
   heroImage?: ImageRef | null;
+  heroBanners: HomepageBanner[];
   featuredCoupons: string[];
   featuredStores: string[];
   featuredCategories: string[];

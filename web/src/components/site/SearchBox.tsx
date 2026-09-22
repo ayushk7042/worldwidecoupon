@@ -18,10 +18,13 @@ export function SearchBox({
   size = "md",
   placeholder = "Search 190+ stores…",
   autoFocus,
+  withButton,
 }: {
   size?: "md" | "lg";
   placeholder?: string;
   autoFocus?: boolean;
+  /** Adds a submit button inside the field — used in the header. */
+  withButton?: boolean;
 }) {
   const [term, setTerm] = useState("");
   const [items, setItems] = useState<Suggestion[]>([]);
@@ -142,10 +145,23 @@ export function SearchBox({
             aria-expanded={open}
             aria-autocomplete="list"
             className={classNames(
-              "w-full rounded-full border border-[var(--border-subtle)] bg-[var(--surface)] pr-4 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition focus:border-brand-400 focus:outline-none focus:ring-4 focus:ring-brand-500/10",
-              tall ? "h-14 pl-12 text-base shadow-[var(--shadow-lift)]" : "h-10 pl-10 text-sm"
+              "w-full rounded-full border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition focus:border-brand-400 focus:outline-none focus:ring-4 focus:ring-brand-500/10",
+              tall ? "h-14 pl-12 text-base shadow-[var(--shadow-lift)]" : "h-11 pl-11 text-sm",
+              withButton ? (tall ? "pr-32" : "pr-24") : "pr-4"
             )}
           />
+
+          {withButton ? (
+            <button
+              type="submit"
+              className={classNames(
+                "absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full bg-brand-gradient font-bold text-white transition hover:brightness-110",
+                tall ? "h-11 px-6 text-sm" : "h-8 px-4 text-[13px]"
+              )}
+            >
+              Search
+            </button>
+          ) : null}
         </div>
       </form>
 
