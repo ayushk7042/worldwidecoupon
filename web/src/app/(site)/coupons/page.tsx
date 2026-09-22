@@ -125,6 +125,9 @@ export default async function CouponsPage({
     chips.push({ label: "Exclusive to us", href: hrefWith(params, { exclusive: undefined }) });
   }
 
+  const activeCategory = categories.find((item) => item.slug === category);
+  const activeStore = stores.find((item) => item.slug === store || item._id === store);
+
   const headline = withCode === "true"
     ? "Promo codes you can copy"
     : type === "freeshipping"
@@ -135,7 +138,11 @@ export default async function CouponsPage({
           ? "Offers ending this week"
           : search
             ? `Results for “${search}”`
-            : "All coupon codes & deals";
+            : activeCategory
+              ? `${activeCategory.name} coupons & deals`
+              : activeStore
+                ? `${activeStore.name} coupons & deals`
+                : "All coupon codes & deals";
 
   const start = feed.items.length ? (page - 1) * PER_PAGE + 1 : 0;
 
@@ -290,17 +297,19 @@ export default async function CouponsPage({
               <FilterLink href={hrefWith(params, { category: undefined })} active={!category}>
                 All categories
               </FilterLink>
-              {categories.slice(0, 12).map((item) => (
-                <FilterLink
-                  key={item._id}
-                  href={hrefWith(params, { category: item.slug })}
-                  active={category === item.slug}
-                  count={item.activeCouponCount}
-                >
-                  <CategoryIcon name={item.name} className="mr-1.5 inline size-3.5" />
-                  {item.name}
-                </FilterLink>
-              ))}
+              <div className="max-h-72 overflow-y-auto pr-1">
+                {categories.map((item) => (
+                  <FilterLink
+                    key={item._id}
+                    href={hrefWith(params, { category: item.slug })}
+                    active={category === item.slug}
+                    count={item.activeCouponCount}
+                  >
+                    <CategoryIcon name={item.name} className="mr-1.5 inline size-3.5" />
+                    {item.name}
+                  </FilterLink>
+                ))}
+              </div>
             </FilterGroup>
           ) : null}
 

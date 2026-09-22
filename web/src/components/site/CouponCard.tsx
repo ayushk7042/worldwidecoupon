@@ -190,6 +190,12 @@ export function CouponCard({
               </Link>
             </h3>
 
+            {lines.length ? (
+              <p className="mt-1 line-clamp-1 text-[13px] leading-relaxed text-body">
+                {lines[0]}
+              </p>
+            ) : null}
+
             {lines.length || coupon.terms ? (
               <details className="group/details mt-1">
                 <summary className="inline-flex cursor-pointer list-none items-center gap-1 text-[12.5px] font-bold text-brand-600 marker:hidden">
@@ -201,7 +207,7 @@ export function CouponCard({
                 </summary>
 
                 <ul className="mt-2 space-y-1">
-                  {lines.map((line, index) => (
+                  {lines.slice(1).map((line, index) => (
                     <li key={index} className="flex gap-2 text-[13px] leading-relaxed text-body">
                       <span aria-hidden className="mt-1.5 size-1 shrink-0 rounded-full bg-brand-400" />
                       <span>{line}</span>
