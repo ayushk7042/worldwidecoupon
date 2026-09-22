@@ -7,6 +7,7 @@ import { classNames } from "@/lib/format";
 import type { CouponView, RevealResponse } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
+import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 
 /**
@@ -207,14 +208,16 @@ export function VoteWidget({
             onClick={() => vote(true)}
             className="rounded-lg border border-[var(--border-subtle)] px-2.5 py-1 font-semibold transition hover:border-success-500 hover:text-success-600"
           >
-            👍 Yes
+            <ThumbsUp aria-hidden className="size-4" />
+            Yes
           </button>
           <button
             type="button"
             onClick={() => vote(false)}
             className="rounded-lg border border-[var(--border-subtle)] px-2.5 py-1 font-semibold transition hover:border-danger-500 hover:text-danger-600"
           >
-            👎 No
+            <ThumbsDown aria-hidden className="size-4" />
+            No
           </button>
         </span>
       ) : (

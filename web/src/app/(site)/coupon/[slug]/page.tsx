@@ -138,15 +138,23 @@ export default async function CouponPage({ params }: { params: Promise<{ slug: s
                     <SaveButton couponId={coupon._id} label />
                   </div>
 
-                  <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-faint">
-                    {coupon.uses > 0 ? <span>Used {formatCount(coupon.uses)} times</span> : null}
-                    <span>Added {timeAgo(coupon.createdAt)}</span>
-                    {coupon.verifiedAt ? (
-                      <span className="text-success-600">
-                        Last checked {formatDate(coupon.verifiedAt)}
-                      </span>
-                    ) : null}
-                    {expiry ? <span className="font-semibold">{expiry}</span> : <span>No expiry date</span>}
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {[
+                      coupon.uses > 0 ? `${formatCount(coupon.uses)} people used this` : null,
+                      `Added ${timeAgo(coupon.createdAt)}`,
+                      coupon.verifiedAt ? `Checked ${formatDate(coupon.verifiedAt)}` : null,
+                      expiry ?? "No expiry date",
+                      coupon.successRate !== null ? `${coupon.successRate}% worked` : null,
+                    ]
+                      .filter(Boolean)
+                      .map((fact) => (
+                        <span
+                          key={fact as string}
+                          className="rounded-full border border-[var(--border-subtle)] px-3 py-1 text-[11px] font-semibold text-body"
+                        >
+                          {fact}
+                        </span>
+                      ))}
                   </div>
                 </div>
               </div>
@@ -219,7 +227,7 @@ export default async function CouponPage({ params }: { params: Promise<{ slug: s
                     ) : null
                   }
                 />
-                <div className="space-y-3">
+                <div className="grid gap-3 xl:grid-cols-2">
                   {related.map((item) => (
                     <CouponCard key={item._id} coupon={item} showStore={!store} />
                   ))}
@@ -230,15 +238,70 @@ export default async function CouponPage({ params }: { params: Promise<{ slug: s
 
           <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
             {store ? (
-              <Card className="text-center">
-                <StoreLogo name={store.name} logo={store.logo} size={72} className="mx-auto" />
-                <h3 className="mt-3 font-bold">{store.name}</h3>
-                {store.bestOffer ? (
-                  <p className="mt-1 text-sm text-body">Best offer: {store.bestOffer}</p>
+              <Card padded={false} className="overflow-hidden">
+                <div className="flex items-center gap-3 border-b border-[var(--border-subtle)] bg-gradient-to-r from-brand-50 to-accent-100/60 px-4 py-3.5 dark:from-brand-950/70 dark:to-brand-900/40">
+                  <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-1.5">
+                    <StoreLogo name={store.name} logo={store.logo} size={46} rounded="rounded-xl" className="border-0" />
+                  </span>
+                  <div className="min-w-0">
+                    <Link
+                      href={`/store/${store.slug}`}
+                      className="block truncate font-display text-base font-extrabold transition hover:text-brand-700 dark:hover:text-brand-300"
+                    >
+                      {store.name}
+                    </Link>
+                    {store.bestOffer ? (
+                      <p className="truncate text-xs font-semibold text-faint">
+                        Best right now · {store.bestOffer}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+
+                <dl className="grid grid-cols-3 divide-x divide-[var(--border-subtle)] border-b border-[var(--border-subtle)] text-center">
+                  {[
+                    { label: "Offers", value: store.activeCouponCount },
+                    { label: "Codes", value: store.codeCount },
+                    { label: "Deals", value: store.dealCount },
+                  ].map((stat) => (
+                    <div key={stat.label} className="px-2 py-3">
+                      <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-faint">
+                        {stat.label}
+                      </dt>
+                      <dd className="font-display text-lg font-extrabold text-brand-600">
+                        {formatCount(stat.value ?? 0)}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+
+                {related.length ? (
+                  <ul className="divide-y divide-[var(--border-subtle)]">
+                    {related.slice(0, 3).map((item) => (
+                      <li key={item._id}>
+                        <Link
+                          href={`/coupon/${item.slug}`}
+                          className="flex items-center gap-2.5 px-4 py-2.5 transition hover:bg-brand-50 dark:hover:bg-brand-950/50"
+                        >
+                          <span className="min-w-0 flex-1">
+                            <span className="line-clamp-2 text-xs font-semibold leading-snug">
+                              {item.title}
+                            </span>
+                          </span>
+                          <span className="shrink-0 rounded bg-brand-50 px-1.5 py-0.5 text-[11px] font-extrabold text-brand-700 dark:bg-brand-950/70 dark:text-brand-300">
+                            {item.badge}
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
                 ) : null}
-                <ButtonLink href={`/store/${store.slug}`} variant="secondary" full className="mt-4">
-                  All {store.name} offers
-                </ButtonLink>
+
+                <div className="p-3">
+                  <ButtonLink href={`/store/${store.slug}`} variant="secondary" full>
+                    All {store.name} offers
+                  </ButtonLink>
+                </div>
               </Card>
             ) : null}
 

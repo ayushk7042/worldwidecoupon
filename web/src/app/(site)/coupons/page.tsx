@@ -79,7 +79,7 @@ export default async function CouponsPage({
     exclusive,
   };
 
-  const [feed, categories, stores] = await Promise.all([
+  const [feed, categories, stores, fallback] = await Promise.all([
     apiPaged<CouponView>("/coupons", { query, revalidate: 180 }).catch(() => ({
       items: [] as CouponView[],
       pagination: { page: 1, limit: PER_PAGE, total: 0, pages: 1, hasMore: false } as PageInfo,
@@ -91,6 +91,12 @@ export default async function CouponsPage({
     })
       .then((result) => result.items)
       .catch(() => [] as Store[]),
+    // Some filters legitimately match nothing — most imported offers carry no
+    // end date, so "ending this week" is often empty. Rather than a dead page,
+    // the biggest live discounts are offered instead.
+    apiPaged<CouponView>("/coupons", { query: { limit: 8, sort: "discount" }, revalidate: 600 })
+      .then((result) => result.items)
+      .catch(() => [] as CouponView[]),
   ]);
 
   /* Every active filter, so they can be shown — and removed — as chips. */
@@ -342,11 +348,38 @@ export default async function CouponsPage({
               </div>
             </>
           ) : (
-            <EmptyState
-              title="No offers match that"
-              body="Try removing a filter, or browse everything we have live right now."
-              action={<ButtonLink href="/coupons">Show all offers</ButtonLink>}
-            />
+            <>
+              <EmptyState
+                title={
+                  exclusive === "true"
+                    ? "No exclusive codes live right now"
+                    : expiringSoon === "true"
+                      ? "Nothing is about to expire"
+                      : "No offers match that"
+                }
+                body={
+                  exclusive === "true"
+                    ? "Exclusives come and go — we negotiate them one store at a time. Here is what is saving people the most today."
+                    : expiringSoon === "true"
+                      ? "Every live offer either runs on with no end date or has more than a week left. Here are the biggest discounts instead."
+                      : "Try removing a filter, or browse everything we have live right now."
+                }
+                action={<ButtonLink href="/coupons">Show all offers</ButtonLink>}
+              />
+
+              {fallback.length ? (
+                <section className="mt-8">
+                  <h2 className="mb-3 font-display text-lg font-extrabold">
+                    Biggest savings on the site
+                  </h2>
+                  <div className="grid gap-3 xl:grid-cols-2">
+                    {fallback.map((coupon) => (
+                      <CouponCard key={coupon._id} coupon={coupon} />
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+            </>
           )}
 
           <Pagination

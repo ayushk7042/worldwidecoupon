@@ -119,7 +119,21 @@ export function CouponCard({
               {store.name}
             </Link>
           </>
-        ) : null}
+        ) : (
+          /* On a store page the shop is a given, so the type takes the slot
+             rather than leaving the header with a lone discount chip. */
+          <span className="flex min-w-0 items-center gap-1.5">
+            <Badge tone={coupon.hasCode ? "brand" : "accent"}>
+              {COUPON_TYPE_LABELS[coupon.type]}
+            </Badge>
+            {coupon.verified ? (
+              <Badge tone="success">
+                <BadgeCheck aria-hidden className="mr-1 inline size-3" />
+                Verified
+              </Badge>
+            ) : null}
+          </span>
+        )}
 
         <span className="ml-auto flex shrink-0 items-center gap-1.5">
           {coupon.exclusive ? <Badge tone="accent">Exclusive</Badge> : null}
@@ -135,17 +149,19 @@ export function CouponCard({
 
       {/* Body: the offer itself. */}
       <div className="flex flex-1 flex-col gap-2.5 px-4 py-3.5">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <Badge tone={coupon.hasCode ? "brand" : "accent"}>
-            {COUPON_TYPE_LABELS[coupon.type]}
-          </Badge>
-          {coupon.verified ? (
-            <Badge tone="success">
-              <BadgeCheck aria-hidden className="mr-1 inline size-3" />
-              Verified
+        {showStore ? (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Badge tone={coupon.hasCode ? "brand" : "accent"}>
+              {COUPON_TYPE_LABELS[coupon.type]}
             </Badge>
-          ) : null}
-        </div>
+            {coupon.verified ? (
+              <Badge tone="success">
+                <BadgeCheck aria-hidden className="mr-1 inline size-3" />
+                Verified
+              </Badge>
+            ) : null}
+          </div>
+        ) : null}
 
         <h3 className="text-[15px] font-semibold leading-snug break-words sm:text-base">
           <Link href={href} className="transition hover:text-brand-700 dark:hover:text-brand-300">
