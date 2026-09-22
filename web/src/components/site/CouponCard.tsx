@@ -1,3 +1,4 @@
+import { BadgeCheck, Clock3, Flame } from "lucide-react";
 import Link from "next/link";
 import {
   COUPON_TYPE_LABELS,
@@ -110,8 +111,18 @@ export function CouponCard({
             {COUPON_TYPE_LABELS[coupon.type]}
           </Badge>
           {coupon.exclusive ? <Badge tone="accent">Exclusive</Badge> : null}
-          {coupon.verified ? <Badge tone="success">✓ Verified</Badge> : null}
-          {coupon.trending ? <Badge tone="warn">🔥 Trending</Badge> : null}
+          {coupon.verified ? (
+            <Badge tone="success">
+              <BadgeCheck aria-hidden className="mr-1 inline size-3" />
+              Verified
+            </Badge>
+          ) : null}
+          {coupon.trending ? (
+            <Badge tone="warn">
+              <Flame aria-hidden className="mr-1 inline size-3" />
+              Trending
+            </Badge>
+          ) : null}
         </div>
 
         <h3 className="text-base font-semibold leading-snug break-words sm:text-[17px]">
@@ -197,7 +208,7 @@ function MetaRow({
 
       {expiry ? (
         <span className={classNames("font-semibold", urgent && "text-warn-600")}>
-          {urgent ? "⏳ " : ""}
+          {urgent ? <Clock3 aria-hidden className="mr-1 inline size-3" /> : null}
           {expiry}
         </span>
       ) : (

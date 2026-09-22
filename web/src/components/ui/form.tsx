@@ -6,6 +6,7 @@ import type {
   SelectHTMLAttributes,
   TextareaHTMLAttributes,
 } from "react";
+import { Check, TriangleAlert } from "lucide-react";
 import { useId } from "react";
 import { classNames } from "@/lib/format";
 
@@ -234,7 +235,7 @@ export function FormError({ message }: { message?: string | null }) {
       role="alert"
       className="flex items-start gap-2 rounded-xl border border-danger-500/30 bg-danger-50 px-4 py-3 text-sm font-medium text-danger-600 dark:bg-danger-500/10"
     >
-      <span aria-hidden>⚠</span>
+      <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={2.2} />
       <span>{message}</span>
     </div>
   );
@@ -248,7 +249,7 @@ export function FormSuccess({ message }: { message?: string | null }) {
       role="status"
       className="flex items-start gap-2 rounded-xl border border-success-500/30 bg-success-50 px-4 py-3 text-sm font-medium text-success-700 dark:bg-success-700/10 dark:text-success-500"
     >
-      <span aria-hidden>✓</span>
+      <Check aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={2.4} />
       <span>{message}</span>
     </div>
   );

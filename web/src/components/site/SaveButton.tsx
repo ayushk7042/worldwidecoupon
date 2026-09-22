@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { Star } from "lucide-react";
 import { useState } from "react";
 import { classNames } from "@/lib/format";
 import { useToast } from "@/components/ui/Toast";
@@ -97,7 +98,11 @@ export function FollowStoreButton({ storeId, storeName }: { storeId: string; sto
           : "border-[var(--border-subtle)] surface hover:border-brand-300 hover:text-brand-700"
       )}
     >
-      <span aria-hidden>{following ? "★" : "☆"}</span>
+      {following ? (
+        <Star aria-hidden className="size-4 fill-current" />
+      ) : (
+        <Star aria-hidden className="size-4" />
+      )}
       {following ? "Following" : "Follow store"}
     </button>
   );

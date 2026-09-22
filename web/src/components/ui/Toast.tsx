@@ -10,6 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { CheckCircle2, Info, TriangleAlert, type LucideIcon } from "lucide-react";
 import { classNames } from "@/lib/format";
 
 type ToastTone = "success" | "error" | "info";
@@ -28,10 +29,10 @@ interface ToastApi {
 
 const ToastContext = createContext<ToastApi | null>(null);
 
-const TONES: Record<ToastTone, { icon: string; classes: string }> = {
-  success: { icon: "✓", classes: "border-success-500/30 bg-success-600 text-white" },
-  error: { icon: "⚠", classes: "border-danger-500/30 bg-danger-600 text-white" },
-  info: { icon: "ℹ", classes: "border-brand-500/30 bg-ink-900 text-white" },
+const TONES: Record<ToastTone, { Icon: LucideIcon; classes: string }> = {
+  success: { Icon: CheckCircle2, classes: "border-success-500/30 bg-success-600 text-white" },
+  error: { Icon: TriangleAlert, classes: "border-danger-500/30 bg-danger-600 text-white" },
+  info: { Icon: Info, classes: "border-brand-500/30 bg-ink-900 text-white" },
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -98,7 +99,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             )}
           >
             <span aria-hidden className="mt-px">
-              {TONES[toast.tone].icon}
+              {(() => {
+                const { Icon } = TONES[toast.tone];
+                return <Icon aria-hidden className="size-4" strokeWidth={2.2} />;
+              })()}
             </span>
             <span className="flex-1">{toast.message}</span>
           </button>

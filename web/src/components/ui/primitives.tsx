@@ -1,3 +1,4 @@
+import { SearchX } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { BrandImage } from "@/components/site/BrandImage";
@@ -163,7 +164,7 @@ function InitialsTile({ name, size }: { name: string; size: number }) {
 ========================================================= */
 
 export function EmptyState({
-  icon = "🔍",
+  icon,
   title,
   body,
   action,
@@ -175,7 +176,9 @@ export function EmptyState({
 }) {
   return (
     <div className="surface flex flex-col items-center rounded-2xl border border-dashed border-[var(--border-strong)] px-6 py-14 text-center">
-      <div className="mb-4 text-4xl">{icon}</div>
+      <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-950/60 dark:text-brand-300">
+        {icon ?? <SearchX aria-hidden className="size-7" strokeWidth={1.7} />}
+      </div>
       <h3 className="text-lg font-bold">{title}</h3>
       {body ? <p className="mt-2 max-w-sm text-sm text-body">{body}</p> : null}
       {action ? <div className="mt-5">{action}</div> : null}

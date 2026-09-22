@@ -1,3 +1,4 @@
+import { CategoryIcon } from "@/components/ui/icons";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -86,7 +87,7 @@ export default async function CategoryPage({
 
           <div className="flex items-start gap-4">
             <span className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-3xl dark:bg-brand-950/60">
-              {category.icon ?? "🏷️"}
+              <CategoryIcon name={category.name} className="size-8" />
             </span>
 
             <div className="min-w-0">
@@ -158,7 +159,7 @@ export default async function CategoryPage({
               </div>
             ) : (
               <EmptyState
-                icon={category.icon ?? "🏷️"}
+                icon={<CategoryIcon name={category.name} className="size-7" />}
                 title={`No live ${category.name.toLowerCase()} offers`}
                 body="Nothing here right now. Try another category or browse everything."
                 action={<ButtonLink href="/coupons">All offers</ButtonLink>}

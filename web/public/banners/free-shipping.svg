@@ -1,74 +1,71 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400" role="img"
-     aria-label="Free shipping with no minimum spend — WorldwideCoupons">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400" role="img" aria-label="Free delivery with no minimum spend — WorldwideCoupons">
   <defs>
-    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
-      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#0E9F6E" flood-opacity="0.25"/>
+    <filter id="lift" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#0B3B2A" flood-opacity="0.22"/>
     </filter>
-    <filter id="card" x="-40%" y="-40%" width="180%" height="180%">
-      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#1F2937" flood-opacity="0.2"/>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="34"/>
     </filter>
-    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="30"/>
-    </filter>
-    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
-      <circle cx="2" cy="2" r="1.7" fill="#0E9F6E" opacity="0.13"/>
-    </pattern>
-    <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#DFF7E9"/>
-      <stop offset="55%" stop-color="#F7FCF9"/>
-      <stop offset="100%" stop-color="#FFDCC7"/>
+    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.2"/>
     </linearGradient>
-    <linearGradient id="cta3" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="cta" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#0E9F6E"/>
       <stop offset="100%" stop-color="#22C55E"/>
     </linearGradient>
-    <linearGradient id="box" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="band" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#DFF7E9"/>
+      <stop offset="100%" stop-color="#FFE7E2"/>
+    </linearGradient>
+    <linearGradient id="parcel" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#FFFFFF"/>
       <stop offset="100%" stop-color="#EEF2F6"/>
     </linearGradient>
   </defs>
 
-  <rect width="1200" height="400" rx="30" fill="url(#bg3)"/>
-  <rect width="1200" height="400" rx="30" fill="url(#dots)" opacity="0.4"/>
+  <rect width="1200" height="400" rx="30" fill="url(#band)"/>
 
-  <g filter="url(#blur)" opacity="0.6">
-    <circle cx="1100" cy="330" r="140" fill="#FFFFFF"/>
-    <circle cx="130" cy="20" r="110" fill="#FFFFFF"/>
+  <g clip-path="inset(0 round 30)">
+    <circle cx="1080" cy="80" r="170" fill="#FFFFFF" opacity="0.75" filter="url(#glow)"/>
+    <circle cx="90" cy="360" r="130" fill="#FFFFFF" opacity="0.65" filter="url(#glow)"/>
+    <g stroke="#0E9F6E" stroke-opacity="0.14" stroke-width="2" stroke-linecap="round">
+      <path d="M540 330h120M600 358h120M500 300h60"/>
+    </g>
   </g>
 
   <g transform="translate(64 62)">
-    <rect width="214" height="38" rx="19" fill="#1F2937"/>
-    <circle cx="22" cy="19" r="6" fill="#FFDCC7"/>
-    <text x="40" y="25" font-size="14" font-weight="700" letter-spacing="1.8" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">THIS WEEK ONLY</text>
+    <rect width="196" height="36" rx="18" fill="#10241C"/>
+    <circle cx="20" cy="18" r="5" fill="#FFDCC7"/>
+    <text x="36" y="23" font-size="13" font-weight="700" letter-spacing="1.7" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">THIS WEEK ONLY</text>
   </g>
 
-  <text x="64" y="186" font-size="54" font-weight="800" fill="#1F2937" letter-spacing="-1.8" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Free shipping,</text>
-  <text x="64" y="248" font-size="54" font-weight="800" fill="#0E9F6E" letter-spacing="-1.8" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">no minimum spend</text>
-  <text x="64" y="292" font-size="19" font-weight="500" fill="#4B5563" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Delivery on the house at hundreds of stores.</text>
+  <text x="64" y="186" font-size="52" font-weight="800" fill="#10241C" letter-spacing="-2" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Free delivery,</text>
+  <text x="64" y="246" font-size="52" font-weight="800" fill="#0E9F6E" letter-spacing="-2" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">no minimum spend</text>
+  <text x="64" y="288" font-size="18" font-weight="500" fill="#4B5563" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Hundreds of stores covering the postage this week.</text>
 
-  <g transform="translate(64 306)" filter="url(#soft)">
-    <rect width="238" height="58" rx="29" fill="url(#cta3)"/>
-    <text x="119" y="37" text-anchor="middle" font-size="18" font-weight="800" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Browse the offers &#8594;</text>
+  <g transform="translate(64 308)" filter="url(#lift)">
+    <rect width="224" height="56" rx="28" fill="url(#cta)"/>
+    <text x="112" y="36" text-anchor="middle" font-size="17" font-weight="800" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Browse the offers</text>
   </g>
 
-  <g filter="url(#card)" transform="translate(890 110)">
-    <rect x="0" y="0" width="216" height="168" rx="24" fill="url(#box)"/>
-    <rect x="0" y="0" width="216" height="58" rx="24" fill="#FFDCC7"/>
-    <rect x="94" y="0" width="30" height="168" fill="#22C55E" opacity="0.92"/>
-    <circle cx="109" cy="29" r="18" fill="#0E9F6E"/>
-    <text x="109" y="36" text-anchor="middle" font-size="19" font-weight="800" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">%</text>
-    <text x="109" y="136" text-anchor="middle" font-size="13.5" font-weight="700" letter-spacing="1.5" fill="#4B5563" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">ON US</text>
+  <g filter="url(#lift)" transform="translate(792 96)">
+    <rect x="0" y="40" width="300" height="200" rx="28" fill="url(#parcel)"/>
+    <rect x="0" y="40" width="300" height="66" rx="28" fill="#FFDCC7"/>
+    <rect x="132" y="40" width="36" height="200" fill="#22C55E" opacity="0.9"/>
+    <circle cx="150" cy="73" r="22" fill="#0E9F6E"/>
+    <text x="150" y="81" text-anchor="middle" font-size="22" font-weight="800" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">%</text>
+    <text x="150" y="186" text-anchor="middle" font-size="14" font-weight="700" letter-spacing="1.6" fill="#4B5563" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">POSTAGE ON US</text>
   </g>
 
-  <g stroke="#22C55E" stroke-width="9" stroke-linecap="round" opacity="0.32">
-    <path d="M700 168h104"/>
-    <path d="M660 218h80"/>
-    <path d="M716 268h76"/>
+  <g transform="translate(624 196)" filter="url(#lift)">
+    <rect width="150" height="56" rx="18" fill="#FFFFFF"/>
+    <text x="75" y="35" text-anchor="middle" font-size="18" font-weight="800" fill="#0E9F6E" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">$0 shipping</text>
   </g>
 
   <g transform="translate(1136 352)">
-    <text x="0" y="0" text-anchor="end" font-size="21" font-weight="800" fill="#1F2937" letter-spacing="-0.4" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Worldwide<tspan fill="#0E9F6E">Coupons</tspan></text>
-    <text x="0" y="22" text-anchor="end" font-size="11" font-weight="600" fill="#6B7280" letter-spacing="1.6" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">BETTER DEALS. BIGGER SAVINGS. WORLDWIDE.</text>
+    <text x="0" y="0" text-anchor="end" font-size="20" font-weight="800" fill="#10241C" letter-spacing="-0.4" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Worldwide<tspan fill="#0E9F6E">Coupons</tspan></text>
+    <text x="0" y="21" text-anchor="end" font-size="10.5" font-weight="600" fill="#6B7280" letter-spacing="1.6" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">BETTER DEALS. BIGGER SAVINGS. WORLDWIDE.</text>
   </g>
 
 </svg>

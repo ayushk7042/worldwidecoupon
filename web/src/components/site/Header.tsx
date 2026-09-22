@@ -3,6 +3,21 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import {
+  ChevronRight,
+  Clock3,
+  Flame,
+  LayoutGrid,
+  Menu,
+  Star,
+  Store,
+  Tag,
+  Ticket,
+  Truck,
+  User,
+  X,
+} from "lucide-react";
+import { CategoryIcon } from "@/components/ui/icons";
 import { classNames } from "@/lib/format";
 import type { Category } from "@/lib/types";
 import { Logo } from "./Logo";
@@ -12,12 +27,12 @@ import { useShopper } from "./ShopperProvider";
 
 /** The strip under the search bar — the paths shoppers actually use. */
 const PRIMARY_LINKS = [
-  { href: "/coupons", label: "All offers", icon: "🏷️" },
-  { href: "/coupons?withCode=true", label: "Promo codes", icon: "🎟️" },
-  { href: "/stores", label: "Stores", icon: "🏬" },
-  { href: "/coupons?type=freeshipping", label: "Free shipping", icon: "🚚" },
-  { href: "/coupons?exclusive=true", label: "Exclusives", icon: "⭐" },
-  { href: "/coupons?expiringSoon=true", label: "Ending soon", icon: "⏳" },
+  { href: "/coupons", label: "All offers", Icon: Tag },
+  { href: "/coupons?withCode=true", label: "Promo codes", Icon: Ticket },
+  { href: "/stores", label: "Stores", Icon: Store },
+  { href: "/coupons?type=freeshipping", label: "Free shipping", Icon: Truck },
+  { href: "/coupons?exclusive=true", label: "Exclusives", Icon: Star },
+  { href: "/coupons?expiringSoon=true", label: "Ending soon", Icon: Clock3 },
 ];
 
 export function Header({ categories }: { categories: Category[] }) {
@@ -107,13 +122,11 @@ export function Header({ categories }: { categories: Category[] }) {
             aria-expanded={menuOpen}
             className="inline-flex size-10 items-center justify-center rounded-full border border-[var(--border-subtle)] lg:hidden"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="size-5">
-              {menuOpen ? (
-                <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
-              ) : (
-                <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
-              )}
-            </svg>
+            {menuOpen ? (
+              <X aria-hidden className="size-5" />
+            ) : (
+              <Menu aria-hidden className="size-5" />
+            )}
           </button>
         </div>
       </div>
@@ -138,9 +151,7 @@ export function Header({ categories }: { categories: Category[] }) {
                     : "bg-brand-gradient text-white hover:brightness-110"
                 )}
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" className="size-4">
-                  <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
-                </svg>
+                <LayoutGrid aria-hidden className="size-4" strokeWidth={2.2} />
                 Categories
               </button>
 
@@ -160,8 +171,8 @@ export function Header({ categories }: { categories: Category[] }) {
                         href={`/category/${category.slug}`}
                         className="group/cat flex items-center gap-2.5 rounded-2xl px-3 py-2 transition-all duration-200 hover:-translate-y-px hover:bg-brand-50 hover:shadow-[var(--shadow-card)] dark:hover:bg-brand-950/50"
                       >
-                        <span className="flex size-9 items-center justify-center rounded-xl bg-accent-100 text-base transition-transform duration-200 group-hover/cat:scale-110 dark:bg-brand-950/70">
-                          {category.icon ?? "🏷️"}
+                        <span className="flex size-9 items-center justify-center rounded-xl bg-accent-100 text-brand-700 transition-transform duration-200 group-hover/cat:scale-110 dark:bg-brand-950/70 dark:text-brand-300">
+                          <CategoryIcon name={category.name} className="size-4.5" />
                         </span>
                         <span className="min-w-0 flex-1 truncate text-sm font-semibold">
                           {category.name}
@@ -179,7 +190,7 @@ export function Header({ categories }: { categories: Category[] }) {
                     </span>
                     <Link
                       href="/categories"
-                      className="ml-auto inline-flex h-9 items-center rounded-full bg-brand-gradient px-4 text-sm font-bold text-white transition hover:brightness-110"
+                      className="ml-auto inline-flex h-9 items-center gap-1 rounded-full bg-brand-gradient px-4 text-sm font-bold text-white transition hover:brightness-110"
                     >
                       Browse every category →
                     </Link>
@@ -201,9 +212,11 @@ export function Header({ categories }: { categories: Category[] }) {
                     : "text-[var(--text-secondary)] hover:-translate-y-px hover:bg-[var(--surface)] hover:text-brand-700 hover:shadow-[var(--shadow-card)] dark:hover:text-brand-300"
                 )}
               >
-                <span aria-hidden className="text-xs transition-transform duration-200 group-hover/link:scale-125">
-                  {link.icon}
-                </span>
+                <link.Icon
+                  aria-hidden
+                  className="size-4 transition-transform duration-200 group-hover/link:scale-110"
+                  strokeWidth={2}
+                />
                 {link.label}
                 <span
                   aria-hidden
@@ -220,7 +233,8 @@ export function Header({ categories }: { categories: Category[] }) {
             href="/coupons?sort=discount"
             className="ml-auto flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-accent-300 px-4 text-sm font-bold text-accent-600 transition hover:brightness-95 dark:bg-accent-600/20 dark:text-accent-400"
           >
-            🔥 Biggest savings today
+            <Flame aria-hidden className="size-4" strokeWidth={2.2} />
+            Biggest savings today
           </Link>
         </div>
       </div>
@@ -239,7 +253,7 @@ export function Header({ categories }: { categories: Category[] }) {
                 href={link.href}
                 className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold transition hover:bg-brand-50 dark:hover:bg-brand-950/50"
               >
-                <span aria-hidden>{link.icon}</span>
+                <link.Icon aria-hidden className="size-4" strokeWidth={2} />
                 {link.label}
               </Link>
             ))}
@@ -247,7 +261,7 @@ export function Header({ categories }: { categories: Category[] }) {
               href={shopper ? "/account" : "/account/login"}
               className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold transition hover:bg-brand-50 dark:hover:bg-brand-950/50"
             >
-              <span aria-hidden>👤</span>
+              <User aria-hidden className="size-4" strokeWidth={2} />
               {shopper ? "My account" : "Sign in"}
             </Link>
           </nav>
@@ -264,7 +278,7 @@ export function Header({ categories }: { categories: Category[] }) {
                     href={`/category/${category.slug}`}
                     className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition hover:bg-brand-50 dark:hover:bg-brand-950/50"
                   >
-                    <span>{category.icon ?? "🏷️"}</span>
+                    <CategoryIcon name={category.name} className="size-4 text-brand-600" />
                     <span className="truncate">{category.name}</span>
                   </Link>
                 ))}

@@ -1,3 +1,5 @@
+import { BadgeCheck } from "lucide-react";
+import { CategoryIcon } from "@/components/ui/icons";
 import Link from "next/link";
 import { classNames, formatCount } from "@/lib/format";
 import type { Store } from "@/lib/types";
@@ -73,7 +75,11 @@ export function StoreCard({
           {formatCount(store.activeCouponCount)} offers
         </span>
         {store.codeCount > 0 ? <span>· {store.codeCount} codes</span> : null}
-        {store.verified ? <span className="text-success-600">· ✓ Verified</span> : null}
+        {store.verified ? (
+          <span className="inline-flex items-center gap-1 text-success-600">
+            · <BadgeCheck aria-hidden className="size-3" /> Verified
+          </span>
+        ) : null}
       </div>
     </Link>
   );
@@ -101,7 +107,7 @@ export function CategoryTile({
       )}
     >
       <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-xl transition group-hover:scale-110 dark:bg-brand-950/60">
-        {icon ?? "🏷️"}
+        <CategoryIcon name={name} className="size-6" />
       </span>
       <span className="min-w-0">
         <span className="block truncate text-sm font-semibold transition group-hover:text-brand-600">

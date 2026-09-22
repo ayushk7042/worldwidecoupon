@@ -1,3 +1,4 @@
+import { BadgeCheck, Flame, Tag } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -111,9 +112,19 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
 
             <div className="min-w-0 flex-1">
               <div className="mb-2 flex flex-wrap items-center gap-2">
-                {store.verified ? <Badge tone="success">✓ Verified partner</Badge> : null}
+                {store.verified ? (
+                  <Badge tone="success">
+                    <BadgeCheck aria-hidden className="mr-1 inline size-3" />
+                    Verified partner
+                  </Badge>
+                ) : null}
                 {store.exclusive ? <Badge tone="accent">Exclusive codes</Badge> : null}
-                {store.trending ? <Badge tone="warn">🔥 Trending</Badge> : null}
+                {store.trending ? (
+                  <Badge tone="warn">
+                    <Flame aria-hidden className="mr-1 inline size-3" />
+                    Trending
+                  </Badge>
+                ) : null}
               </div>
 
               <h1 className="text-2xl font-extrabold sm:text-3xl">
@@ -195,7 +206,7 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
               </>
             ) : (
               <EmptyState
-                icon="🏷️"
+                icon={<Tag aria-hidden className="size-7" strokeWidth={1.7} />}
                 title={`No live ${store.name} offers right now`}
                 body="We check this store regularly. Follow it and we will let you know the moment something lands."
                 action={<ButtonLink href="/stores">Browse other stores</ButtonLink>}

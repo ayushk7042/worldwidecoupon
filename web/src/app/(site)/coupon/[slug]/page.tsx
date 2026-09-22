@@ -1,3 +1,4 @@
+import { BadgeCheck } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -109,7 +110,12 @@ export default async function CouponPage({ params }: { params: Promise<{ slug: s
                     <Badge tone={coupon.hasCode ? "brand" : "accent"}>
                       {COUPON_TYPE_LABELS[coupon.type]}
                     </Badge>
-                    {coupon.verified ? <Badge tone="success">✓ Verified</Badge> : null}
+                    {coupon.verified ? (
+                      <Badge tone="success">
+                        <BadgeCheck aria-hidden className="mr-1 inline size-3" />
+                        Verified
+                      </Badge>
+                    ) : null}
                     {coupon.exclusive ? <Badge tone="accent">Exclusive</Badge> : null}
                     {coupon.isExpired ? <Badge tone="danger">Expired</Badge> : null}
                   </div>

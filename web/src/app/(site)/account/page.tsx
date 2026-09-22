@@ -1,5 +1,6 @@
 "use client";
 
+import { Bell, Heart, Star } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -124,7 +125,7 @@ export default function AccountPage() {
             </div>
           ) : (
             <EmptyState
-              icon="🔔"
+              icon={<Bell aria-hidden className="size-7" strokeWidth={1.7} />}
               title="Your feed is empty"
               body="Follow a few stores and their new offers will show up here."
               action={<ButtonLink href="/stores">Browse stores</ButtonLink>}
@@ -146,7 +147,7 @@ export default function AccountPage() {
             </div>
           ) : (
             <EmptyState
-              icon="♡"
+              icon={<Heart aria-hidden className="size-7" strokeWidth={1.7} />}
               title="Nothing saved yet"
               body="Tap the heart on any offer to keep it here for later."
               action={<ButtonLink href="/coupons">Find offers</ButtonLink>}
@@ -168,7 +169,7 @@ export default function AccountPage() {
             </div>
           ) : (
             <EmptyState
-              icon="★"
+              icon={<Star aria-hidden className="size-7" strokeWidth={1.7} />}
               title="Not following anyone"
               body="Follow a store to get its new codes in your feed."
               action={<ButtonLink href="/stores">Browse stores</ButtonLink>}

@@ -1,3 +1,4 @@
+import { Clock3, Star } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { AdSlot } from "@/components/ads/AdSlot";
@@ -136,10 +137,12 @@ export default async function CouponsPage({
 
           <FilterGroup title="Highlights">
             <FilterLink href={hrefWith(params, { expiringSoon: "true" })} active={expiringSoon === "true"}>
-              ⏳ Ending this week
+              <Clock3 aria-hidden className="mr-1.5 inline size-3.5" />
+              Ending this week
             </FilterLink>
             <FilterLink href={hrefWith(params, { exclusive: "true" })} active={exclusive === "true"}>
-              ⭐ Exclusive to us
+              <Star aria-hidden className="mr-1.5 inline size-3.5" />
+              Exclusive to us
             </FilterLink>
           </FilterGroup>
 

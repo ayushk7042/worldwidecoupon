@@ -1,11 +1,30 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { AdSlot } from "@/components/ads/AdSlot";
+import {
+  ArrowRight,
+  BadgeCheck,
+  Check,
+  Clock3,
+  Flame,
+  LayoutGrid,
+  LockOpen,
+  MessagesSquare,
+  Star,
+  Store as StoreIcon,
+  Tag,
+  Ticket,
+  Truck,
+  Wrench,
+} from "lucide-react";
+import { CategoryIcon } from "@/components/ui/icons";
 import { CouponCard } from "@/components/site/CouponCard";
+import { RevealButton } from "@/components/site/RevealButton";
+import { SaveButton } from "@/components/site/SaveButton";
 import { DEFAULT_BANNERS, HeroBanners } from "@/components/site/HeroBanners";
 import { StoreCard } from "@/components/site/StoreCard";
 import { ButtonLink } from "@/components/ui/Button";
-import { Card, EmptyState, Rail, SectionHeading, StoreLogo } from "@/components/ui/primitives";
+import { Badge, Card, EmptyState, Rail, SectionHeading, StoreLogo } from "@/components/ui/primitives";
 import { apiPaged, apiSafe } from "@/lib/api";
 import {
   COUPON_TYPE_LABELS,
@@ -100,7 +119,7 @@ export default async function HomePage() {
     return (
       <div className="mx-auto max-w-3xl px-4 py-24">
         <EmptyState
-          icon="🛠️"
+          icon={<Wrench aria-hidden className="size-7" strokeWidth={1.7} />}
           title="Nothing to show yet"
           body="The API returned no offers. Check that the backend is running and that the coupon data has been imported."
           action={<ButtonLink href="/admin">Open the admin panel</ButtonLink>}
@@ -157,17 +176,26 @@ export default async function HomePage() {
           <SectionHeading
             eyebrow="Handpicked"
             title="Today's best offers"
-            subtitle="Checked by our team before they went on the page."
+            subtitle="Opened, tested and written up by an editor before they went on the page."
             action={
-              <Link href="/coupons" className="text-sm font-semibold text-brand-600 hover:underline">
-                See all →
+              <Link
+                href="/coupons"
+                className="group inline-flex items-center gap-1.5 rounded-full border border-[var(--border-subtle)] px-4 py-2 text-sm font-semibold transition-all hover:-translate-y-px hover:border-brand-300 hover:text-brand-600 hover:shadow-[var(--shadow-card)]"
+              >
+                See all offers
+                <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
             }
           />
-          <div className="grid gap-3 lg:grid-cols-2 2xl:grid-cols-3">
-            {data.featured.slice(0, 6).map((coupon) => (
-              <CouponCard key={coupon._id} coupon={coupon} />
-            ))}
+
+          <div className="grid gap-4 lg:grid-cols-[1.15fr_1fr]">
+            <SpotlightOffer coupon={data.featured[0]!} />
+
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+              {data.featured.slice(1, 5).map((coupon) => (
+                <MiniOffer key={coupon._id} coupon={coupon} />
+              ))}
+            </div>
           </div>
         </section>
       ) : null}
@@ -181,17 +209,23 @@ export default async function HomePage() {
           <SectionHeading
             eyebrow="Top brands"
             title="Stores people are saving at"
+            subtitle="The shops our readers open most often this week."
             action={
-              <Link href="/stores" className="text-sm font-semibold text-brand-600 hover:underline">
-                All stores →
+              <Link
+                href="/stores"
+                className="group inline-flex items-center gap-1.5 rounded-full border border-[var(--border-subtle)] px-4 py-2 text-sm font-semibold transition-all hover:-translate-y-px hover:border-brand-300 hover:text-brand-600 hover:shadow-[var(--shadow-card)]"
+              >
+                All stores
+                <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
             }
           />
-          <Rail>
-            {data.stores.map((store) => (
-              <StoreCard key={store._id} store={store} variant="rail" />
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {data.stores.slice(0, 8).map((store) => (
+              <BrandCard key={store._id} store={store} />
             ))}
-          </Rail>
+          </div>
         </section>
       ) : null}
 
@@ -215,13 +249,23 @@ export default async function HomePage() {
           <SectionHeading
             eyebrow="Moving fast"
             title="Trending right now"
-            subtitle="The offers other shoppers are using today."
+            subtitle="Ranked by how many shoppers used them in the last day."
+            action={
+              <Link
+                href="/coupons?sort=popular"
+                className="group inline-flex items-center gap-1.5 rounded-full border border-[var(--border-subtle)] px-4 py-2 text-sm font-semibold transition-all hover:-translate-y-px hover:border-brand-300 hover:text-brand-600 hover:shadow-[var(--shadow-card)]"
+              >
+                See the chart
+                <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            }
           />
-          <Rail>
-            {feed.trending.slice(0, 16).map((coupon) => (
-              <CouponCard key={coupon._id} coupon={coupon} variant="rail" />
+
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {feed.trending.slice(0, 6).map((coupon, index) => (
+              <RankedOffer key={coupon._id} coupon={coupon} rank={index + 1} />
             ))}
-          </Rail>
+          </div>
         </section>
       ) : null}
 
@@ -361,7 +405,7 @@ const QUICK_LINKS = [
     href: "/coupons?withCode=true",
     label: "Promo codes",
     hint: "Copy and paste",
-    icon: "🎟️",
+    Icon: Ticket,
     className: "from-brand-100 to-brand-50 dark:from-brand-950 dark:to-brand-900/40",
   },
   {
@@ -369,7 +413,7 @@ const QUICK_LINKS = [
     href: "/coupons?type=freeshipping",
     label: "Free shipping",
     hint: "No delivery fee",
-    icon: "🚚",
+    Icon: Truck,
     className: "from-accent-100 to-accent-50 dark:from-brand-950 dark:to-brand-900/40",
   },
   {
@@ -377,7 +421,7 @@ const QUICK_LINKS = [
     href: "/coupons?exclusive=true",
     label: "Exclusives",
     hint: "Only on this site",
-    icon: "⭐",
+    Icon: Star,
     className: "from-accent-300 to-accent-100 dark:from-brand-950 dark:to-brand-900/40",
   },
   {
@@ -385,15 +429,15 @@ const QUICK_LINKS = [
     href: "/coupons?expiringSoon=true",
     label: "Ending soon",
     hint: "Before they go",
-    icon: "⏳",
+    Icon: Clock3,
     className: "from-brand-200 to-brand-50 dark:from-brand-950 dark:to-brand-900/40",
   },
 ];
 
 const HERO_PROMISES = [
-  { icon: "✅", title: "Hand-checked", body: "An editor opens every offer" },
-  { icon: "⏱️", title: "Real expiry dates", body: "No invented countdowns" },
-  { icon: "🔓", title: "No account needed", body: "Codes are one click away" },
+  { Icon: BadgeCheck, title: "Hand-checked", body: "An editor opens every offer" },
+  { Icon: Clock3, title: "Real expiry dates", body: "No invented countdowns" },
+  { Icon: LockOpen, title: "No account needed", body: "Codes are one click away" },
 ];
 
 type QuickCounts = Record<"codes" | "shipping" | "exclusive" | "expiring", number>;
@@ -443,8 +487,8 @@ function HomeHero({
                   link.className
                 )}
               >
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[var(--surface)]/85 text-base shadow-[var(--shadow-card)] transition-transform duration-200 group-hover:scale-110">
-                  {link.icon}
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[var(--surface)]/85 text-brand-600 shadow-[var(--shadow-card)] transition-transform duration-200 group-hover:scale-110">
+                  <link.Icon aria-hidden className="size-5" strokeWidth={1.9} />
                 </span>
 
                 <span className="min-w-0">
@@ -466,8 +510,8 @@ function HomeHero({
                   key={promise.title}
                   className="surface flex h-full items-center gap-3 rounded-2xl border border-[var(--border-subtle)] px-3.5 py-3 shadow-[var(--shadow-card)]"
                 >
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-100 to-accent-100 text-lg ring-1 ring-inset ring-brand-200/60 dark:from-brand-950 dark:to-brand-900/50 dark:ring-brand-800">
-                    {promise.icon}
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-100 to-accent-100 text-brand-700 ring-1 ring-inset ring-brand-200/60 dark:from-brand-950 dark:to-brand-900/50 dark:text-brand-300 dark:ring-brand-800">
+                    <promise.Icon aria-hidden className="size-5" strokeWidth={1.9} />
                   </span>
                   <span className="min-w-0">
                     <span className="block truncate text-[13px] font-bold">{promise.title}</span>
@@ -525,7 +569,8 @@ function HomeHero({
                   <div className="flex flex-wrap gap-1.5">
                     {topPick.verified ? (
                       <span className="rounded-full bg-success-50 px-2 py-1 text-[11px] font-bold text-success-700 dark:bg-success-700/15 dark:text-success-500">
-                        ✓ Verified
+                        <BadgeCheck aria-hidden className="mr-1 inline size-3" />
+                        Verified
                       </span>
                     ) : null}
                     {topPick.exclusive ? (
@@ -613,6 +658,205 @@ function HomeHero({
 }
 
 /* =========================================================
+   OFFER CARDS
+
+   Three shapes for the three feeds: one spotlight, a compact tile, and a
+   ranked row. They share the brand's language but never look the same twice
+   down the page.
+========================================================= */
+
+function SpotlightOffer({ coupon }: { coupon: CouponView }) {
+  const store = storeOf(coupon);
+  const points = descriptionLines(coupon.description, 3);
+
+  return (
+    <article className="surface group relative flex flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-brand-100 opacity-60 blur-3xl transition-opacity duration-300 group-hover:opacity-90 dark:bg-brand-900/50"
+      />
+
+      <div className="relative flex flex-1 flex-col gap-4 p-5 sm:p-6">
+        <div className="flex items-start gap-4">
+          <span className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-brand-gradient text-center font-display text-sm font-extrabold leading-tight text-white shadow-[var(--shadow-glow)]">
+            {coupon.badge}
+          </span>
+
+          <div className="min-w-0 flex-1">
+            <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
+              <Badge tone={coupon.hasCode ? "brand" : "accent"}>
+                {COUPON_TYPE_LABELS[coupon.type]}
+              </Badge>
+              {coupon.verified ? (
+                <Badge tone="success">
+                  <BadgeCheck aria-hidden className="mr-1 inline size-3" />
+                  Verified
+                </Badge>
+              ) : null}
+              {coupon.exclusive ? <Badge tone="accent">Exclusive</Badge> : null}
+            </div>
+
+            <h3 className="font-display text-lg font-extrabold leading-snug sm:text-xl">
+              <Link href={`/coupon/${coupon.slug}`} className="transition hover:text-brand-700 dark:hover:text-brand-300">
+                {coupon.title}
+              </Link>
+            </h3>
+
+            {store ? (
+              <Link
+                href={`/store/${store.slug}`}
+                className="mt-2 inline-flex items-center gap-2 rounded-full border border-[var(--border-subtle)] py-1 pl-1 pr-3 text-xs font-semibold transition hover:border-brand-300 hover:text-brand-600"
+              >
+                <StoreLogo name={store.name} logo={store.logo} size={22} rounded="rounded-full" />
+                {store.name}
+              </Link>
+            ) : null}
+          </div>
+        </div>
+
+        {points.length ? (
+          <ul className="space-y-1.5">
+            {points.map((line, index) => (
+              <li key={index} className="flex gap-2 text-sm text-body">
+                <Check aria-hidden className="mt-0.5 size-4 shrink-0 text-brand-500" strokeWidth={2.4} />
+                <span className="line-clamp-1">{line}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+
+        <div className="mt-auto flex flex-wrap items-center gap-3 pt-1">
+          <RevealButton coupon={coupon} size="lg" />
+          <SaveButton couponId={coupon._id} />
+
+          <span className="ml-auto flex items-center gap-1.5 text-xs font-semibold text-faint">
+            <Clock3 aria-hidden className="size-3.5" />
+            {expiryLabel(coupon) ?? "No expiry"}
+          </span>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function MiniOffer({ coupon }: { coupon: CouponView }) {
+  const store = storeOf(coupon);
+
+  return (
+    <article className="surface group flex flex-col gap-3 rounded-2xl border border-[var(--border-subtle)] p-4 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]">
+      <div className="flex items-center gap-2.5">
+        <StoreLogo name={store?.name ?? "Store"} logo={store?.logo} size={34} rounded="rounded-xl" />
+        <span className="min-w-0 flex-1 truncate text-xs font-bold text-faint">
+          {store?.name ?? "Featured"}
+        </span>
+        <span className="shrink-0 rounded-lg bg-brand-50 px-2 py-1 text-xs font-extrabold text-brand-700 dark:bg-brand-950/70 dark:text-brand-300">
+          {coupon.badge}
+        </span>
+      </div>
+
+      <Link
+        href={`/coupon/${coupon.slug}`}
+        className="line-clamp-2 flex-1 text-sm font-semibold leading-snug transition hover:text-brand-700 dark:hover:text-brand-300"
+      >
+        {coupon.title}
+      </Link>
+
+      <div className="flex items-center gap-2">
+        <RevealButton coupon={coupon} size="sm" />
+        <span className="ml-auto flex items-center gap-1 text-[11px] font-semibold text-faint">
+          <Clock3 aria-hidden className="size-3" />
+          {expiryLabel(coupon) ?? "No expiry"}
+        </span>
+      </div>
+    </article>
+  );
+}
+
+function RankedOffer({ coupon, rank }: { coupon: CouponView; rank: number }) {
+  const store = storeOf(coupon);
+
+  return (
+    <article className="surface group relative flex items-center gap-3.5 overflow-hidden rounded-2xl border border-[var(--border-subtle)] p-4 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]">
+      {/* The rank, oversized and faint, is the section's signature. */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -bottom-4 -right-1 font-display text-7xl font-extrabold leading-none text-brand-100 transition-transform duration-300 group-hover:-translate-y-1 dark:text-brand-950"
+      >
+        {rank}
+      </span>
+
+      <span className="relative flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-gradient text-sm font-extrabold text-white shadow-[var(--shadow-glow)]">
+        {rank}
+      </span>
+
+      <StoreLogo
+        name={store?.name ?? "Store"}
+        logo={store?.logo}
+        size={38}
+        rounded="rounded-xl"
+        className="relative"
+      />
+
+      <div className="relative min-w-0 flex-1">
+        <Link
+          href={`/coupon/${coupon.slug}`}
+          className="line-clamp-2 text-sm font-semibold leading-snug transition hover:text-brand-700 dark:hover:text-brand-300"
+        >
+          {coupon.title}
+        </Link>
+        <p className="mt-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-faint">
+          {store?.name ?? "Featured"}
+          {coupon.uses ? (
+            <>
+              <span aria-hidden>·</span>
+              <Flame aria-hidden className="size-3 text-accent-500" />
+              used {formatCount(coupon.uses)}×
+            </>
+          ) : null}
+        </p>
+      </div>
+
+      <span className="relative shrink-0 rounded-lg bg-brand-50 px-2 py-1 text-xs font-extrabold text-brand-700 dark:bg-brand-950/70 dark:text-brand-300">
+        {coupon.badge}
+      </span>
+    </article>
+  );
+}
+
+function BrandCard({ store }: { store: Store }) {
+  return (
+    <Link
+      href={`/store/${store.slug}`}
+      className="surface group relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-[var(--border-subtle)] p-4 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]"
+    >
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -right-10 -top-10 size-24 rounded-full bg-accent-100 opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100 dark:bg-brand-900/60"
+      />
+
+      <div className="relative flex items-center gap-3">
+        <StoreLogo name={store.name} logo={store.logo} size={46} rounded="rounded-2xl" />
+        <div className="min-w-0">
+          <p className="truncate text-sm font-bold">{store.name}</p>
+          <p className="text-xs text-faint">
+            {formatCount(store.activeCouponCount)} live offers
+          </p>
+        </div>
+      </div>
+
+      <p className="relative line-clamp-1 rounded-xl bg-brand-50 px-3 py-2 text-xs font-bold text-brand-700 dark:bg-brand-950/60 dark:text-brand-300">
+        {store.bestOffer ?? `Up to ${store.averageDiscount ?? "big"} savings`}
+      </p>
+
+      <span className="relative flex items-center gap-1 text-xs font-bold text-brand-600">
+        View deals
+        <ArrowRight aria-hidden className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+      </span>
+    </Link>
+  );
+}
+
+/* =========================================================
    TRENDING BRANDS
 
    One line that slides right to left for ever. The list is rendered twice so
@@ -629,9 +873,7 @@ function TrendingBrands({ stores }: { stores: HomepagePayload["stores"] }) {
       <div className="surface relative overflow-hidden rounded-3xl border border-[var(--border-subtle)] py-3.5 shadow-[var(--shadow-card)]">
         <div className="mb-2.5 flex items-center gap-3 px-4">
           <span className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-faint">
-            <span aria-hidden className="text-sm">
-              🔥
-            </span>
+            <Flame aria-hidden className="size-4 text-accent-500" />
             Trending brands
           </span>
 
@@ -738,7 +980,7 @@ function CategoryRail({
 
             <span
               className={classNames(
-                "relative flex size-12 shrink-0 items-center justify-center rounded-2xl text-xl ring-1 ring-inset transition-transform duration-300 group-hover:scale-110",
+                "relative flex size-12 shrink-0 items-center justify-center rounded-2xl text-brand-700 ring-1 ring-inset transition-transform duration-300 group-hover:scale-110 dark:text-brand-300",
                 index % 3 === 0
                   ? "bg-gradient-to-br from-brand-100 to-brand-50 ring-brand-200/70 dark:from-brand-950 dark:to-brand-900/50 dark:ring-brand-800"
                   : index % 3 === 1
@@ -746,7 +988,7 @@ function CategoryRail({
                     : "bg-gradient-to-br from-accent-300 to-accent-100 ring-accent-200/70 dark:from-brand-950 dark:to-brand-900/50 dark:ring-brand-800"
               )}
             >
-              {category.icon ?? "🏷️"}
+              <CategoryIcon name={category.name} className="size-6" />
             </span>
 
             <span className="relative min-w-0 flex-1">
@@ -791,28 +1033,28 @@ function StatBar({
       value: formatCount(offerCount),
       label: "Live offers",
       note: "Every one opened and checked by an editor",
-      icon: "🏷️",
+      Icon: Tag,
       href: "/coupons",
     },
     {
       value: formatCount(storeCount),
       label: "Stores listed",
       note: "New brands added every week",
-      icon: "🏬",
+      Icon: StoreIcon,
       href: "/stores",
     },
     {
       value: formatCount(codeCount),
       label: "Promo codes",
       note: "Copy, paste, pay less at checkout",
-      icon: "🎟️",
+      Icon: Ticket,
       href: "/coupons?withCode=true",
     },
     {
       value: formatCount(categoryCount),
       label: "Categories",
       note: "From electronics to travel",
-      icon: "🗂️",
+      Icon: LayoutGrid,
       href: "/categories",
     },
   ];
@@ -828,12 +1070,11 @@ function StatBar({
           >
             <div className="surface relative h-full overflow-hidden rounded-[1.4rem] p-5">
               {/* The mark, faint, as a watermark in the corner. */}
-              <span
+              <stat.Icon
                 aria-hidden
-                className="pointer-events-none absolute -right-6 -top-8 text-7xl opacity-[0.06] transition-transform duration-500 group-hover:scale-110"
-              >
-                {stat.icon}
-              </span>
+                className="pointer-events-none absolute -right-5 -top-6 size-28 text-brand-500 opacity-[0.07] transition-transform duration-500 group-hover:scale-110"
+                strokeWidth={1.2}
+              />
 
               <div className="flex items-baseline gap-2">
                 <span className="font-display text-4xl font-extrabold leading-none text-brand-gradient">
@@ -864,10 +1105,10 @@ function StatBar({
 
 function TrustStrip() {
   const points = [
-    { icon: "✓", title: "Checked, not scraped", body: "An editor opens every offer before it goes live." },
-    { icon: "⏱", title: "Real expiry dates", body: "If we do not know when it ends, we say so." },
-    { icon: "🔒", title: "No account needed", body: "Codes are one click away. Signing in only saves them." },
-    { icon: "💬", title: "You keep us honest", body: "Vote on what worked and we act on it." },
+    { Icon: BadgeCheck, title: "Checked, not scraped", body: "An editor opens every offer before it goes live." },
+    { Icon: Clock3, title: "Real expiry dates", body: "If we do not know when it ends, we say so." },
+    { Icon: LockOpen, title: "No account needed", body: "Codes are one click away. Signing in only saves them." },
+    { Icon: MessagesSquare, title: "You keep us honest", body: "Vote on what worked and we act on it." },
   ];
 
   return (
@@ -875,8 +1116,8 @@ function TrustStrip() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {points.map((point) => (
           <Card key={point.title} className="flex gap-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-lg dark:bg-brand-950/60">
-              {point.icon}
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300">
+              <point.Icon aria-hidden className="size-5" strokeWidth={1.9} />
             </span>
             <span>
               <span className="block text-sm font-bold">{point.title}</span>
