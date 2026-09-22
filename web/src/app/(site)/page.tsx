@@ -112,6 +112,26 @@ export default async function HomePage() {
       .catch(() => 0),
   ]);
 
+  /*
+   * Each brand card needs its own offers, and the homepage payload does not
+   * carry them. Six cheap, cached lookups is enough to fill three cards even
+   * when a store or two has only one live offer.
+   */
+  const brandPicks = (
+    await Promise.all(
+      data.stores.slice(0, 6).map((store) =>
+        apiPaged<CouponView>("/coupons", {
+          query: { store: store.slug, limit: 2, sort: "best" },
+          revalidate: 600,
+        })
+          .then((result) => ({ store, offers: result.items }))
+          .catch(() => ({ store, offers: [] as CouponView[] }))
+      )
+    )
+  )
+    .filter((entry) => entry.offers.length === 2)
+    .slice(0, 3);
+
   const totalOffers = data.categories.reduce(
     (sum, category) => sum + (category.activeCouponCount ?? 0),
     0
@@ -162,7 +182,7 @@ export default async function HomePage() {
 
       <CategoryRail categories={data.categories} total={categoryCount} />
 
-      <TopBrands stores={data.stores} storeCount={storeCount} />
+      <TopBrands picks={brandPicks} stores={data.stores} storeCount={storeCount} />
 
       <StatBar
         offerCount={offerCount || totalOffers}
@@ -1004,67 +1024,143 @@ function CategoryRail({
 /* =========================================================
    TOP BRANDS
 
-   A logo wall: no counts, no copy, just the marks a shopper recognises. It
-   sits between the category grid and the numbers, where the page would
-   otherwise run two text blocks together.
+   Each card is a shop and its two best live offers, so the section answers
+   "which brands, and what have they got on" in one pass — rather than being
+   a wall of logos with nothing behind them.
 ========================================================= */
 
 function TopBrands({
+  picks,
   stores,
   storeCount,
 }: {
+  picks: { store: Store; offers: CouponView[] }[];
   stores: HomepagePayload["stores"];
   storeCount: number;
 }) {
-  if (stores.length < 6) return null;
+  if (!picks.length) return null;
+
+  const rest = stores.filter((store) => !picks.some((pick) => pick.store._id === store._id));
 
   return (
     <section className="shell pt-12">
-      <div className="surface relative overflow-hidden rounded-3xl border border-[var(--border-subtle)] p-5 shadow-[var(--shadow-card)] sm:p-6">
-        <span
-          aria-hidden
-          className="pointer-events-none absolute -right-20 -top-24 size-64 rounded-full bg-brand-100 opacity-60 blur-3xl dark:bg-brand-900/40"
-        />
-
-        <div className="relative mb-5 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-brand-600">
-              <span className="h-px w-6 bg-brand-400" />
-              Top brands
-            </p>
-            <h2 className="mt-1 font-display text-xl font-extrabold sm:text-2xl">
-              Names you already shop with
-            </h2>
-          </div>
-
-          <Link
-            href="/stores"
-            className="group inline-flex items-center gap-1.5 rounded-full bg-brand-gradient px-4 py-2 text-sm font-bold text-white shadow-[var(--shadow-glow)] transition-all hover:-translate-y-px hover:shadow-[var(--shadow-glow-strong)]"
-          >
-            Browse {formatCount(storeCount || stores.length)} stores
-            <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-brand-600">
+            <span className="h-px w-6 bg-brand-400" />
+            Top brands
+          </p>
+          <h2 className="mt-1 font-display text-xl font-extrabold sm:text-2xl">
+            Names you already shop with
+          </h2>
+          <p className="mt-1 text-sm text-body">
+            What each of them has on right now, straight from the store page.
+          </p>
         </div>
 
-        <div className="relative grid grid-cols-3 gap-2.5 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
-          {stores.slice(0, 16).map((store) => (
+        <Link
+          href="/stores"
+          className="group inline-flex items-center gap-1.5 rounded-full bg-brand-gradient px-4 py-2 text-sm font-bold text-white shadow-[var(--shadow-glow)] transition-all hover:-translate-y-px hover:shadow-[var(--shadow-glow-strong)]"
+        >
+          Browse {formatCount(storeCount || stores.length)} stores
+          <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
+        </Link>
+      </div>
+
+      <div className="grid gap-3 lg:grid-cols-3">
+        {picks.map(({ store, offers }) => (
+          <article
+            key={store._id}
+            className="surface group flex flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]"
+          >
+            {/* The shop: logo, what it sells, and how much is live. */}
+            <div className="flex items-center gap-3 border-b border-[var(--border-subtle)] bg-gradient-to-r from-brand-50 to-accent-100/60 px-4 py-3.5 dark:from-brand-950/70 dark:to-brand-900/40">
+              <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-1.5">
+                <StoreLogo name={store.name} logo={store.logo} size={46} rounded="rounded-xl" className="border-0" />
+              </span>
+
+              <div className="min-w-0 flex-1">
+                <Link
+                  href={`/store/${store.slug}`}
+                  className="block truncate font-display text-base font-extrabold transition hover:text-brand-700 dark:hover:text-brand-300"
+                >
+                  {store.name}
+                </Link>
+                <p className="truncate text-xs font-semibold text-faint">
+                  {formatCount(store.activeCouponCount)} live offers
+                  {store.codeCount ? ` · ${formatCount(store.codeCount)} codes` : ""}
+                </p>
+              </div>
+
+              {store.bestOffer ? (
+                <span className="shrink-0 rounded-xl bg-brand-gradient px-2.5 py-1.5 text-xs font-extrabold text-white shadow-[var(--shadow-glow)]">
+                  {store.bestOffer}
+                </span>
+              ) : null}
+            </div>
+
+            {/* Its offers, in the same shape as everywhere else on the site. */}
+            <ul className="flex flex-1 flex-col divide-y divide-[var(--border-subtle)]">
+              {offers.map((coupon) => (
+                <li key={coupon._id} className="flex items-center gap-3 px-4 py-3">
+                  <span className="min-w-0 flex-1">
+                    <Link
+                      href={`/coupon/${coupon.slug}`}
+                      className="line-clamp-2 text-sm font-semibold leading-snug transition hover:text-brand-700 dark:hover:text-brand-300"
+                    >
+                      {coupon.title}
+                    </Link>
+                    <span className="mt-1 flex items-center gap-2 text-[11px] font-semibold text-faint">
+                      <span className="rounded bg-brand-50 px-1.5 py-0.5 text-brand-700 dark:bg-brand-950/70 dark:text-brand-300">
+                        {coupon.badge}
+                      </span>
+                      {coupon.hasCode ? "Promo code" : "Deal"}
+                      {coupon.verified ? " · verified" : ""}
+                    </span>
+                  </span>
+
+                  <RevealButton coupon={coupon} size="sm" />
+                </li>
+              ))}
+            </ul>
+
+            <Link
+              href={`/store/${store.slug}`}
+              className="flex items-center justify-between gap-2 border-t border-[var(--border-subtle)] px-4 py-3 text-sm font-bold text-brand-600 transition hover:bg-brand-50 dark:hover:bg-brand-950/50"
+            >
+              All {store.name} offers
+              <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </article>
+        ))}
+      </div>
+
+      {/* The rest of the shelf, as marks only. */}
+      {rest.length ? (
+        <div className="mt-3 grid grid-cols-4 gap-2.5 sm:grid-cols-6 lg:grid-cols-9">
+          {rest.slice(0, 9).map((store) => (
             <Link
               key={store._id}
               href={`/store/${store.slug}`}
-              title={`${store.name} — ${formatCount(store.activeCouponCount)} offers`}
-              className="group flex aspect-[4/3] items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-3 transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]"
+              className="surface group flex flex-col items-center gap-1.5 rounded-2xl border border-[var(--border-subtle)] px-2 py-3 text-center shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]"
             >
               <StoreLogo
                 name={store.name}
                 logo={store.logo}
-                size={56}
+                size={42}
                 rounded="rounded-xl"
                 className="border-0 transition-transform duration-200 group-hover:scale-110"
               />
+              <span className="w-full min-w-0">
+                <span className="block truncate text-[11px] font-bold">{store.name}</span>
+                <span className="block text-[10px] font-semibold text-faint">
+                  {formatCount(store.activeCouponCount)} offers
+                </span>
+              </span>
             </Link>
           ))}
         </div>
-      </div>
+      ) : null}
     </section>
   );
 }

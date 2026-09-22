@@ -1,4 +1,4 @@
-import { BadgeCheck, Clock3, Flame } from "lucide-react";
+import { BadgeCheck, Clock3, Flame, Users } from "lucide-react";
 import Link from "next/link";
 import {
   COUPON_TYPE_LABELS,
@@ -17,9 +17,9 @@ import { SaveButton } from "./SaveButton";
 /**
  * The unit the whole site is built from.
  *
- * `variant` changes density, not information: a rail card is narrow and
- * fixed-width, a list card is wide and shows the description, a compact card
- * strips everything but the essentials for a sidebar.
+ * Every variant follows the same reading order — who, what, why it is worth
+ * a click, then the action — so a shopper never has to relearn the card when
+ * they move between the homepage, a category and a store.
  */
 export function CouponCard({
   coupon,
@@ -35,43 +35,16 @@ export function CouponCard({
   const store = storeOf(coupon);
   const expiry = expiryLabel(coupon);
   const urgent = isUrgent(coupon);
-  const lines = descriptionLines(coupon.description, variant === "list" ? 3 : 1);
+  const lines = descriptionLines(coupon.description, variant === "list" ? 2 : 1);
 
   const href = `/coupon/${coupon.slug}`;
 
-  if (variant === "rail") {
-    return (
-      <article className="surface group flex w-[19rem] shrink-0 snap-start flex-col gap-3 rounded-2xl border border-[var(--border-subtle)] p-5 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]">
-        <div className="flex items-start justify-between gap-3">
-          {store ? (
-            <Link href={`/store/${store.slug}`} className="flex items-center gap-2.5">
-              <StoreLogo name={store.name} logo={store.logo} size={40} />
-              <span className="text-sm font-semibold">{store.name}</span>
-            </Link>
-          ) : (
-            <span />
-          )}
-          <DiscountBadge coupon={coupon} />
-        </div>
-
-        <Link href={href} className="flex-1">
-          <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug transition group-hover:text-brand-600">
-            {coupon.title}
-          </h3>
-        </Link>
-
-        <div className="flex items-center justify-between gap-2">
-          <MetaRow coupon={coupon} expiry={expiry} urgent={urgent} compact />
-          <RevealButton coupon={coupon} size="sm" />
-        </div>
-      </article>
-    );
-  }
-
+  /* ---------------- compact: a row inside a sidebar or a modal ---------------- */
   if (variant === "compact") {
     return (
       <article className="flex items-center gap-3 border-b border-[var(--border-subtle)] py-3 last:border-0">
-        {store ? <StoreLogo name={store.name} logo={store.logo} size={36} /> : null}
+        {store ? <StoreLogo name={store.name} logo={store.logo} size={36} rounded="rounded-xl" /> : null}
+
         <Link href={href} className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold transition hover:text-brand-600">
             {coupon.title}
@@ -80,100 +53,140 @@ export function CouponCard({
             {coupon.badge} · {COUPON_TYPE_LABELS[coupon.type]}
           </p>
         </Link>
+
         <RevealButton coupon={coupon} size="sm" />
       </article>
     );
   }
 
+  /* ---------------- rail: fixed width, used in horizontal scrollers ---------------- */
+  if (variant === "rail") {
+    return (
+      <article className="surface group relative flex w-[19rem] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-[var(--border-subtle)] shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]">
+        <div className="flex items-center gap-2.5 border-b border-[var(--border-subtle)] bg-[var(--surface-sunken)]/60 px-4 py-2.5">
+          {store ? (
+            <>
+              <StoreLogo name={store.name} logo={store.logo} size={30} rounded="rounded-lg" />
+              <Link
+                href={`/store/${store.slug}`}
+                className="min-w-0 flex-1 truncate text-xs font-bold transition hover:text-brand-600"
+              >
+                {store.name}
+              </Link>
+            </>
+          ) : (
+            <span className="flex-1" />
+          )}
+
+          <DiscountBadge coupon={coupon} />
+        </div>
+
+        <div className="flex flex-1 flex-col gap-3 p-4">
+          <Link href={href} className="flex-1">
+            <h3 className="line-clamp-3 text-[15px] font-semibold leading-snug transition group-hover:text-brand-700 dark:group-hover:text-brand-300">
+              {coupon.title}
+            </h3>
+          </Link>
+
+          <RevealButton coupon={coupon} full />
+
+          <MetaRow coupon={coupon} expiry={expiry} urgent={urgent} />
+        </div>
+      </article>
+    );
+  }
+
+  /* ---------------- list: the default, everywhere offers are listed ---------------- */
   return (
     <article
       className={classNames(
-        // Below `sm` the three columns cannot all fit, so the card stacks:
-        // badge and logo on one row, then the copy, then the action.
-        "surface group relative flex flex-col gap-3 rounded-2xl border p-4 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-[var(--shadow-lift)] sm:flex-row sm:gap-5 sm:p-5",
+        "surface group relative flex flex-col overflow-hidden rounded-2xl border shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]",
         urgent ? "border-warn-500/40" : "border-[var(--border-subtle)]",
         coupon.isExpired && "opacity-65"
       )}
     >
-      {/* The badge column doubles as the torn-stub edge of a paper voucher. */}
-      <div className="flex shrink-0 flex-row items-center gap-3 sm:flex-col sm:gap-2">
-        <DiscountBadge coupon={coupon} large />
+      {/* Header: who the offer is with, and what it is worth. */}
+      <div className="flex items-center gap-3 border-b border-[var(--border-subtle)] bg-[var(--surface-sunken)]/50 px-4 py-2.5">
         {showStore && store ? (
-          <Link href={`/store/${store.slug}`} aria-label={store.name}>
-            <StoreLogo name={store.name} logo={store.logo} size={48} />
-          </Link>
+          <>
+            <Link href={`/store/${store.slug}`} aria-label={store.name} className="shrink-0">
+              <StoreLogo name={store.name} logo={store.logo} size={34} rounded="rounded-lg" />
+            </Link>
+            <Link
+              href={`/store/${store.slug}`}
+              className="min-w-0 truncate text-xs font-bold transition hover:text-brand-600"
+            >
+              {store.name}
+            </Link>
+          </>
         ) : null}
-      </div>
 
-      <div className="min-w-0 flex-1">
-        <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
-          <Badge tone={coupon.hasCode ? "brand" : "accent"}>
-            {COUPON_TYPE_LABELS[coupon.type]}
-          </Badge>
+        <span className="ml-auto flex shrink-0 items-center gap-1.5">
           {coupon.exclusive ? <Badge tone="accent">Exclusive</Badge> : null}
-          {coupon.verified ? (
-            <Badge tone="success">
-              <BadgeCheck aria-hidden className="mr-1 inline size-3" />
-              Verified
-            </Badge>
-          ) : null}
           {coupon.trending ? (
             <Badge tone="warn">
               <Flame aria-hidden className="mr-1 inline size-3" />
               Trending
             </Badge>
           ) : null}
+          <DiscountBadge coupon={coupon} />
+        </span>
+      </div>
+
+      {/* Body: the offer itself. */}
+      <div className="flex flex-1 flex-col gap-2.5 px-4 py-3.5">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <Badge tone={coupon.hasCode ? "brand" : "accent"}>
+            {COUPON_TYPE_LABELS[coupon.type]}
+          </Badge>
+          {coupon.verified ? (
+            <Badge tone="success">
+              <BadgeCheck aria-hidden className="mr-1 inline size-3" />
+              Verified
+            </Badge>
+          ) : null}
         </div>
 
-        <h3 className="text-base font-semibold leading-snug break-words sm:text-[17px]">
-          <Link href={href} className="transition hover:text-brand-600">
+        <h3 className="text-[15px] font-semibold leading-snug break-words sm:text-base">
+          <Link href={href} className="transition hover:text-brand-700 dark:hover:text-brand-300">
             {coupon.title}
           </Link>
         </h3>
 
-        {showStore && store ? (
-          <p className="mt-0.5 text-sm text-faint">
-            at{" "}
-            <Link href={`/store/${store.slug}`} className="font-medium text-body hover:text-brand-600">
-              {store.name}
-            </Link>
-          </p>
-        ) : null}
-
         {lines.length ? (
-          <ul className="mt-2.5 space-y-1">
+          <ul className="space-y-1">
             {lines.map((line, index) => (
-              <li key={index} className="flex gap-2 text-sm text-body">
+              <li key={index} className="flex gap-2 text-[13px] leading-relaxed text-body">
                 <span aria-hidden className="mt-1.5 size-1 shrink-0 rounded-full bg-brand-400" />
                 <span className="line-clamp-1">{line}</span>
               </li>
             ))}
           </ul>
         ) : null}
-
-        <div className="mt-3">
-          <MetaRow coupon={coupon} expiry={expiry} urgent={urgent} />
-        </div>
       </div>
 
-      <div className="flex shrink-0 items-center justify-between gap-2 sm:flex-col sm:items-end sm:justify-center">
-        <RevealButton coupon={coupon} />
-        {!hideSave ? <SaveButton couponId={coupon._id} /> : null}
+      {/* Footer: the action, and the facts that decide whether it is worth it. */}
+      <div className="flex flex-wrap items-center gap-3 border-t border-dashed border-[var(--border-strong)] px-4 py-3">
+        <MetaRow coupon={coupon} expiry={expiry} urgent={urgent} />
+
+        <span className="ml-auto flex items-center gap-2">
+          {!hideSave ? <SaveButton couponId={coupon._id} /> : null}
+          <RevealButton coupon={coupon} />
+        </span>
       </div>
     </article>
   );
 }
 
-function DiscountBadge({ coupon, large }: { coupon: CouponView; large?: boolean }) {
+function DiscountBadge({ coupon }: { coupon: CouponView }) {
   const isPercent = coupon.discountType === "percent";
 
   return (
     <span
       className={classNames(
-        "inline-flex items-center justify-center rounded-xl text-center font-bold leading-tight",
-        large ? "min-h-14 w-16 px-1.5 py-2 text-[13px]" : "px-2.5 py-1 text-xs",
+        "inline-flex items-center justify-center rounded-lg px-2.5 py-1 text-center text-xs font-extrabold leading-tight",
         isPercent
-          ? "bg-brand-gradient text-white"
+          ? "bg-brand-gradient text-white shadow-[var(--shadow-glow)]"
           : "bg-brand-50 text-brand-700 ring-1 ring-brand-200 dark:bg-brand-950 dark:text-brand-300 dark:ring-brand-800"
       )}
     >
@@ -186,34 +199,28 @@ function MetaRow({
   coupon,
   expiry,
   urgent,
-  compact,
 }: {
   coupon: CouponView;
   expiry: string | null;
   urgent: boolean;
-  compact?: boolean;
 }) {
   return (
-    <div
-      className={classNames(
-        "flex flex-wrap items-center gap-x-3 gap-y-1 text-xs",
-        compact ? "text-faint" : "text-faint"
-      )}
-    >
-      {coupon.uses > 0 ? <span>Used {formatCount(coupon.uses)}×</span> : null}
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold text-faint">
+      <span className={classNames("flex items-center gap-1", urgent && "text-warn-600")}>
+        <Clock3 aria-hidden className="size-3" />
+        {expiry ?? "No expiry"}
+      </span>
 
-      {coupon.successRate !== null ? (
-        <span className="font-semibold text-success-600">{coupon.successRate}% worked</span>
+      {coupon.uses > 0 ? (
+        <span className="flex items-center gap-1">
+          <Users aria-hidden className="size-3" />
+          {formatCount(coupon.uses)} used
+        </span>
       ) : null}
 
-      {expiry ? (
-        <span className={classNames("font-semibold", urgent && "text-warn-600")}>
-          {urgent ? <Clock3 aria-hidden className="mr-1 inline size-3" /> : null}
-          {expiry}
-        </span>
-      ) : (
-        <span>No expiry</span>
-      )}
+      {coupon.successRate !== null ? (
+        <span className="text-success-600">{coupon.successRate}% worked</span>
+      ) : null}
     </div>
   );
 }
@@ -226,7 +233,7 @@ export function CouponList({
   showStore?: boolean;
 }) {
   return (
-    <div className="space-y-3">
+    <div className="grid gap-3 xl:grid-cols-2">
       {items.map((coupon) => (
         <CouponCard key={coupon._id} coupon={coupon} showStore={showStore} />
       ))}

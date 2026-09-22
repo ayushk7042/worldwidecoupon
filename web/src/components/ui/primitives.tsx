@@ -13,7 +13,8 @@ type BadgeTone = "brand" | "success" | "warn" | "danger" | "neutral" | "accent";
 
 const BADGE_TONES: Record<BadgeTone, string> = {
   brand: "bg-brand-50 text-brand-700 ring-brand-200 dark:bg-brand-950 dark:text-brand-300 dark:ring-brand-800",
-  accent: "bg-purple-50 text-purple-700 ring-purple-200 dark:bg-purple-950 dark:text-purple-300 dark:ring-purple-800",
+  accent:
+    "bg-accent-300 text-accent-600 ring-accent-400/40 dark:bg-accent-600/15 dark:text-accent-400 dark:ring-accent-600/30",
   success: "bg-success-50 text-success-700 ring-success-500/25 dark:bg-success-700/15 dark:text-success-500",
   warn: "bg-warn-50 text-warn-600 ring-warn-500/25 dark:bg-warn-500/10 dark:text-warn-500",
   danger: "bg-danger-50 text-danger-600 ring-danger-500/25 dark:bg-danger-500/10 dark:text-danger-500",
