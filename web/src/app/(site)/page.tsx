@@ -359,98 +359,97 @@ function HomeHero({
   return (
     <section className="bg-aurora relative overflow-hidden border-b border-[var(--border-subtle)]">
       <div className="shell relative py-6 lg:py-8">
-        {/* The banner runs the full width: it is the loudest thing on the page
-            and nothing should be competing with it for the eye. */}
-        <div className="relative">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -inset-3 rounded-[2.4rem] bg-gradient-to-r from-brand-400/25 via-accent-400/20 to-brand-300/25 blur-2xl"
-          />
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <div className="relative min-w-0">
+            {/* A blurred colour wash behind the frame lifts the artwork off
+                the page instead of sitting it in a plain box. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -inset-3 rounded-[2.4rem] bg-gradient-to-r from-brand-400/25 via-accent-400/20 to-brand-300/25 blur-2xl"
+            />
 
-          <HeroBanners
-            banners={banners.length ? banners : DEFAULT_BANNERS}
-            height="ratio"
-            bare
-            frameClassName="relative rounded-[1.75rem] border-0 bg-transparent shadow-[0_34px_70px_-30px_rgba(31,41,55,0.65)] ring-1 ring-ink-900/10 dark:ring-white/15"
-          />
-        </div>
+            <HeroBanners
+              banners={banners.length ? banners : DEFAULT_BANNERS}
+              height="ratio"
+              bare
+              frameClassName="relative rounded-[1.75rem] border-0 bg-transparent shadow-[0_34px_70px_-30px_rgba(31,41,55,0.65)] ring-1 ring-ink-900/10 dark:ring-white/15"
+            />
+          </div>
 
-        <div className="mt-4 grid gap-3 lg:grid-cols-[1.7fr_repeat(4,minmax(0,1fr))]">
-          {topPick ? (
-            <article className="surface hover-lift group relative flex min-w-0 flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-[var(--shadow-card)]">
-              <div className="flex items-center justify-between gap-2 bg-brand-gradient px-4 py-2 text-white">
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em]">
-                  <span className="size-1.5 animate-pulse rounded-full bg-white" />
-                  Pick of the day
-                </span>
-                <span className="font-display text-base font-extrabold">{topPick.badge}</span>
-              </div>
-
-              <div className="flex flex-1 flex-col gap-3 p-4">
-                <div className="flex items-start gap-3">
-                  <StoreLogo
-                    name={store?.name ?? "Store"}
-                    logo={store?.logo}
-                    size={44}
-                    rounded="rounded-2xl"
-                  />
-
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-bold text-faint">
-                      {store?.name ?? "Featured"} · {topPick.hasCode ? "Promo code" : "Deal"}
-                    </p>
-                    <Link
-                      href={`/coupon/${topPick.slug}`}
-                      className="line-clamp-2 text-[15px] font-semibold leading-snug transition hover:text-brand-700 dark:hover:text-brand-300"
-                    >
-                      {topPick.title}
-                    </Link>
-                  </div>
+          <aside className="flex min-w-0 flex-col gap-3">
+            {topPick ? (
+              <article className="surface hover-lift group relative flex flex-1 flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-[var(--shadow-card)]">
+                <div className="flex items-center justify-between gap-2 bg-brand-gradient px-4 py-2.5 text-white">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em]">
+                    <span className="size-1.5 animate-pulse rounded-full bg-white" />
+                    Pick of the day
+                  </span>
+                  <span className="font-display text-base font-extrabold">{topPick.badge}</span>
                 </div>
 
+                <div className="flex flex-1 flex-col gap-3 p-4">
+                  <div className="flex items-start gap-3">
+                    <StoreLogo
+                      name={store?.name ?? "Store"}
+                      logo={store?.logo}
+                      size={46}
+                      rounded="rounded-2xl"
+                    />
+
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-xs font-bold text-faint">
+                        {store?.name ?? "Featured"} · {topPick.hasCode ? "Promo code" : "Deal"}
+                      </p>
+                      <Link
+                        href={`/coupon/${topPick.slug}`}
+                        className="line-clamp-2 text-[15px] font-semibold leading-snug transition hover:text-brand-700 dark:hover:text-brand-300"
+                      >
+                        {topPick.title}
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="mt-auto space-y-2">
+                    <Link
+                      href={`/coupon/${topPick.slug}`}
+                      className="inline-flex h-11 w-full items-center justify-center gap-1.5 rounded-2xl bg-brand-gradient text-sm font-bold text-white shadow-[var(--shadow-glow)] transition-all duration-200 group-hover:-translate-y-0.5 group-hover:shadow-[var(--shadow-glow-strong)]"
+                    >
+                      {topPick.hasCode ? "Reveal the code" : "Get the deal"}
+                      <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5">
+                        →
+                      </span>
+                    </Link>
+
+                    <p className="text-center text-[11px] text-faint">
+                      {topPick.verified ? "Checked by an editor" : "Updated today"}
+                      {topPick.uses ? ` · used ${formatCount(topPick.uses)}×` : ""}
+                    </p>
+                  </div>
+                </div>
+              </article>
+            ) : null}
+
+            <div className="grid shrink-0 grid-cols-4 gap-2">
+              {QUICK_LINKS.map((link) => (
                 <Link
-                  href={`/coupon/${topPick.slug}`}
-                  className="mt-auto inline-flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-brand-gradient text-sm font-bold text-white shadow-[var(--shadow-glow)] transition-all duration-200 group-hover:-translate-y-0.5 group-hover:shadow-[var(--shadow-glow-strong)]"
+                  key={link.href}
+                  href={link.href}
+                  title={link.hint}
+                  className={classNames(
+                    "group flex min-w-0 flex-col items-center gap-1.5 rounded-2xl bg-gradient-to-br px-1 py-2.5 text-center ring-1 ring-inset ring-ink-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)] dark:ring-white/10",
+                    link.className
+                  )}
                 >
-                  {topPick.hasCode ? "Reveal the code" : "Get the deal"}
-                  <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5">
-                    →
+                  <span className="flex size-9 items-center justify-center rounded-xl bg-[var(--surface)]/85 text-base shadow-[var(--shadow-card)] transition-transform duration-200 group-hover:scale-110">
+                    {link.icon}
                   </span>
-                </Link>
-              </div>
-            </article>
-          ) : null}
-
-          <div className="grid grid-cols-2 gap-3 lg:col-span-4 lg:grid-cols-4">
-            {QUICK_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={classNames(
-                  "group relative flex min-w-0 flex-col justify-between gap-2 overflow-hidden rounded-3xl bg-gradient-to-br p-3.5 ring-1 ring-inset ring-ink-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)] dark:ring-white/10",
-                  link.className
-                )}
-              >
-                <span className="flex size-10 items-center justify-center rounded-2xl bg-[var(--surface)]/85 text-lg shadow-[var(--shadow-card)] transition-transform duration-200 group-hover:scale-110">
-                  {link.icon}
-                </span>
-
-                <span className="min-w-0">
-                  <span className="block truncate text-[13px] font-bold leading-tight">
+                  <span className="w-full truncate text-[11px] font-bold leading-tight">
                     {link.label}
                   </span>
-                  <span className="block truncate text-[11px] text-faint">{link.hint}</span>
-                </span>
-
-                <span
-                  aria-hidden
-                  className="absolute right-3 top-3 text-sm text-faint opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100"
-                >
-                  →
-                </span>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          </aside>
         </div>
       </div>
     </section>
@@ -469,16 +468,25 @@ function TrendingBrands({ stores }: { stores: HomepagePayload["stores"] }) {
 
   return (
     <section className="shell pt-6">
-      <div className="surface rounded-3xl border border-[var(--border-subtle)] px-4 py-3 shadow-[var(--shadow-card)]">
-        <div className="flex items-center gap-3">
-          <span className="hidden shrink-0 items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-faint sm:flex">
+      <div className="surface rounded-3xl border border-[var(--border-subtle)] px-4 py-4 shadow-[var(--shadow-card)]">
+        <div className="mb-3 flex items-center gap-3">
+          <span className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-faint">
             <span aria-hidden className="text-sm">
               🔥
             </span>
-            Trending
+            Trending brands
           </span>
 
-          <div className="no-scrollbar -my-1 flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-2">
+          <Link
+            href="/stores"
+            className="ml-auto text-xs font-bold text-brand-600 transition hover:underline"
+          >
+            All stores →
+          </Link>
+        </div>
+
+        <div>
+          <div className="no-scrollbar -my-1 flex flex-nowrap items-center gap-2 overflow-x-auto py-2 lg:flex-wrap lg:overflow-visible">
             {stores.slice(0, 16).map((item) => (
               <Link
                 key={item._id}
@@ -493,12 +501,6 @@ function TrendingBrands({ stores }: { stores: HomepagePayload["stores"] }) {
               </Link>
             ))}
 
-            <Link
-              href="/stores"
-              className="shrink-0 rounded-full px-3 py-1.5 text-xs font-bold text-brand-600 transition hover:underline"
-            >
-              All stores →
-            </Link>
           </div>
         </div>
       </div>

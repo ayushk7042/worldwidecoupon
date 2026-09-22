@@ -59,7 +59,7 @@
     <text x="94" y="112" text-anchor="middle" font-size="12.5" font-weight="700" letter-spacing="1.4" fill="#4B5563" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">ON US</text>
   </g>
 
-  <g transform="translate(752 62)">
+  <g transform="translate(736 54)">
     <text x="0" y="0" text-anchor="end" font-size="19" font-weight="800" fill="#1F2937" letter-spacing="-0.4" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">Worldwide<tspan fill="#0E9F6E">Coupons</tspan></text>
     <text x="0" y="20" text-anchor="end" font-size="11" font-weight="600" fill="#6B7280" letter-spacing="1.5" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">BETTER DEALS. BIGGER SAVINGS.</text>
   </g>

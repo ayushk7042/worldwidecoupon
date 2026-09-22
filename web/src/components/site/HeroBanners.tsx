@@ -208,10 +208,10 @@ function Slide({
     <div
       className={classNames(
         "w-full shrink-0",
-        // `ratio` matches the shipped artwork exactly (2:1 mobile, 4:1 above),
+        // `ratio` matches the shipped artwork exactly (2:1 mobile, 3:1 above),
         // so nothing is ever cropped out of a banner.
         height === "ratio"
-          ? "aspect-[2/1] sm:aspect-[4/1]"
+          ? "aspect-[2/1] sm:aspect-[3/1]"
           : height === "tall"
             ? "h-[170px] sm:h-[220px] lg:h-[290px]"
             : "h-[150px] sm:h-[190px] lg:h-[230px]"
