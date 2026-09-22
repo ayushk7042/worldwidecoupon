@@ -4,6 +4,11 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { CouponCard } from "@/components/site/CouponCard";
+import {
+  OfferFilters,
+  oneOf,
+  type OfferParams,
+} from "@/components/site/OfferFilters";
 import { CategoryIcon } from "@/components/ui/icons";
 import { FollowStoreButton } from "@/components/site/SaveButton";
 import { ButtonLink } from "@/components/ui/Button";
@@ -18,7 +23,7 @@ import {
 import { api, apiBase, apiSafe } from "@/lib/api";
 import { formatCount, timeAgo } from "@/lib/format";
 import { JsonLd, breadcrumbSchema, faqSchema, storeSchema } from "@/lib/schema";
-import type { Category, Store, StoreDetail } from "@/lib/types";
+import type { Category, CouponView, Store, StoreDetail } from "@/lib/types";
 
 export const revalidate = 300;
 
@@ -63,11 +68,37 @@ export async function generateMetadata({
   };
 }
 
-export default async function StorePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function StorePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<OfferParams>;
+}) {
   const { slug } = await params;
+  const query = await searchParams;
   const store = await loadStore(slug);
 
   if (!store) notFound();
+
+  const show = oneOf(query.show);
+  const sort = oneOf(query.sort) ?? "best";
+  const filtering = Boolean(show) || sort !== "best";
+
+  /* Only fetch a filtered list when the URL asks for one; the store payload
+     already carries the default view. */
+  const filtered = filtering
+    ? await apiSafe<CouponView[]>("/coupons", [], {
+        query: {
+          store: slug,
+          limit: 48,
+          sort,
+          ...(show === "codes" ? { withCode: true } : {}),
+          ...(show === "deals" ? { withCode: false } : {}),
+        },
+        revalidate: 300,
+      })
+    : [];
 
   const categorySlug =
     typeof store.primaryCategory === "object" && store.primaryCategory
@@ -217,7 +248,36 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
                   subtitle="Sorted with the most likely to work first."
                 />
 
-                {codes.length ? (
+                <OfferFilters
+                  base={`/store/${store.slug}`}
+                  params={query}
+                  counts={{
+                    all: store.stats.total,
+                    codes: store.stats.codes,
+                    deals: store.stats.deals,
+                  }}
+                />
+
+                {filtering ? (
+                  <div className="mb-8">
+                    {filtered.length ? (
+                      <div className="grid gap-3 2xl:grid-cols-2">
+                        {filtered.map((coupon) => (
+                          <CouponCard key={coupon._id} coupon={coupon} showStore={false} />
+                        ))}
+                      </div>
+                    ) : (
+                      <EmptyState
+                        icon={<Tag aria-hidden className="size-7" strokeWidth={1.7} />}
+                        title="Nothing matches that filter"
+                        body="Try another view, or see every live offer from this store."
+                        action={<ButtonLink href={`/store/${store.slug}`}>All offers</ButtonLink>}
+                      />
+                    )}
+                  </div>
+                ) : null}
+
+                {!filtering && codes.length ? (
                   <div id="codes" className="mb-8 scroll-mt-28">
                     <h3 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-faint">
                       <span className="rounded bg-brand-50 px-2 py-0.5 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300">
@@ -235,7 +295,7 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
                   </div>
                 ) : null}
 
-                {deals.length ? (
+                {!filtering && deals.length ? (
                   <div id="deals" className="mb-8 scroll-mt-28">
                     <h3 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-faint">
                       <span className="rounded bg-accent-300 px-2 py-0.5 text-accent-600 dark:bg-accent-600/20 dark:text-accent-400">

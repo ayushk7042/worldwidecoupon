@@ -24,6 +24,7 @@ export interface CategoryGroup {
 export function CategoryOffers({ groups }: { groups: CategoryGroup[] }) {
   const [active, setActive] = useState(0);
   const strip = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
 
   if (!groups.length) return null;
 
@@ -31,6 +32,26 @@ export function CategoryOffers({ groups }: { groups: CategoryGroup[] }) {
 
   const nudge = (direction: 1 | -1) => {
     strip.current?.scrollBy({ left: direction * 280, behavior: "smooth" });
+  };
+
+  /* Drag to scroll: a trackpad can swipe the strip, a mouse could not. */
+  const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0 || !strip.current) return;
+    drag.current = { x: event.clientX, left: strip.current.scrollLeft, moved: false };
+  };
+
+  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!drag.current || !strip.current) return;
+    const delta = event.clientX - drag.current.x;
+    if (Math.abs(delta) > 4) drag.current.moved = true;
+    strip.current.scrollLeft = drag.current.left - delta;
+  };
+
+  const endDrag = () => {
+    // A drag that moved should not also pick the chip under the cursor.
+    const moved = drag.current?.moved ?? false;
+    drag.current = null;
+    return moved;
   };
 
   return (
@@ -72,13 +93,20 @@ export function CategoryOffers({ groups }: { groups: CategoryGroup[] }) {
 
         <div
           ref={strip}
-          className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto scroll-smooth px-1 py-1"
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={endDrag}
+          onPointerLeave={endDrag}
+          className="no-scrollbar -mx-1 flex cursor-grab gap-2 overflow-x-auto scroll-smooth px-1 py-1 active:cursor-grabbing"
         >
           {groups.map((group, index) => (
             <button
               key={group.category._id}
               type="button"
-              onClick={() => setActive(index)}
+              onClick={() => {
+                if (drag.current?.moved) return;
+                setActive(index);
+              }}
               aria-pressed={index === active}
               className={classNames(
                 "flex shrink-0 items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-bold transition-all duration-200",
@@ -157,12 +185,16 @@ function CompactOffer({ coupon }: { coupon: CouponView }) {
           {coupon.title}
         </Link>
 
-        <RevealButton
-          coupon={coupon}
-          size="sm"
-          full
-          label={coupon.hasCode ? "Copy code" : "Get deal"}
-        />
+        <span className="flex items-center gap-2">
+          <RevealButton
+            coupon={coupon}
+            size="sm"
+            label={coupon.hasCode ? "Copy code" : "Get deal"}
+          />
+          <span className="truncate text-[11px] font-semibold text-faint">
+            {coupon.verified ? "Verified" : "Live now"}
+          </span>
+        </span>
       </div>
     </article>
   );

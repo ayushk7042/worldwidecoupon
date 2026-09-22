@@ -110,7 +110,7 @@ export function CouponCard({
           </Link>
 
           <ProofRow coupon={coupon} expiry={expiry} />
-          <RevealButton coupon={coupon} full />
+          <RevealButton coupon={coupon} size="sm" full />
         </div>
       </article>
     );
@@ -197,21 +197,25 @@ export function CouponCard({
         </div>
 
         {/* ---- the action, with the proof above it ---- */}
-        <div className="flex shrink-0 flex-col justify-center gap-2 @2xl:w-[15.5rem]">
+        <div className="flex shrink-0 flex-col gap-1.5 @2xl:items-end @2xl:justify-center">
           <ProofRow coupon={coupon} expiry={expiry} className="@2xl:justify-end" />
 
           <div className="flex items-center gap-2">
             {!hideSave ? <SaveButton couponId={coupon._id} /> : null}
 
-            <span className="relative flex min-w-0 flex-1 items-center">
-              <RevealButton coupon={coupon} full label={coupon.hasCode ? "Copy code & shop" : "Get the deal"} />
+            <span className="relative flex items-center">
+              <RevealButton
+                coupon={coupon}
+                size="sm"
+                label={coupon.hasCode ? "Copy code" : "Get deal"}
+              />
 
               {coupon.hasCode ? (
-                /* The torn stub peeking out behind the button: the code is
-                   there, it just is not readable until the click. */
+                /* The torn stub behind the button: the code is there, it just
+                   is not readable until the click. */
                 <span
                   aria-hidden
-                  className="pointer-events-none -ml-4 hidden h-9 items-center rounded-r-lg border-2 border-l-0 border-dashed border-[var(--border-strong)] bg-[var(--surface-sunken)] pl-5 pr-2 font-mono text-[11px] font-bold tracking-widest text-faint lg:flex"
+                  className="pointer-events-none -ml-3 hidden h-7 items-center rounded-r-md border border-l-0 border-dashed border-[var(--border-strong)] bg-[var(--surface-sunken)] pl-4 pr-2 font-mono text-[10px] font-bold tracking-widest text-faint @2xl:flex"
                 >
                   ••••
                 </span>

@@ -4,18 +4,30 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { CouponCard } from "@/components/site/CouponCard";
+import {
+  OfferFilters,
+  oneOf,
+  withParams,
+  type OfferParams,
+} from "@/components/site/OfferFilters";
 import { CategoryTile, StoreCard } from "@/components/site/StoreCard";
 import { ButtonLink } from "@/components/ui/Button";
 import {
   Breadcrumbs,
   Card,
   EmptyState,
+  Pagination,
   SectionHeading,
 } from "@/components/ui/primitives";
-import { api, apiSafe } from "@/lib/api";
+import { api, apiPaged, apiSafe } from "@/lib/api";
 import { formatCount } from "@/lib/format";
 import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/schema";
-import type { Category, CategoryDetail } from "@/lib/types";
+import type {
+  Category,
+  CategoryDetail,
+  CouponView,
+  Pagination as PageInfo,
+} from "@/lib/types";
 
 export const revalidate = 300;
 
@@ -54,15 +66,46 @@ export async function generateMetadata({
 
 export default async function CategoryPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<OfferParams>;
 }) {
   const { slug } = await params;
+  const query = await searchParams;
   const category = await loadCategory(slug);
 
   if (!category) notFound();
 
-  const siblings = await apiSafe<Category[]>("/categories/menu", [], { revalidate: 3600 });
+  const show = oneOf(query.show);
+  const sort = oneOf(query.sort) ?? "best";
+  const page = Math.max(1, Number(oneOf(query.page) ?? 1) || 1);
+
+  /* The offers are fetched separately from the category itself, so the
+     filters and the pagination in the URL actually drive the list. */
+  const [siblings, feed, codeCount] = await Promise.all([
+    apiSafe<Category[]>("/categories/menu", [], { revalidate: 3600 }),
+    apiPaged<CouponView>("/coupons", {
+      query: {
+        category: slug,
+        limit: 24,
+        page,
+        sort,
+        ...(show === "codes" ? { withCode: true } : {}),
+        ...(show === "deals" ? { withCode: false } : {}),
+      },
+      revalidate: 300,
+    }).catch(() => ({
+      items: [] as CouponView[],
+      pagination: { page: 1, limit: 24, total: 0, pages: 1, hasMore: false } as PageInfo,
+    })),
+    apiPaged<CouponView>("/coupons", {
+      query: { category: slug, limit: 1, withCode: true },
+      revalidate: 600,
+    })
+      .then((result) => result.pagination.total)
+      .catch(() => 0),
+  ]);
 
   const trail = [
     { label: "Home", href: "/" },
@@ -131,20 +174,30 @@ export default async function CategoryPage({
         <div className="grid gap-8 lg:grid-cols-[1fr_19rem]">
           <div className="min-w-0">
             <SectionHeading
-              title={`Top ${category.name.toLowerCase()} offers`}
+              title={`${formatCount(feed.pagination.total)} ${category.name.toLowerCase()} offers`}
               action={
                 <Link
                   href={`/coupons?category=${category.slug}`}
                   className="text-sm font-semibold text-brand-600 hover:underline"
                 >
-                  See all {formatCount(category.activeCouponCount)} →
+                  Open in all offers →
                 </Link>
               }
             />
 
-            {category.coupons.length ? (
+            <OfferFilters
+              base={`/category/${category.slug}`}
+              params={query}
+              counts={{
+                all: category.activeCouponCount,
+                codes: codeCount,
+                deals: Math.max(0, category.activeCouponCount - codeCount),
+              }}
+            />
+
+            {feed.items.length ? (
               <div className="space-y-3">
-                {category.coupons.map((coupon, index) => (
+                {feed.items.map((coupon, index) => (
                   <div key={coupon._id}>
                     <CouponCard coupon={coupon} />
                     {index === 5 ? (
@@ -166,13 +219,13 @@ export default async function CategoryPage({
               />
             )}
 
-            {category.coupons.length >= 24 ? (
-              <div className="mt-6 text-center">
-                <ButtonLink href={`/coupons?category=${category.slug}`} variant="secondary">
-                  Load all {formatCount(category.activeCouponCount)} offers
-                </ButtonLink>
-              </div>
-            ) : null}
+            <Pagination
+              page={feed.pagination.page}
+              pages={feed.pagination.pages}
+              hrefFor={(next: number) =>
+                withParams(`/category/${category.slug}`, query, { page: String(next) })
+              }
+            />
           </div>
 
           <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
