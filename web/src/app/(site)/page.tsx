@@ -223,29 +223,9 @@ export default async function HomePage() {
             }
           />
 
-          <div className="grid gap-4 lg:grid-cols-[1.05fr_1fr]">
-            <FeaturedBrand store={data.stores[0]!} />
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              {data.stores.slice(1, 7).map((store) => (
-                <BrandCard key={store._id} store={store} />
-              ))}
-            </div>
-          </div>
-
-          {/* A quick way into the rest of the directory, and a crawlable one. */}
-          <div className="mt-4 flex flex-wrap items-center gap-1.5 rounded-2xl border border-[var(--border-subtle)] px-4 py-3">
-            <span className="mr-1 text-[11px] font-bold uppercase tracking-[0.16em] text-faint">
-              Jump to
-            </span>
-            {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((letter) => (
-              <Link
-                key={letter}
-                href={`/stores?letter=${letter}`}
-                className="flex size-7 items-center justify-center rounded-lg text-xs font-bold text-body transition hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-950/60 dark:hover:text-brand-300"
-              >
-                {letter}
-              </Link>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+            {data.stores.slice(0, 12).map((store) => (
+              <BrandCard key={store._id} store={store} />
             ))}
           </div>
         </section>
@@ -671,15 +651,30 @@ function SpotlightOffer({ coupon }: { coupon: CouponView }) {
 
   return (
     <article className="surface group relative flex flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]">
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-brand-100 opacity-60 blur-3xl transition-opacity duration-300 group-hover:opacity-90 dark:bg-brand-900/50"
-      />
+      {/* The discount rides the top strip rather than taking a tile of its own. */}
+      <div className="flex items-center gap-3 border-b border-[var(--border-subtle)] bg-gradient-to-r from-brand-50 to-accent-100/70 px-5 py-3 dark:from-brand-950/70 dark:to-brand-900/40">
+        <span className="rounded-full bg-brand-gradient px-3 py-1 text-xs font-extrabold text-white shadow-[var(--shadow-glow)]">
+          {coupon.badge}
+        </span>
+        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-700 dark:text-brand-300">
+          Editor&#39;s pick
+        </span>
+        <span className="ml-auto flex items-center gap-1.5 text-[11px] font-semibold text-faint">
+          <Clock3 aria-hidden className="size-3.5" />
+          {expiryLabel(coupon) ?? "No expiry"}
+        </span>
+      </div>
 
-      <div className="relative flex flex-1 flex-col gap-4 p-5 sm:p-6">
+      <div className="flex flex-1 flex-col gap-4 p-5 sm:p-6">
         <div className="flex items-start gap-4">
-          <span className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-brand-gradient text-center font-display text-sm font-extrabold leading-tight text-white shadow-[var(--shadow-glow)]">
-            {coupon.badge}
+          <span className="flex size-20 shrink-0 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-2">
+            <StoreLogo
+              name={store?.name ?? "Store"}
+              logo={store?.logo}
+              size={64}
+              rounded="rounded-xl"
+              className="border-0"
+            />
           </span>
 
           <div className="min-w-0 flex-1">
@@ -697,7 +692,10 @@ function SpotlightOffer({ coupon }: { coupon: CouponView }) {
             </div>
 
             <h3 className="font-display text-lg font-extrabold leading-snug sm:text-xl">
-              <Link href={`/coupon/${coupon.slug}`} className="transition hover:text-brand-700 dark:hover:text-brand-300">
+              <Link
+                href={`/coupon/${coupon.slug}`}
+                className="transition hover:text-brand-700 dark:hover:text-brand-300"
+              >
                 {coupon.title}
               </Link>
             </h3>
@@ -705,10 +703,9 @@ function SpotlightOffer({ coupon }: { coupon: CouponView }) {
             {store ? (
               <Link
                 href={`/store/${store.slug}`}
-                className="mt-2 inline-flex items-center gap-2 rounded-full border border-[var(--border-subtle)] py-1 pl-1 pr-3 text-xs font-semibold transition hover:border-brand-300 hover:text-brand-600"
+                className="mt-1 inline-block text-sm font-semibold text-faint transition hover:text-brand-600"
               >
-                <StoreLogo name={store.name} logo={store.logo} size={22} rounded="rounded-full" />
-                {store.name}
+                at {store.name}
               </Link>
             ) : null}
           </div>
@@ -728,11 +725,6 @@ function SpotlightOffer({ coupon }: { coupon: CouponView }) {
         <div className="mt-auto flex flex-wrap items-center gap-3 pt-1">
           <RevealButton coupon={coupon} size="lg" />
           <SaveButton couponId={coupon._id} />
-
-          <span className="ml-auto flex items-center gap-1.5 text-xs font-semibold text-faint">
-            <Clock3 aria-hidden className="size-3.5" />
-            {expiryLabel(coupon) ?? "No expiry"}
-          </span>
         </div>
       </div>
     </article>
@@ -743,30 +735,41 @@ function MiniOffer({ coupon }: { coupon: CouponView }) {
   const store = storeOf(coupon);
 
   return (
-    <article className="surface group flex flex-col gap-3 rounded-2xl border border-[var(--border-subtle)] p-4 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]">
-      <div className="flex items-center gap-2.5">
-        <StoreLogo name={store?.name ?? "Store"} logo={store?.logo} size={34} rounded="rounded-xl" />
-        <span className="min-w-0 flex-1 truncate text-xs font-bold text-faint">
-          {store?.name ?? "Featured"}
-        </span>
-        <span className="shrink-0 rounded-lg bg-brand-50 px-2 py-1 text-xs font-extrabold text-brand-700 dark:bg-brand-950/70 dark:text-brand-300">
-          {coupon.badge}
-        </span>
-      </div>
+    <article className="surface group flex gap-3 rounded-2xl border border-[var(--border-subtle)] p-4 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]">
+      <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-1.5">
+        <StoreLogo
+          name={store?.name ?? "Store"}
+          logo={store?.logo}
+          size={44}
+          rounded="rounded-lg"
+          className="border-0"
+        />
+      </span>
 
-      <Link
-        href={`/coupon/${coupon.slug}`}
-        className="line-clamp-2 flex-1 text-sm font-semibold leading-snug transition hover:text-brand-700 dark:hover:text-brand-300"
-      >
-        {coupon.title}
-      </Link>
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <span className="min-w-0 flex-1 truncate text-xs font-bold text-faint">
+            {store?.name ?? "Featured"}
+          </span>
+          <span className="shrink-0 rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-extrabold text-brand-700 dark:bg-brand-950/70 dark:text-brand-300">
+            {coupon.badge}
+          </span>
+        </div>
 
-      <div className="flex items-center gap-2">
-        <RevealButton coupon={coupon} size="sm" />
-        <span className="ml-auto flex items-center gap-1 text-[11px] font-semibold text-faint">
-          <Clock3 aria-hidden className="size-3" />
-          {expiryLabel(coupon) ?? "No expiry"}
-        </span>
+        <Link
+          href={`/coupon/${coupon.slug}`}
+          className="line-clamp-2 flex-1 text-sm font-semibold leading-snug transition hover:text-brand-700 dark:hover:text-brand-300"
+        >
+          {coupon.title}
+        </Link>
+
+        <div className="flex items-center gap-2">
+          <RevealButton coupon={coupon} size="sm" />
+          <span className="ml-auto flex items-center gap-1 text-[11px] font-semibold text-faint">
+            <Clock3 aria-hidden className="size-3" />
+            {expiryLabel(coupon) ?? "No expiry"}
+          </span>
+        </div>
       </div>
     </article>
   );
@@ -823,97 +826,31 @@ function RankedOffer({ coupon, rank }: { coupon: CouponView; rank: number }) {
   );
 }
 
-function FeaturedBrand({ store }: { store: Store }) {
-  return (
-    <article className="relative flex flex-col justify-between overflow-hidden rounded-3xl bg-brand-gradient p-6 text-white shadow-[var(--shadow-glow)]">
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-70"
-        style={{
-          backgroundImage:
-            "radial-gradient(24rem 14rem at 10% -20%, rgba(255,255,255,0.35), transparent 70%), radial-gradient(20rem 12rem at 100% 120%, rgba(255,255,255,0.22), transparent 70%)",
-        }}
-      />
-
-      <div className="relative">
-        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/75">
-          Most opened this week
-        </p>
-
-        <div className="mt-4 flex items-center gap-3.5">
-          <span className="flex size-16 items-center justify-center rounded-2xl bg-white p-1 shadow-[var(--shadow-card)]">
-            <StoreLogo name={store.name} logo={store.logo} size={56} rounded="rounded-xl" />
-          </span>
-
-          <div className="min-w-0">
-            <h3 className="truncate font-display text-2xl font-extrabold">{store.name}</h3>
-            <p className="text-sm text-white/80">
-              {formatCount(store.activeCouponCount)} live offers
-              {store.codeCount ? ` · ${formatCount(store.codeCount)} promo codes` : ""}
-            </p>
-          </div>
-        </div>
-
-        {store.bestOffer ? (
-          <p className="mt-5 inline-flex rounded-2xl bg-white/15 px-4 py-2.5 text-sm font-bold ring-1 ring-inset ring-white/25">
-            Best right now · {store.bestOffer}
-          </p>
-        ) : null}
-
-        {store.description ? (
-          <p className="mt-4 line-clamp-2 max-w-md text-sm leading-relaxed text-white/80">
-            {store.description}
-          </p>
-        ) : null}
-      </div>
-
-      <div className="relative mt-6 flex flex-wrap items-center gap-2">
-        <Link
-          href={`/store/${store.slug}`}
-          className="inline-flex h-11 items-center gap-1.5 rounded-2xl bg-white px-5 text-sm font-bold text-brand-700 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
-        >
-          See {store.name} offers
-          <ArrowRight aria-hidden className="size-4" />
-        </Link>
-
-        <span className="inline-flex items-center gap-1.5 rounded-2xl px-3 py-2 text-xs font-semibold text-white/80 ring-1 ring-inset ring-white/25">
-          <Flame aria-hidden className="size-3.5" />
-          {formatCount(store.clicks)} clicks
-        </span>
-      </div>
-    </article>
-  );
-}
-
 function BrandCard({ store }: { store: Store }) {
   return (
     <Link
       href={`/store/${store.slug}`}
-      className="surface group relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-[var(--border-subtle)] p-4 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]"
+      className="surface group flex flex-col items-center gap-2.5 rounded-2xl border border-[var(--border-subtle)] p-4 text-center shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]"
     >
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -right-10 -top-10 size-24 rounded-full bg-accent-100 opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100 dark:bg-brand-900/60"
-      />
-
-      <div className="relative flex items-center gap-3">
-        <StoreLogo name={store.name} logo={store.logo} size={46} rounded="rounded-2xl" />
-        <div className="min-w-0">
-          <p className="truncate text-sm font-bold">{store.name}</p>
-          <p className="text-xs text-faint">
-            {formatCount(store.activeCouponCount)} live offers
-          </p>
-        </div>
-      </div>
-
-      <p className="relative line-clamp-1 rounded-xl bg-brand-50 px-3 py-2 text-xs font-bold text-brand-700 dark:bg-brand-950/60 dark:text-brand-300">
-        {store.bestOffer ?? `Up to ${store.averageDiscount ?? "big"} savings`}
-      </p>
-
-      <span className="relative flex items-center gap-1 text-xs font-bold text-brand-600">
-        View deals
-        <ArrowRight aria-hidden className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+      {/* The logo is the point of this card, so it gets the room. */}
+      <span className="flex size-16 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-1.5 transition-transform duration-200 group-hover:scale-105">
+        <StoreLogo name={store.name} logo={store.logo} size={52} rounded="rounded-xl" className="border-0" />
       </span>
+
+      <span className="min-w-0 w-full">
+        <span className="block truncate text-sm font-bold transition-colors group-hover:text-brand-700 dark:group-hover:text-brand-300">
+          {store.name}
+        </span>
+        <span className="block text-[11px] font-semibold text-faint">
+          {formatCount(store.activeCouponCount)} offers
+        </span>
+      </span>
+
+      {store.bestOffer ? (
+        <span className="max-w-full truncate rounded-full bg-brand-50 px-2.5 py-0.5 text-[11px] font-bold text-brand-700 dark:bg-brand-950/70 dark:text-brand-300">
+          {store.bestOffer}
+        </span>
+      ) : null}
     </Link>
   );
 }
