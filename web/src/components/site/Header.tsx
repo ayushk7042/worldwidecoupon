@@ -30,7 +30,7 @@ const PRIMARY_LINKS = [
   { href: "/coupons", label: "All offers", Icon: Tag },
   { href: "/coupons?withCode=true", label: "Promo codes", Icon: Ticket },
   { href: "/stores", label: "Stores", Icon: Store },
-  { href: "/coupons?type=freeshipping", label: "Free shipping", Icon: Truck },
+  { href: "/coupons?type=freeshipping", label: "Free delivery", Icon: Truck },
   { href: "/coupons?exclusive=true", label: "Exclusives", Icon: Star },
   { href: "/coupons?expiringSoon=true", label: "Ending soon", Icon: Clock3 },
 ];

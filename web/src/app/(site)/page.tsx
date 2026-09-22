@@ -162,6 +162,8 @@ export default async function HomePage() {
 
       <CategoryRail categories={data.categories} total={categoryCount} />
 
+      <TopBrands stores={data.stores} storeCount={storeCount} />
+
       <StatBar
         offerCount={offerCount || totalOffers}
         storeCount={storeCount}
@@ -209,7 +211,7 @@ export default async function HomePage() {
       {data.stores.length ? (
         <section className="shell pt-14">
           <SectionHeading
-            eyebrow="Top brands"
+            eyebrow="Reader favourites"
             title="Stores people are saving at"
             subtitle="The shops our readers open most often this week."
             action={
@@ -391,8 +393,8 @@ const QUICK_LINKS = [
   {
     key: "shipping" as const,
     href: "/coupons?type=freeshipping",
-    label: "Free shipping",
-    hint: "No delivery fee",
+    label: "Free delivery",
+    hint: "Postage on us",
     Icon: Truck,
     className: "from-accent-100 to-accent-50 dark:from-brand-950 dark:to-brand-900/40",
   },
@@ -994,6 +996,74 @@ function CategoryRail({
             </span>
           </Link>
         ))}
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   TOP BRANDS
+
+   A logo wall: no counts, no copy, just the marks a shopper recognises. It
+   sits between the category grid and the numbers, where the page would
+   otherwise run two text blocks together.
+========================================================= */
+
+function TopBrands({
+  stores,
+  storeCount,
+}: {
+  stores: HomepagePayload["stores"];
+  storeCount: number;
+}) {
+  if (stores.length < 6) return null;
+
+  return (
+    <section className="shell pt-12">
+      <div className="surface relative overflow-hidden rounded-3xl border border-[var(--border-subtle)] p-5 shadow-[var(--shadow-card)] sm:p-6">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -right-20 -top-24 size-64 rounded-full bg-brand-100 opacity-60 blur-3xl dark:bg-brand-900/40"
+        />
+
+        <div className="relative mb-5 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-brand-600">
+              <span className="h-px w-6 bg-brand-400" />
+              Top brands
+            </p>
+            <h2 className="mt-1 font-display text-xl font-extrabold sm:text-2xl">
+              Names you already shop with
+            </h2>
+          </div>
+
+          <Link
+            href="/stores"
+            className="group inline-flex items-center gap-1.5 rounded-full bg-brand-gradient px-4 py-2 text-sm font-bold text-white shadow-[var(--shadow-glow)] transition-all hover:-translate-y-px hover:shadow-[var(--shadow-glow-strong)]"
+          >
+            Browse {formatCount(storeCount || stores.length)} stores
+            <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </div>
+
+        <div className="relative grid grid-cols-3 gap-2.5 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
+          {stores.slice(0, 16).map((store) => (
+            <Link
+              key={store._id}
+              href={`/store/${store.slug}`}
+              title={`${store.name} — ${formatCount(store.activeCouponCount)} offers`}
+              className="group flex aspect-[4/3] items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-3 transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]"
+            >
+              <StoreLogo
+                name={store.name}
+                logo={store.logo}
+                size={56}
+                rounded="rounded-xl"
+                className="border-0 transition-transform duration-200 group-hover:scale-110"
+              />
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );

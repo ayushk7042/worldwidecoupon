@@ -54,14 +54,18 @@ export function Card({
   className,
   padded = true,
   hover = false,
+  id,
 }: {
   children: ReactNode;
   className?: string;
   padded?: boolean;
   hover?: boolean;
+  /** Lets a card be the target of an in-page jump link. */
+  id?: string;
 }) {
   return (
     <div
+      id={id}
       className={classNames(
         "surface rounded-2xl border border-[var(--border-subtle)] shadow-[var(--shadow-card)]",
         padded && "p-5",
