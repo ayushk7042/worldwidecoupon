@@ -33,6 +33,13 @@ export interface AdminMethods {
 export type AdminDocument = HydratedDocument<Admin, AdminMethods>;
 export type AdminModelType = Model<Admin, {}, AdminMethods>;
 
+/**
+ * Every permission starts off, and is granted explicitly.
+ *
+ * They used to default to `true`, which meant an editor created with only
+ * "publish" ticked quietly received delete, store, team and import rights as
+ * well — the checkboxes in the panel had no effect on creation.
+ */
 const permissionDefaults = (value: boolean) =>
   Object.fromEntries(
     ADMIN_PERMISSIONS.map((permission) => [
@@ -60,9 +67,9 @@ const adminSchema = new Schema<Admin, AdminModelType, AdminMethods>(
     role: { type: String, enum: ADMIN_ROLES, default: "editor" },
 
     permissions: {
-      type: new Schema(permissionDefaults(true), { _id: false }),
+      type: new Schema(permissionDefaults(false), { _id: false }),
       default: () =>
-        Object.fromEntries(ADMIN_PERMISSIONS.map((p) => [p, true])) as Record<
+        Object.fromEntries(ADMIN_PERMISSIONS.map((p) => [p, false])) as Record<
           AdminPermission,
           boolean
         >,
@@ -93,8 +100,12 @@ adminSchema.method("can", function can(
   permission: AdminPermission
 ) {
   if (this.status !== "active") return false;
+
+  // A superadmin is never locked out by a stored flag, and a viewer is never
+  // let in by one.
   if (this.role === "superadmin") return true;
   if (this.role === "viewer") return false;
+
   return Boolean(this.permissions?.[permission]);
 });
 

@@ -1,6 +1,6 @@
 import type { CookieOptions, Response } from "express";
 import { isProduction } from "../config/env.js";
-import { AdminModel } from "../models/Admin.js";
+import { ADMIN_PERMISSIONS, AdminModel, type AdminPermission } from "../models/Admin.js";
 import { ADMIN_COOKIE } from "../middlewares/auth.middleware.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -117,17 +117,42 @@ export const listAdmins = asyncHandler(async (_req, res) => {
   sendOk(res, admins);
 });
 
+/** Superadmins get everything, viewers nothing, editors what was ticked. */
+const permissionsForRole = (
+  role: string,
+  supplied: Partial<Record<AdminPermission, boolean>> = {}
+): Record<AdminPermission, boolean> =>
+  Object.fromEntries(
+    ADMIN_PERMISSIONS.map((permission) => [
+      permission,
+      role === "superadmin" ? true : role === "viewer" ? false : Boolean(supplied[permission]),
+    ])
+  ) as Record<AdminPermission, boolean>;
+
 export const createAdmin = asyncHandler(async (req, res) => {
   const body = req.body as z.infer<typeof registerAdminBody>;
 
   const exists = await AdminModel.exists({ email: body.email });
   if (exists) throw ApiError.conflict("An account with that email already exists");
 
-  const admin = await AdminModel.create(body);
+  const admin = await AdminModel.create({
+    ...body,
+    permissions: permissionsForRole(body.role, body.permissions),
+  });
 
+  // `_id` as well as `id`, so the panel reads this the same way it reads the
+  // list endpoint and never has to guess which field carries the identifier.
   sendCreated(
     res,
-    { id: String(admin._id), name: admin.name, email: admin.email, role: admin.role },
+    {
+      _id: String(admin._id),
+      id: String(admin._id),
+      name: admin.name,
+      email: admin.email,
+      role: admin.role,
+      permissions: admin.permissions,
+      status: admin.status,
+    },
     "Team member added"
   );
 });
@@ -141,9 +166,21 @@ export const updateAdmin = asyncHandler(async (req, res) => {
     throw ApiError.badRequest("You cannot suspend your own account");
   }
 
+  const current = await AdminModel.findById(id).select("role permissions").lean();
+  if (!current) throw ApiError.notFound("Team member not found");
+
+  /* A role change rewrites the whole permission set, and a supplied set
+     replaces it outright — an unticked box has to mean "no". */
+  const role = body.role ?? current.role;
+  const patch: Record<string, unknown> = { ...body };
+
+  if (body.role || body.permissions) {
+    patch.permissions = permissionsForRole(role, body.permissions ?? current.permissions);
+  }
+
   const admin = await AdminModel.findByIdAndUpdate(
     id,
-    { $set: body },
+    { $set: patch },
     { new: true, runValidators: true }
   );
 

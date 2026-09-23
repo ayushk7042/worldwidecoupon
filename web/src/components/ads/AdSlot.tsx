@@ -35,6 +35,25 @@ export interface AdSlotProps {
   label?: boolean;
 }
 
+/** The widest a creative may be drawn in each slot, in CSS pixels. */
+const MAX_WIDTH: Record<string, number> = {
+  "home-hero": 336,
+  "home-top": 970,
+  "home-infeed": 728,
+  "home-mid": 970,
+  "home-bottom": 970,
+  sidebar: 336,
+  "sidebar-sticky": 336,
+  "store-top": 970,
+  "store-inline": 728,
+  "store-bottom": 970,
+  "coupon-inline": 728,
+  "category-top": 970,
+  "category-infeed": 728,
+  footer: 970,
+  "mobile-sticky-bottom": 480,
+};
+
 export function AdSlot({
   position,
   category,
@@ -116,6 +135,16 @@ export function AdSlot({
   const image = ad.image?.url;
   if (!image) return null;
 
+  /*
+   * A creative is never blown up past its own size: a 320x50 strip stretched
+   * across a 1,000px slot is a blurry mess, and `object-cover` used to crop
+   * anything whose shape did not match the slot. The cap per position keeps
+   * the standard sizes looking like the standard sizes even when the artwork
+   * carries no dimensions.
+   */
+  const cap = MAX_WIDTH[ad.position] ?? 970;
+  const natural = ad.image?.width;
+
   const banner = (
     // eslint-disable-next-line @next/next/no-img-element
     <img
@@ -125,7 +154,8 @@ export function AdSlot({
       height={ad.image?.height}
       loading="lazy"
       decoding="async"
-      className="w-full object-cover"
+      style={{ maxWidth: Math.min(natural || cap, cap) }}
+      className="mx-auto block h-auto w-full object-contain"
     />
   );
 

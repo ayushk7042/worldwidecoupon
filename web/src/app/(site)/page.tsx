@@ -669,6 +669,8 @@ function HomeHero({
                 ) : null}
               </article>
             ) : null}
+
+            <AdSlot position="home-hero" minHeight={0} />
           </aside>
         </div>
       </div>
