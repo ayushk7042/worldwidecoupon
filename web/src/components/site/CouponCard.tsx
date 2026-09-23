@@ -1,4 +1,4 @@
-import { BadgeCheck, ChevronDown, TrendingUp, Users } from "lucide-react";
+import { BadgeCheck, ChevronDown, Clock3, ExternalLink, TrendingUp, Users } from "lucide-react";
 import Link from "next/link";
 import {
   COUPON_TYPE_LABELS,
@@ -54,6 +54,10 @@ export function CouponCard({
   const expiry = expiryLabel(coupon);
   const lines = descriptionLines(coupon.description, 4);
   const ribbon = ribbonFor(coupon);
+  const urgent = isUrgent(coupon);
+
+  /* Anything added in the last week is worth calling out. */
+  const isNew = Date.now() - new Date(coupon.createdAt).getTime() < 7 * 86_400_000;
 
   const href = `/coupon/${coupon.slug}`;
 
@@ -117,143 +121,178 @@ export function CouponCard({
   }
 
   /* ---------------- list: the default ---------------- */
+  const ctaLabel = coupon.hasCode
+    ? `Unlock ${coupon.badge} code`
+    : `Save ${coupon.badge} now`;
+
   return (
     <article
       className={classNames(
-        "@container surface group relative flex overflow-hidden rounded-2xl border border-[var(--border-subtle)] shadow-[var(--shadow-card)] transition-all duration-200",
-        "hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]",
+        "@container surface overflow-hidden rounded-2xl border border-[var(--border-subtle)] shadow-[var(--shadow-card)] transition-all duration-200",
+        "hover:border-brand-300 hover:shadow-[var(--shadow-lift)]",
         coupon.isExpired && "opacity-65"
       )}
     >
-      {/* A colour down the edge separates a code from a deal at a glance. */}
-      <span
-        aria-hidden
-        className={classNames(
-          "w-1.5 shrink-0",
-          coupon.hasCode ? "bg-brand-gradient" : "bg-accent-300 dark:bg-accent-600/40"
-        )}
-      />
+      {ribbon ? (
+        <p
+          className={classNames(
+            "px-4 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em]",
+            ribbon.className
+          )}
+        >
+          {ribbon.label}
+        </p>
+      ) : null}
 
-      <div className="min-w-0 flex-1">
-        {ribbon ? (
-          <p
-            className={classNames(
-              "px-4 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em]",
-              ribbon.className
-            )}
-          >
-            {ribbon.label}
-          </p>
-        ) : null}
+      <div className="flex flex-col gap-4 p-4 @2xl:flex-row @2xl:items-center @2xl:gap-5 @2xl:p-5">
+        {/* ---- what it saves ---- */}
+        <div className="flex shrink-0 items-center gap-3 @2xl:w-[7.5rem] @2xl:flex-col @2xl:items-center @2xl:justify-center @2xl:gap-0 @2xl:self-stretch @2xl:border-r @2xl:border-dashed @2xl:border-[var(--border-strong)] @2xl:pr-5 @2xl:text-center">
+          <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-600">
+            {coupon.discountType === "percent" || coupon.discountType === "fixed"
+              ? "Up to"
+              : COUPON_TYPE_LABELS[coupon.type]}
+          </span>
+          <span className="font-display text-2xl font-extrabold leading-none text-brand-600 @2xl:text-[1.9rem]">
+            {coupon.badge.replace(/\s*off$/i, "")}
+          </span>
+          <span className="hidden text-[11px] font-bold uppercase tracking-[0.14em] text-brand-600 @2xl:block">
+            Off
+          </span>
+        </div>
 
-        <div className="flex flex-col gap-3 p-3.5 @2xl:flex-row @2xl:items-center @2xl:gap-4">
-          {/* ---- what it saves ---- */}
-          <div className="flex shrink-0 items-center gap-2 @2xl:w-[7rem] @2xl:flex-col @2xl:items-center @2xl:justify-center @2xl:gap-0.5 @2xl:self-stretch @2xl:border-r @2xl:border-dashed @2xl:border-[var(--border-strong)] @2xl:pr-4 @2xl:text-center">
-            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-faint">
-              {coupon.discountType === "percent" || coupon.discountType === "fixed"
-                ? "Up to"
-                : COUPON_TYPE_LABELS[coupon.type]}
-            </span>
-            <span className="font-display text-xl font-extrabold leading-tight text-brand-600 @2xl:text-[1.6rem]">
-              {coupon.badge}
-            </span>
-          </div>
+        {/* ---- what it is ---- */}
+        <div className="min-w-0 flex-1">
+          <h3 className="text-base font-semibold leading-snug break-words @2xl:text-[17px]">
+            <Link href={href} className="transition hover:text-brand-700 dark:hover:text-brand-300">
+              {coupon.title}
+            </Link>
+          </h3>
 
-          {/* ---- what it is ---- */}
-          <div className="min-w-0 flex-1">
-            <div className="mb-1 flex flex-wrap items-center gap-2">
-              {showStore && store ? (
-                <Link
-                  href={`/store/${store.slug}`}
-                  className="flex items-center gap-1.5 text-[11px] font-bold text-faint transition hover:text-brand-600"
-                >
-                  <StoreLogo name={store.name} logo={store.logo} size={20} rounded="rounded-md" />
-                  {store.name}
-                </Link>
-              ) : null}
-
-              <span
-                className={classNames(
-                  "rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide",
-                  coupon.hasCode
-                    ? "bg-brand-50 text-brand-700 dark:bg-brand-950/70 dark:text-brand-300"
-                    : "bg-accent-300 text-accent-600 dark:bg-accent-600/20 dark:text-accent-400"
-                )}
-              >
-                {COUPON_TYPE_LABELS[coupon.type]}
+          {/* The three facts a shopper judges an offer on, each with a tone of
+              its own so none of them reads as decoration. */}
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            {isNew ? (
+              <span className="rounded-full bg-brand-600 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-white">
+                New
               </span>
-            </div>
-
-            <h3 className="text-[15px] font-semibold leading-snug break-words @2xl:text-base">
-              <Link href={href} className="transition hover:text-brand-700 dark:hover:text-brand-300">
-                {coupon.title}
-              </Link>
-            </h3>
-
-            {lines.length ? (
-              <p className="mt-1 line-clamp-1 text-[13px] leading-relaxed text-body">
-                {lines[0]}
-              </p>
             ) : null}
 
-            {lines.length || coupon.terms ? (
-              <details className="group/details mt-1">
-                <summary className="inline-flex cursor-pointer list-none items-center gap-1 text-[12.5px] font-bold text-brand-600 marker:hidden">
-                  Show details
-                  <ChevronDown
-                    aria-hidden
-                    className="size-3.5 transition-transform group-open/details:rotate-180"
-                  />
-                </summary>
+            {coupon.exclusive ? (
+              <span className="rounded-full bg-accent-500 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-white">
+                Exclusive
+              </span>
+            ) : null}
 
-                <ul className="mt-2 space-y-1">
-                  {lines.slice(1).map((line, index) => (
-                    <li key={index} className="flex gap-2 text-[13px] leading-relaxed text-body">
-                      <span aria-hidden className="mt-1.5 size-1 shrink-0 rounded-full bg-brand-400" />
-                      <span>{line}</span>
-                    </li>
-                  ))}
-                </ul>
+            <span
+              className={classNames(
+                "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide",
+                urgent
+                  ? "bg-danger-500 text-white"
+                  : expiry
+                    ? "bg-warn-50 text-warn-600 dark:bg-warn-500/15"
+                    : "surface-sunken text-faint"
+              )}
+            >
+              <Clock3 aria-hidden className="size-3" />
+              {expiry ?? "No expiry"}
+            </span>
 
-                {coupon.terms ? (
-                  <div
-                    className="prose-offer mt-2 text-[12px]"
-                    dangerouslySetInnerHTML={{ __html: coupon.terms }}
-                  />
-                ) : null}
-              </details>
+            {coupon.uses > 0 ? (
+              <span className="inline-flex items-center gap-1 rounded-full surface-sunken px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-faint">
+                <Users aria-hidden className="size-3" />
+                {formatCount(coupon.uses)} used
+              </span>
             ) : null}
           </div>
 
-          {/* ---- the action, with the proof above it ---- */}
-          <div className="flex shrink-0 flex-col gap-1.5 @2xl:w-[13.5rem] @2xl:items-end @2xl:justify-center">
-            <ProofRow coupon={coupon} expiry={expiry} className="@2xl:justify-end" />
-
-            <div className="flex items-center gap-2">
-              {!hideSave ? <SaveButton couponId={coupon._id} /> : null}
-
-              <span className="relative flex items-center">
-                <RevealButton
-                  coupon={coupon}
-                  size="sm"
-                  label={coupon.hasCode ? "Copy code" : "Get deal"}
+          {lines.length || coupon.terms ? (
+            <details className="group/details mt-2">
+              <summary className="inline-flex cursor-pointer list-none items-center gap-1 text-[13px] font-bold text-brand-600 marker:hidden">
+                Show details
+                <ChevronDown
+                  aria-hidden
+                  className="size-3.5 transition-transform group-open/details:rotate-180"
                 />
+              </summary>
 
-                {coupon.hasCode ? (
-                  /* The torn stub behind the button: the code is there, it just
-                     is not readable until the click. */
-                  <span
-                    aria-hidden
-                    className="pointer-events-none -ml-3 hidden h-7 items-center rounded-r-md border border-l-0 border-dashed border-[var(--border-strong)] bg-[var(--surface-sunken)] pl-4 pr-2 font-mono text-[10px] font-bold tracking-widest text-faint @2xl:flex"
-                  >
-                    ••••
-                  </span>
-                ) : null}
+              <ul className="mt-2 space-y-1">
+                {lines.map((line, index) => (
+                  <li key={index} className="flex gap-2 text-[13px] leading-relaxed text-body">
+                    <span aria-hidden className="mt-1.5 size-1 shrink-0 rounded-full bg-brand-400" />
+                    <span>{line}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {coupon.terms ? (
+                <div
+                  className="prose-offer mt-2 text-[12px]"
+                  dangerouslySetInnerHTML={{ __html: coupon.terms }}
+                />
+              ) : null}
+            </details>
+          ) : null}
+        </div>
+
+        {/* ---- the action ---- */}
+        <div className="flex shrink-0 flex-col gap-2 @2xl:w-[17.5rem] @2xl:items-end">
+          <span className="flex items-center gap-3 text-[11px] font-semibold">
+            {coupon.verified ? (
+              <span className="flex items-center gap-1 text-success-600">
+                <BadgeCheck aria-hidden className="size-3.5" />
+                Verified
               </span>
-            </div>
-          </div>
+            ) : null}
+            {coupon.successRate !== null ? (
+              <span className="flex items-center gap-1 text-brand-600">
+                <TrendingUp aria-hidden className="size-3.5" />
+                {coupon.successRate}% success
+              </span>
+            ) : null}
+          </span>
+
+          <span className="flex w-full items-center gap-2">
+            {!hideSave ? <SaveButton couponId={coupon._id} /> : null}
+
+            <span className="relative flex min-w-0 flex-1 items-center">
+              <RevealButton coupon={coupon} full label={ctaLabel} />
+
+              {coupon.hasCode ? (
+                /* The stub of the voucher, torn off behind the button. */
+                <span
+                  aria-hidden
+                  className="pointer-events-none -ml-5 hidden h-11 items-center rounded-r-xl border-2 border-l-0 border-dashed border-[var(--border-strong)] bg-[var(--surface-sunken)] pl-6 pr-2.5 font-mono text-[11px] font-bold tracking-[0.2em] text-faint @2xl:flex"
+                >
+                  ••
+                </span>
+              ) : null}
+            </span>
+          </span>
         </div>
       </div>
+
+      {/* ---- whose offer it is ---- */}
+      {showStore && store ? (
+        <div className="flex items-center gap-3 border-t border-[var(--border-subtle)] bg-[var(--surface-sunken)]/60 px-4 py-2.5">
+          <Link
+            href={`/store/${store.slug}`}
+            className="flex items-center gap-2.5 transition hover:opacity-90"
+          >
+            <span className="flex size-9 items-center justify-center rounded-lg border border-[var(--border-subtle)] bg-white p-1">
+              <StoreLogo name={store.name} logo={store.logo} size={28} rounded="rounded" className="border-0" />
+            </span>
+            <span className="text-[13px] font-bold">{store.name}</span>
+          </Link>
+
+          <Link
+            href={`/store/${store.slug}`}
+            className="ml-auto inline-flex items-center gap-1.5 text-[13px] font-bold text-brand-600 transition hover:underline"
+          >
+            View all {store.name} offers
+            <ExternalLink aria-hidden className="size-3.5" />
+          </Link>
+        </div>
+      ) : null}
     </article>
   );
 }
@@ -308,7 +347,7 @@ export function CouponList({
   showStore?: boolean;
 }) {
   return (
-    <div className="grid gap-3 2xl:grid-cols-2">
+    <div className="space-y-3">
       {items.map((coupon) => (
         <CouponCard key={coupon._id} coupon={coupon} showStore={showStore} />
       ))}

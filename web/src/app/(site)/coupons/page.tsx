@@ -376,7 +376,7 @@ export default async function CouponsPage({
             <>
               {/* Two columns from `xl`, so a wide screen is not one thin ribbon
                   of cards with empty space either side. */}
-              <div className="grid gap-3 2xl:grid-cols-2">
+              <div className="space-y-3">
                 {feed.items.slice(0, 6).map((coupon) => (
                   <CouponCard key={coupon._id} coupon={coupon} />
                 ))}
@@ -384,7 +384,7 @@ export default async function CouponsPage({
 
               <AdSlot position="category-infeed" className="my-3" />
 
-              <div className="grid gap-3 2xl:grid-cols-2">
+              <div className="space-y-3">
                 {feed.items.slice(6).map((coupon) => (
                   <CouponCard key={coupon._id} coupon={coupon} />
                 ))}
@@ -415,7 +415,7 @@ export default async function CouponsPage({
                   <h2 className="mb-3 font-display text-lg font-extrabold">
                     Biggest savings on the site
                   </h2>
-                  <div className="grid gap-3 2xl:grid-cols-2">
+                  <div className="space-y-3">
                     {fallback.map((coupon) => (
                       <CouponCard key={coupon._id} coupon={coupon} />
                     ))}

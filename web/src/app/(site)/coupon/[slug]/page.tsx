@@ -227,7 +227,7 @@ export default async function CouponPage({ params }: { params: Promise<{ slug: s
                     ) : null
                   }
                 />
-                <div className="grid gap-3 2xl:grid-cols-2">
+                <div className="space-y-3">
                   {related.map((item) => (
                     <CouponCard key={item._id} coupon={item} showStore={!store} />
                   ))}

@@ -261,7 +261,7 @@ export default async function StorePage({
                 {filtering ? (
                   <div className="mb-8">
                     {filtered.length ? (
-                      <div className="grid gap-3 2xl:grid-cols-2">
+                      <div className="space-y-3">
                         {filtered.map((coupon) => (
                           <CouponCard key={coupon._id} coupon={coupon} showStore={false} />
                         ))}
@@ -285,7 +285,7 @@ export default async function StorePage({
                       </span>
                       Promo codes
                     </h3>
-                    <div className="grid gap-3 2xl:grid-cols-2">
+                    <div className="space-y-3">
                       {codes.map((coupon) => (
                         <CouponCard key={coupon._id} coupon={coupon} showStore={false} />
                       ))}
@@ -303,7 +303,7 @@ export default async function StorePage({
                       </span>
                       Deals — no code needed
                     </h3>
-                    <div className="grid gap-3 2xl:grid-cols-2">
+                    <div className="space-y-3">
                       {deals.map((coupon) => (
                         <CouponCard key={coupon._id} coupon={coupon} showStore={false} />
                       ))}
