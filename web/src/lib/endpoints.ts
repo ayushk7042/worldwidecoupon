@@ -250,6 +250,13 @@ export const ads = {
   ): Promise<Advertisement | null> =>
     api<Advertisement | null>("/ads/serve", { query: params, ...options }),
 
+  /** Every matching ad for a slot, for a carousel rather than a single static creative. */
+  serveList: (
+    params: { position: string; device?: string; category?: string; store?: string; limit?: number },
+    options: Opts = {}
+  ): Promise<Advertisement[]> =>
+    api<Advertisement[]>("/ads/serve-list", { query: params, ...options }),
+
   trackClick: (id: string) =>
     api<{ url: string | null }>(`/ads/${id}/click`, { method: "POST" }),
 

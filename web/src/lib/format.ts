@@ -37,9 +37,12 @@ export function timeAgo(input?: string | Date | null): string {
   const days = Math.floor(seconds / 86_400);
   if (days === 1) return "yesterday";
   if (days < 30) return `${days} days ago`;
-  if (days < 365) return `${Math.floor(days / 30)} months ago`;
 
-  return `${Math.floor(days / 365)} years ago`;
+  const months = Math.floor(days / 30);
+  if (days < 365) return months === 1 ? "a month ago" : `${months} months ago`;
+
+  const years = Math.floor(days / 365);
+  return years === 1 ? "a year ago" : `${years} years ago`;
 }
 
 export function formatDate(input?: string | Date | null): string {
@@ -168,3 +171,12 @@ export function descriptionLines(text?: string | null, max = 4): string[] {
 
 export const classNames = (...values: (string | false | null | undefined)[]): string =>
   values.filter(Boolean).join(" ");
+
+/**
+ * The badge reads "50% OFF" or "$5 OFF", and a hero wants the number loud and
+ * the rest quiet, so it is split on the first space.
+ */
+export function splitBadge(badge: string): { lead: string; tail: string } {
+  const match = badge.trim().match(/^(\S+)\s+(.*)$/);
+  return match ? { lead: match[1] ?? badge, tail: match[2] ?? "" } : { lead: badge, tail: "" };
+}

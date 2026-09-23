@@ -371,6 +371,7 @@ export const AD_POSITIONS = [
   "store-top",
   "store-inline",
   "store-bottom",
+  "coupon-top",
   "coupon-inline",
   "category-top",
   "category-infeed",
