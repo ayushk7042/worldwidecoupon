@@ -286,15 +286,17 @@ export default function AdminHomepagePage() {
                   <div className="grid gap-4 lg:grid-cols-2">
                     <ImagePicker
                       label="Banner artwork"
-                      hint="Wide image, about 1200×300. Shown on every screen when no mobile version is set."
+                      hint="Wide image, about 1800×600 (3:1). Shown on every screen when no mobile version is set."
                       value={banner.image ?? null}
                       onChange={(value) => patch({ image: value })}
+                      folder="homepage"
                     />
                     <ImagePicker
                       label="Mobile artwork (optional)"
                       hint="Used below 640px — roughly 800×400 works well."
                       value={banner.mobileImage ?? null}
                       onChange={(value) => patch({ mobileImage: value })}
+                      folder="homepage"
                     />
                   </div>
 
