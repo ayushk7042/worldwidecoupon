@@ -5,6 +5,12 @@ import { classNames } from "@/lib/format";
 /** Natural size of the exported artwork, used to keep the aspect ratio exact. */
 const LOGO = { width: 1100, height: 198 };
 
+/*
+ * The mark is asked for at twice the size it is drawn at, so it stays crisp on
+ * the retina screens most shoppers browse on. CSS still sizes it.
+ */
+const RETINA = 2;
+
 /**
  * The globe-and-tag mark on its own — headers that are too tight for the
  * wordmark, avatars, and the admin sidebar.
@@ -28,8 +34,9 @@ export function LogoMark({
       <Image
         src="/brand/mark.png"
         alt={title}
-        width={size}
-        height={size}
+        width={size * RETINA}
+        height={size * RETINA}
+        style={{ width: size, height: size }}
         priority={priority}
         className={classNames("shrink-0 object-contain dark:hidden", className)}
         aria-hidden={title ? undefined : true}
@@ -38,8 +45,9 @@ export function LogoMark({
         src="/brand/mark-dark.png"
         alt=""
         aria-hidden
-        width={size}
-        height={size}
+        width={size * RETINA}
+        height={size * RETINA}
+        style={{ width: size, height: size }}
         priority={priority}
         className={classNames("hidden shrink-0 object-contain dark:block", className)}
       />
@@ -75,8 +83,8 @@ export function Logo({
         <Image
           src="/brand/logo.png"
           alt="WorldwideCoupons"
-          width={width}
-          height={height}
+          width={width * RETINA}
+          height={height * RETINA}
           priority={priority}
           className="block h-full w-auto object-contain dark:hidden"
         />
@@ -84,8 +92,8 @@ export function Logo({
           src="/brand/logo-dark.png"
           alt=""
           aria-hidden
-          width={width}
-          height={height}
+          width={width * RETINA}
+          height={height * RETINA}
           priority={priority}
           className="hidden h-full w-auto object-contain dark:block"
         />

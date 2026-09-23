@@ -259,9 +259,9 @@ export default async function CategoryPage({
                       <Link
                         key={item._id}
                         href={`/category/${item.slug}`}
-                        className="rounded-full border border-[var(--border-subtle)] px-3 py-1 text-xs font-semibold transition hover:border-brand-300 hover:text-brand-600"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border-subtle)] px-3 py-1 text-xs font-semibold transition hover:border-brand-300 hover:text-brand-600"
                       >
-                        {item.icon ? `${item.icon} ` : ""}
+                        <CategoryIcon name={item.name} className="size-3.5" />
                         {item.name}
                       </Link>
                     ))}

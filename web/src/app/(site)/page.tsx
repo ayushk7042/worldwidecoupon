@@ -356,7 +356,7 @@ export default async function HomePage() {
         section.category && section.coupons.length ? (
           <section key={section.category._id} className="shell pt-14">
             <SectionHeading
-              eyebrow={section.category.icon ?? undefined}
+              eyebrow="Category"
               title={section.heading || section.category.name}
               action={
                 <Link
