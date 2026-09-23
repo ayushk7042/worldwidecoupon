@@ -905,16 +905,16 @@ function TrendingBrands({ stores }: { stores: HomepagePayload["stores"] }) {
 
   return (
     <section className="shell pt-6">
-      <div className="surface relative overflow-hidden rounded-3xl border border-[var(--border-subtle)] py-3.5 shadow-[var(--shadow-card)]">
-        <div className="mb-2.5 flex items-center gap-3 px-4">
-          <span className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-faint">
-            <Flame aria-hidden className="size-4 text-accent-500" />
+      <div className="surface relative overflow-hidden rounded-3xl border border-[var(--border-subtle)] py-5 shadow-[var(--shadow-card)]">
+        <div className="mb-3.5 flex items-center gap-3 px-5">
+          <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-faint">
+            <Flame aria-hidden className="size-4.5 text-accent-500" />
             Trending brands
           </span>
 
           <Link
             href="/stores"
-            className="ml-auto text-xs font-bold text-brand-600 transition hover:underline"
+            className="ml-auto text-sm font-bold text-brand-600 transition hover:underline"
           >
             All stores →
           </Link>
@@ -931,20 +931,29 @@ function TrendingBrands({ stores }: { stores: HomepagePayload["stores"] }) {
             className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-[var(--surface)] via-[var(--surface)]/80 to-transparent"
           />
 
-          <div className="marquee-track gap-2.5">
+          <div className="marquee-track gap-3">
             {[0, 1].map((copy) => (
-              <div key={copy} className="flex shrink-0 gap-2.5 pr-2.5" aria-hidden={copy === 1}>
+              <div key={copy} className="flex shrink-0 gap-3 pr-3" aria-hidden={copy === 1}>
                 {lane.map((item) => (
                   <Link
                     key={`${copy}-${item._id}`}
                     href={`/store/${item.slug}`}
                     tabIndex={copy === 1 ? -1 : undefined}
-                    className="group flex shrink-0 items-center gap-2 rounded-full border border-[var(--border-subtle)] py-1 pl-1 pr-3.5 text-xs font-semibold transition-colors duration-200 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-950/50 dark:hover:text-brand-300"
+                    className="group flex shrink-0 items-center gap-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] py-2 pl-2 pr-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-[var(--shadow-card)] dark:hover:bg-brand-950/40"
                   >
-                    <StoreLogo name={item.name} logo={item.logo} size={26} rounded="rounded-full" />
-                    <span className="max-w-32 truncate">{item.name}</span>
-                    <span className="rounded-full bg-brand-50 px-1.5 py-0.5 text-[10px] font-bold text-brand-700 dark:bg-brand-950/70 dark:text-brand-300">
-                      {formatCount(item.activeCouponCount)}
+                    <StoreLogo name={item.name} logo={item.logo} size={44} rounded="rounded-xl" />
+                    <span className="min-w-0">
+                      <span className="block max-w-40 truncate text-sm font-bold transition-colors group-hover:text-brand-700 dark:group-hover:text-brand-300">
+                        {item.name}
+                      </span>
+                      <span className="mt-0.5 flex items-center gap-1.5 text-xs font-semibold text-faint">
+                        <span className="rounded-full bg-brand-50 px-2 py-0.5 font-bold text-brand-700 dark:bg-brand-950/70 dark:text-brand-300">
+                          {formatCount(item.activeCouponCount)} offers
+                        </span>
+                        {item.bestOffer ? (
+                          <span className="whitespace-nowrap">{item.bestOffer}</span>
+                        ) : null}
+                      </span>
                     </span>
                   </Link>
                 ))}
