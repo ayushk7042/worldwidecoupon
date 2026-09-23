@@ -18,7 +18,8 @@ import { liveCouponFilter } from "./counters.service.js";
 
 /** Fields of a store a coupon card actually renders. */
 export const STORE_CARD_FIELDS =
-  "name slug logo brandColor affiliateUrl websiteUrl trackingParams verified domain";
+  "name slug logo brandColor affiliateUrl websiteUrl trackingParams verified domain " +
+  "activeCouponCount codeCount dealCount bestOffer";
 
 export const SORTERS: Record<CouponSort, Record<string, 1 | -1>> = {
   best: { priority: -1, verified: -1, discountValue: -1, createdAt: -1 },
