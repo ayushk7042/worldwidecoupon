@@ -47,6 +47,7 @@ const MAX_WIDTH: Record<string, number> = {
   "store-top": 970,
   "store-inline": 728,
   "store-bottom": 970,
+  "coupon-top": 970,
   "coupon-inline": 728,
   "category-top": 970,
   "category-infeed": 728,
