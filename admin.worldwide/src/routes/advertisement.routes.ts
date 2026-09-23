@@ -9,6 +9,7 @@ const router = Router();
 /* ---------- public ---------- */
 
 router.get("/serve", ads.serveAd);
+router.get("/serve-list", ads.serveAdList);
 router.post("/:id/click", validate({ params: idParam }), ads.trackAdClick);
 
 /* ---------- admin ---------- */

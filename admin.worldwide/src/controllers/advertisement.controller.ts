@@ -61,6 +61,58 @@ export const serveAd = asyncHandler(async (req, res) => {
   sendOk(res, ad);
 });
 
+/**
+ * GET /api/ads/serve-list?position=&device=
+ *
+ * Same targeting as `serveAd`, but every matching ad rather than just the
+ * best one — for a slot that slides through several creatives instead of
+ * showing a single static one.
+ */
+export const serveAdList = asyncHandler(async (req, res) => {
+  const position = String(req.query.position ?? "");
+  const device = String(req.query.device ?? "desktop") as AdDevice;
+  const category = String(req.query.category ?? "");
+  const store = String(req.query.store ?? "");
+  const limit = Math.min(Number(req.query.limit) || 8, 20);
+
+  if (!AD_POSITIONS.includes(position as never)) {
+    throw ApiError.badRequest("Unknown ad position");
+  }
+
+  const now = new Date();
+
+  const filter: Record<string, unknown> = {
+    position,
+    status: "active",
+    devices: device,
+    $and: [
+      { $or: [{ startsAt: null }, { startsAt: { $lte: now } }] },
+      { $or: [{ endsAt: null }, { endsAt: { $gte: now } }] },
+    ],
+  };
+
+  if (isObjectId(category)) {
+    filter.$or = [{ categories: { $size: 0 } }, { categories: category }];
+  }
+  if (isObjectId(store)) {
+    filter.stores = { $in: [[], store] };
+  }
+
+  const list = await AdvertisementModel.find(filter)
+    .sort({ priority: -1, createdAt: -1 })
+    .limit(limit)
+    .lean();
+
+  if (list.length) {
+    void AdvertisementModel.updateMany(
+      { _id: { $in: list.map((ad) => ad._id) } },
+      { $inc: { impressions: 1 } }
+    ).catch(() => undefined);
+  }
+
+  sendOk(res, list);
+});
+
 /** POST /api/ads/:id/click */
 export const trackAdClick = asyncHandler(async (req, res) => {
   const { id } = req.params as { id: string };
