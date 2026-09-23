@@ -218,7 +218,7 @@ function Slide({
       )}
       aria-hidden={hidden}
       // A hidden slide must not be reachable by keyboard behind the visible one.
-      {...(hidden ? { inert: "" as unknown as boolean } : {})}
+      {...(hidden ? { inert: true } : {})}
     >
       {banner.link ? (
         banner.link.startsWith("http") ? (

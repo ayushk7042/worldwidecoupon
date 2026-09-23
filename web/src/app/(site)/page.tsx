@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { AdSlot } from "@/components/ads/AdSlot";
+import { AdCarousel } from "@/components/ads/AdCarousel";
 import {
   ArrowRight,
   BadgeCheck,
@@ -670,7 +671,7 @@ function HomeHero({
               </article>
             ) : null}
 
-            <AdSlot position="home-hero" minHeight={0} />
+            <AdCarousel position="home-hero" className="h-40" minHeight={0} />
           </aside>
         </div>
       </div>
