@@ -26,6 +26,7 @@ const POSITION_NOTES: Record<AdPosition, string> = {
   "store-top": "Banner at the top of every store page.",
   "store-inline": "Between the offers on a store page.",
   "store-bottom": "Below the offer list on a store page.",
+  "coupon-top": "Full-width banner at the top of the offer page, under the hero.",
   "coupon-inline": "Inside the offer detail page, under the reveal button.",
   "category-top": "Banner at the top of every category page.",
   "category-infeed": "Between the cards on a category page.",

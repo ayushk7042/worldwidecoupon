@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 import { Checkbox, Field, Input } from "@/components/ui/form";
 import { Modal } from "@/components/ui/Modal";
+import { useToast } from "@/components/ui/Toast";
 import { classNames } from "@/lib/format";
 import { media as mediaApi } from "@/lib/endpoints";
+import { readToken } from "@/lib/session";
 import { useAdminData } from "./hooks";
 import type { ImageRef } from "@/lib/types";
 
@@ -311,13 +313,43 @@ export function ImagePicker({
   hint,
   value,
   onChange,
+  folder = "general",
 }: {
   label: string;
   hint?: string;
   value: ImageRef | null | undefined;
   onChange: (next: ImageRef | null) => void;
+  /** Cloudinary folder a direct upload from this field lands in. */
+  folder?: string;
 }) {
   const [browsing, setBrowsing] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const toast = useToast();
+
+  const uploadFiles = async (files: FileList | null) => {
+    if (!files?.length) return;
+    setUploading(true);
+    try {
+      const [uploaded] = await mediaApi.upload(files, folder, readToken("admin"));
+      if (uploaded) {
+        onChange({
+          public_id: uploaded.public_id,
+          url: uploaded.secureUrl ?? uploaded.url,
+          thumbnailUrl: uploaded.thumbnailUrl,
+          alt: uploaded.alt ?? uploaded.name,
+          width: uploaded.width,
+          height: uploaded.height,
+        });
+        toast.success("Image uploaded");
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileInput.current) fileInput.current.value = "";
+    }
+  };
 
   return (
     <Field label={label} hint={hint}>
@@ -350,6 +382,21 @@ export function ImagePicker({
           />
 
           <div className="flex gap-2">
+            <input
+              ref={fileInput}
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={(event) => void uploadFiles(event.target.files)}
+            />
+            <Button
+              type="button"
+              size="sm"
+              loading={uploading}
+              onClick={() => fileInput.current?.click()}
+            >
+              Upload image
+            </Button>
             <Button type="button" size="sm" variant="secondary" onClick={() => setBrowsing(true)}>
               Media library
             </Button>
@@ -365,6 +412,7 @@ export function ImagePicker({
       <MediaBrowser
         open={browsing}
         onClose={() => setBrowsing(false)}
+        folder={folder}
         onPick={(item) => {
           onChange({
             public_id: item.public_id,
@@ -385,27 +433,67 @@ export function MediaBrowser({
   open,
   onClose,
   onPick,
+  folder = "general",
 }: {
   open: boolean;
   onClose: () => void;
   onPick: (item: { public_id?: string; url: string; secureUrl?: string; thumbnailUrl?: string; alt?: string; name: string; width?: number; height?: number }) => void;
+  /** Cloudinary folder a direct upload from this browser lands in. */
+  folder?: string;
 }) {
   const [search, setSearch] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const toast = useToast();
   const library = useAdminData(
     (token) => mediaApi.list({ limit: 60, ...(search ? { search } : {}) }, token),
     [search, open]
   );
 
+  const uploadFiles = async (files: FileList | null) => {
+    if (!files?.length) return;
+    setUploading(true);
+    try {
+      const [uploaded] = await mediaApi.upload(files, folder, readToken("admin"));
+      if (uploaded) {
+        toast.success("Image uploaded");
+        onPick(uploaded);
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileInput.current) fileInput.current.value = "";
+    }
+  };
+
   if (!open) return null;
 
   return (
     <Modal open={open} onClose={onClose} title="Media library" size="xl">
-      <Input
-        placeholder="Search the library…"
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-        className="mb-4"
-      />
+      <div className="mb-4 flex gap-2">
+        <Input
+          placeholder="Search the library…"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          className="flex-1"
+        />
+        <input
+          ref={fileInput}
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={(event) => void uploadFiles(event.target.files)}
+        />
+        <Button
+          type="button"
+          size="sm"
+          loading={uploading}
+          onClick={() => fileInput.current?.click()}
+        >
+          Upload new
+        </Button>
+      </div>
 
       {library.loading ? (
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
