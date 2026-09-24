@@ -1,0 +1,386 @@
+import Link from "next/link";
+import type { Metadata } from "next";
+import {
+  ArrowRight,
+  Clock3,
+  Gift,
+  PlaneTakeoff,
+  Search,
+  ShoppingCart,
+  Smile,
+  Ticket,
+  Wrench,
+} from "lucide-react";
+import { AdSlot } from "@/components/ads/AdSlot";
+import { RevealButton } from "@/components/site/RevealButton";
+import { HomeHeroCarousel } from "@/components/site/HomeHeroCarousel";
+import { NewsletterBar } from "@/components/site/NewsletterBar";
+import { TrustStrip } from "@/components/site/TrustStrip";
+import { CategoryIcon } from "@/components/ui/icons";
+import { ButtonLink } from "@/components/ui/Button";
+import { EmptyState, SectionHeading, StoreLogo } from "@/components/ui/primitives";
+import { apiSafe } from "@/lib/api";
+import { descriptionLines, formatCount } from "@/lib/format";
+import type { CouponView, HomepageBlock, HomepagePayload, Store } from "@/lib/types";
+
+export const revalidate = 300;
+
+export const metadata: Metadata = {
+  // Absolute, so the tab reads as the brand rather than the page's headline.
+  title: { absolute: "WorldwideCoupons — verified coupon codes & deals" },
+  description:
+    "Every code on WorldwideCoupons is checked before it goes live. Copy, click through, and pay less at the brands you already shop with.",
+  alternates: { canonical: "/" },
+};
+
+const EMPTY: HomepagePayload = {
+  announcement: null,
+  hero: { heading: null, subheading: null, image: null, coupon: null },
+  banners: [],
+  featured: [],
+  newest: [],
+  expiring: [],
+  stores: [],
+  categories: [],
+  sections: [],
+  blocks: [],
+};
+
+/** Pastel washes for the category circles, cycled — no category owns a colour. */
+const CATEGORY_TONES = [
+  "bg-accent-100 text-accent-600 dark:bg-accent-600/15 dark:text-accent-400",
+  "bg-brand-100 text-brand-700 dark:bg-brand-950 dark:text-brand-300",
+  "bg-success-50 text-success-600 dark:bg-success-700/15 dark:text-success-500",
+  "bg-warn-50 text-warn-600 dark:bg-warn-500/10 dark:text-warn-500",
+  "bg-brand-50 text-brand-600 dark:bg-brand-900/50 dark:text-brand-300",
+  "bg-accent-300/50 text-accent-600 dark:bg-accent-600/20 dark:text-accent-400",
+];
+
+const HOW_IT_WORKS = [
+  { Icon: Search, title: "Search", body: "Find your favorite store or category" },
+  { Icon: Ticket, title: "Get Coupon", body: "Click on the deal and get your exclusive code" },
+  { Icon: ShoppingCart, title: "Shop", body: "Apply the code at checkout and save big" },
+  { Icon: Smile, title: "Enjoy", body: "That's it! Enjoy your savings and happy shopping!" },
+];
+
+export default async function HomePage() {
+  const data = await apiSafe<HomepagePayload>("/homepage", EMPTY, { revalidate: 300 });
+
+  const categories = [...data.categories].sort(
+    (a, b) => (b.activeCouponCount ?? 0) - (a.activeCouponCount ?? 0)
+  );
+  const travelCategory = data.categories.find((category) => /travel/i.test(category.name));
+
+  if (!data.featured.length && !data.stores.length) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-24">
+        <EmptyState
+          icon={<Wrench aria-hidden className="size-7" strokeWidth={1.7} />}
+          title="Nothing to show yet"
+          body="The API returned no offers. Check that the backend is running and that the coupon data has been imported."
+          action={<ButtonLink href="/admin">Open the admin panel</ButtonLink>}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {data.announcement?.active && data.announcement.text ? (
+        <div className="bg-brand-gradient px-4 py-2.5 text-center text-sm font-semibold text-white">
+          {data.announcement.link ? (
+            <Link href={data.announcement.link} className="underline-offset-2 hover:underline">
+              {data.announcement.text}
+            </Link>
+          ) : (
+            data.announcement.text
+          )}
+        </div>
+      ) : null}
+
+      {/* =========================================================
+          HERO — a peek carousel, so there is always more to scroll to
+      ========================================================= */}
+      <section className="shell pt-4 sm:pt-6">
+        <HomeHeroCarousel banners={data.banners} spotlight={data.featured} />
+      </section>
+
+      <section className="shell py-6">
+        <TrustStrip />
+      </section>
+
+      <div className="shell">
+        <AdSlot position="home-top" minHeight={0} />
+      </div>
+
+      {/* =========================================================
+          POPULAR STORES
+      ========================================================= */}
+      {data.stores.length ? (
+        <section className="shell pt-10">
+          <SectionHeading
+            title="Popular Stores"
+            subtitle="Shop from your favorite brands and get exclusive coupons"
+            action={
+              <Link href="/stores" className="text-sm font-semibold text-brand-600 hover:underline">
+                View All Stores →
+              </Link>
+            }
+          />
+          <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+            {data.stores.slice(0, 8).map((store) => (
+              <Link
+                key={store._id}
+                href={`/store/${store.slug}`}
+                className="surface group flex flex-col items-center gap-2 rounded-2xl border border-[var(--border-subtle)] px-2 py-4 text-center shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]"
+              >
+                <StoreLogo
+                  name={store.name}
+                  logo={store.logo}
+                  size={44}
+                  rounded="rounded-xl"
+                  className="border-0 transition-transform duration-200 group-hover:scale-110"
+                />
+                <span className="w-full min-w-0 truncate text-xs font-bold">{store.name}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {/* =========================================================
+          SHOP BY CATEGORY
+      ========================================================= */}
+      {categories.length ? (
+        <section className="shell pt-12">
+          <SectionHeading
+            title="Shop by Category"
+            subtitle="Find the best deals in your favorite categories"
+            action={
+              <Link href="/categories" className="text-sm font-semibold text-brand-600 hover:underline">
+                View All Categories →
+              </Link>
+            }
+          />
+          <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 lg:grid-cols-8">
+            {categories.slice(0, 8).map((category, index) => (
+              <Link
+                key={category._id}
+                href={`/category/${category.slug}`}
+                className="group flex flex-col items-center gap-2 text-center"
+              >
+                <span
+                  className={`flex size-16 items-center justify-center rounded-full transition-transform duration-200 group-hover:scale-110 ${CATEGORY_TONES[index % CATEGORY_TONES.length]}`}
+                >
+                  <CategoryIcon name={category.name} className="size-6" />
+                </span>
+                <span className="w-full min-w-0 truncate text-xs font-bold">{category.name}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {/* =========================================================
+          PROMO BANNERS
+      ========================================================= */}
+      <PromoBanners blocks={data.blocks} travelHref={travelCategory ? `/category/${travelCategory.slug}` : "/coupons"} />
+
+      {/* =========================================================
+          HOW IT WORKS
+      ========================================================= */}
+      <section className="shell pt-12">
+        <SectionHeading title="How It Works" subtitle="Get your favorite deals in just a few clicks" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {HOW_IT_WORKS.map((step, index) => (
+            <div
+              key={step.title}
+              className="surface relative flex items-start gap-3 rounded-2xl border border-[var(--border-subtle)] p-5 shadow-[var(--shadow-card)]"
+            >
+              <span className="relative shrink-0">
+                <span className="flex size-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-950/60 dark:text-brand-300">
+                  <step.Icon aria-hidden className="size-5" strokeWidth={1.9} />
+                </span>
+                <span className="absolute -left-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full bg-brand-gradient text-[10px] font-extrabold text-white">
+                  {index + 1}
+                </span>
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-bold">{step.title}</span>
+                <span className="mt-0.5 block text-xs leading-relaxed text-faint">{step.body}</span>
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="shell">
+        <AdSlot position="home-mid" className="mt-12" />
+      </div>
+
+      {/* =========================================================
+          FEATURED DEALS & COUPONS
+      ========================================================= */}
+      {data.featured.length ? (
+        <section className="shell pt-12">
+          <SectionHeading
+            title="Featured Deals & Coupons"
+            subtitle="Handpicked deals just for you"
+            action={
+              <Link href="/coupons" className="text-sm font-semibold text-brand-600 hover:underline">
+                View All Deals →
+              </Link>
+            }
+          />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {data.featured.slice(0, 4).map((coupon) => (
+              <FeaturedDealCard key={coupon._id} coupon={coupon} />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <NewsletterBar />
+
+      <div className="shell">
+        <AdSlot position="home-bottom" className="mb-4" />
+      </div>
+    </>
+  );
+}
+
+/* =========================================================
+   PROMO BANNERS
+
+   Editor-configured homepage blocks win when there are two or more; the
+   evergreen defaults below fill the gap otherwise, so the row is never
+   half-empty.
+========================================================= */
+
+function PromoBanners({ blocks, travelHref }: { blocks: HomepageBlock[]; travelHref: string }) {
+  const useBlocks = blocks.length >= 2;
+
+  const cards: { title: string; subtitle?: string; link?: string; cta?: string }[] = useBlocks
+    ? blocks.slice(0, 2).map((block) => ({
+        title: block.title,
+        subtitle: block.subtitle,
+        link: block.link,
+        cta: "Shop now",
+      }))
+    : [
+        {
+          title: "Extra 10% OFF\non First Order",
+          subtitle: "New to WorldwideCoupons? Get an exclusive welcome discount.",
+          link: "/account/register",
+          cta: "Get Code",
+        },
+        {
+          title: "Travel More\nSpend Less",
+          subtitle: "Get exclusive travel coupons and save on your next trip.",
+          link: travelHref,
+          cta: "Explore Travel Deals",
+        },
+      ];
+
+  return (
+    <section className="shell pt-12">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Link
+          href={cards[0]!.link || "/coupons"}
+          className="group relative overflow-hidden rounded-3xl bg-brand-gradient p-7 text-white shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)] sm:p-8"
+        >
+          <Gift aria-hidden className="pointer-events-none absolute -bottom-6 -right-6 size-32 text-white/10" strokeWidth={1.2} />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold uppercase tracking-wide">
+            Welcome offer
+          </span>
+          <h3 className="mt-3 whitespace-pre-line font-display text-2xl font-extrabold leading-tight">
+            {cards[0]!.title}
+          </h3>
+          <p className="mt-2 max-w-sm text-sm text-white/85">{cards[0]!.subtitle}</p>
+          <span className="mt-5 inline-flex h-11 items-center gap-1.5 rounded-2xl bg-white px-5 text-sm font-bold text-brand-700 transition group-hover:-translate-y-0.5">
+            {cards[0]!.cta ?? "Get Code"}
+            <ArrowRight aria-hidden className="size-4" />
+          </span>
+        </Link>
+
+        <Link
+          href={cards[1]!.link || "/coupons"}
+          className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-accent-400 to-accent-500 p-7 text-white shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)] sm:p-8"
+        >
+          <PlaneTakeoff aria-hidden className="pointer-events-none absolute -bottom-6 -right-6 size-32 text-white/10" strokeWidth={1.2} />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold uppercase tracking-wide">
+            Limited time
+          </span>
+          <h3 className="mt-3 whitespace-pre-line font-display text-2xl font-extrabold leading-tight">
+            {cards[1]!.title}
+          </h3>
+          <p className="mt-2 max-w-sm text-sm text-white/85">{cards[1]!.subtitle}</p>
+          <span className="mt-5 inline-flex h-11 items-center gap-1.5 rounded-2xl bg-white px-5 text-sm font-bold text-accent-600 transition group-hover:-translate-y-0.5">
+            {cards[1]!.cta ?? "Explore"}
+            <ArrowRight aria-hidden className="size-4" />
+          </span>
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   FEATURED DEAL CARD
+========================================================= */
+
+function FeaturedDealCard({ coupon }: { coupon: CouponView }) {
+  const store = typeof coupon.store === "object" && coupon.store ? (coupon.store as Store) : null;
+  const line = descriptionLines(coupon.description, 1)[0];
+
+  return (
+    <article className="surface group flex flex-col overflow-hidden rounded-2xl border border-[var(--border-subtle)] shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]">
+      <div className="flex items-center gap-2 px-4 pt-4">
+        <StoreLogo name={store?.name ?? "Store"} logo={store?.logo} size={22} rounded="rounded-md" className="border-0" />
+        <span className="truncate text-sm font-bold">{store?.name ?? "Featured"}</span>
+      </div>
+
+      <div className="relative mx-4 mt-3 flex h-28 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-brand-50 to-accent-100/50 dark:from-brand-950/40 dark:to-brand-900/20">
+        {coupon.image?.url ? (
+          // Uploaded creative — a plain img, like every other brand asset on the site.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={coupon.image.url}
+            alt={coupon.image.alt ?? coupon.title}
+            className="h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <StoreLogo
+            name={store?.name ?? coupon.title}
+            logo={store?.logo}
+            size={56}
+            rounded="rounded-2xl"
+            className="shadow-[var(--shadow-card)]"
+          />
+        )}
+      </div>
+
+      <div className="flex flex-1 flex-col gap-1 px-4 pb-4 pt-3">
+        <Link
+          href={`/coupon/${coupon.slug}`}
+          className="text-sm font-extrabold text-brand-700 transition hover:text-brand-600 dark:text-brand-300"
+        >
+          {coupon.badge}
+        </Link>
+        {line ? <p className="truncate text-xs text-faint">{line}</p> : null}
+
+        <div className="mt-auto flex items-center justify-between gap-2 pt-3">
+          <RevealButton coupon={coupon} size="sm" />
+          {coupon.uses > 0 ? (
+            <span className="flex items-center gap-1 text-[11px] font-semibold text-faint">
+              <Clock3 aria-hidden className="size-3" />
+              {formatCount(coupon.uses)} used
+            </span>
+          ) : null}
+        </div>
+      </div>
+    </article>
+  );
+}
