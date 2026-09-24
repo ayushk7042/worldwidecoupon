@@ -1,12 +1,27 @@
-import { ArrowRight, Check, Clock3, Filter, Star, Ticket, X } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarCheck,
+  Check,
+  ChevronDown,
+  Clock3,
+  Filter,
+  MousePointerClick,
+  PiggyBank,
+  ShieldCheck,
+  SlidersHorizontal,
+  Star,
+  Tag,
+  Ticket,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { AdSlot } from "@/components/ads/AdSlot";
-import { CouponCard } from "@/components/site/CouponCard";
+import { FilterGroup, FilterLink } from "@/components/site/FilterParts";
+import { OfferRow } from "@/components/site/OfferRow";
 import { ButtonLink } from "@/components/ui/Button";
 import { CategoryIcon } from "@/components/ui/icons";
 import {
-  Breadcrumbs,
   EmptyState,
   Pagination,
   StoreLogo,
@@ -142,64 +157,105 @@ export default async function CouponsPage({
               ? `${activeCategory.name} coupons & deals`
               : activeStore
                 ? `${activeStore.name} coupons & deals`
-                : "All coupon codes & deals";
+                : "All Coupon Codes & Deals";
 
   const start = feed.items.length ? (page - 1) * PER_PAGE + 1 : 0;
 
   return (
     <div className="shell py-8">
-      <Breadcrumbs trail={[{ label: "Home", href: "/" }, { label: "All offers" }]} />
-
-      {/* ---- header band: title, counts and the filters in force ---- */}
-      <section className="surface relative overflow-hidden rounded-3xl border border-[var(--border-subtle)] p-5 shadow-[var(--shadow-card)] sm:p-7">
-        <span
-          aria-hidden
-          className="pointer-events-none absolute -right-24 -top-28 size-72 rounded-full bg-brand-100 opacity-60 blur-3xl dark:bg-brand-900/40"
-        />
-
-        <div className="relative flex flex-wrap items-end justify-between gap-4">
+      {/* ---- header: breadcrumb, two-tone title, four promises, and the
+          artwork on the right ---- */}
+      <section className="relative overflow-hidden rounded-3xl border border-brand-200/60 bg-gradient-to-r from-brand-50 via-brand-50 to-brand-100/70 p-5 sm:p-7 dark:border-brand-700/40 dark:from-brand-900/45 dark:via-brand-950/60 dark:to-brand-900/30">
+        <div className="relative grid items-center gap-6 lg:grid-cols-[1fr_38rem]">
           <div className="min-w-0">
-            <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-brand-600">
-              <Ticket aria-hidden className="size-4" />
-              Offers
-            </p>
-            <h1 className="mt-1.5 font-display text-2xl font-extrabold sm:text-3xl">{headline}</h1>
-            <p className="mt-1.5 text-sm text-body">
-              <strong className="text-[var(--text-primary)]">
-                {formatCount(feed.pagination.total)}
-              </strong>{" "}
-              live offers{chips.length ? " matching your filters" : " across every store we list"}, each
-              one opened and checked before it went on the page.
-            </p>
+            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm text-body">
+              <Link href="/" className="transition hover:text-brand-600">Home</Link>
+              <span aria-hidden>/</span>
+              <span className="font-medium text-[var(--text-primary)]">All offers</span>
+            </nav>
+
+            <div className="mt-3 flex items-start gap-4">
+              <span className="mt-1 hidden size-14 shrink-0 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-[var(--shadow-glow)] sm:flex">
+                <Ticket aria-hidden className="size-7" />
+              </span>
+              <div className="min-w-0">
+                <h1 className="font-display text-3xl font-extrabold leading-tight sm:text-4xl">
+                  {headline.includes(" ") ? (
+                    <>
+                      {headline.slice(0, headline.lastIndexOf(" "))}{" "}
+                      <span className="text-brand-600">{headline.slice(headline.lastIndexOf(" ") + 1)}</span>
+                    </>
+                  ) : (
+                    headline
+                  )}
+                </h1>
+                <p className="mt-2 max-w-xl text-sm text-body">
+                  <strong className="text-[var(--text-primary)]">{formatCount(feed.pagination.total)}</strong>{" "}
+                  live offers{chips.length ? " matching your filters" : " across every store"}. Grab the best
+                  discounts, promo codes, and exclusive deals — all in one place.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 sm:flex sm:flex-wrap sm:items-center sm:gap-x-6">
+              {(
+                [
+                  { Icon: ShieldCheck, title: "Verified Codes", body: "100% Working" },
+                  { Icon: MousePointerClick, title: "Easy to Use", body: "Copy & Apply" },
+                  { Icon: CalendarCheck, title: "Updated Daily", body: "Latest Offers" },
+                  { Icon: PiggyBank, title: "Save Big", body: "Shop Smarter" },
+                ] as const
+              ).map((point) => (
+                <span key={point.title} className="flex items-center gap-2.5">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700 dark:bg-brand-950/70 dark:text-brand-300">
+                    <point.Icon aria-hidden className="size-5" />
+                  </span>
+                  <span>
+                    <span className="block text-xs font-bold">{point.title}</span>
+                    <span className="block text-[11px] text-faint">{point.body}</span>
+                  </span>
+                </span>
+              ))}
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {(
-              [
-                { href: "/coupons?withCode=true", label: "Promo codes", Icon: Ticket, on: withCode === "true" },
-                { href: "/coupons?expiringSoon=true", label: "Ending soon", Icon: Clock3, on: expiringSoon === "true" },
-                { href: "/coupons?exclusive=true", label: "Exclusives", Icon: Star, on: exclusive === "true" },
-              ] as const
-            ).map((quick) => (
+          {/* The site's own artwork, feathered into the panel so it has no edge. */}
+          <div className="relative hidden items-center justify-center gap-3 lg:flex">
+            <div className="relative aspect-[480/214] w-[25rem] shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/banners/all-offers-graphic.png"
+                alt=""
+                aria-hidden
+                className="h-full w-full object-cover mix-blend-multiply"
+                style={{
+                  maskImage: "var(--feather-promo)",
+                  WebkitMaskImage: "var(--feather-promo)",
+                  maskComposite: "intersect",
+                  WebkitMaskComposite: "source-in",
+                }}
+              />
+            </div>
+
+            <div className="flex flex-col items-start gap-3">
+              <p className="-rotate-6 font-display text-lg font-bold italic leading-tight text-ink-700 dark:text-ink-200">
+                More Savings
+                <br />
+                More Smiles
+              </p>
               <Link
-                key={quick.href}
-                href={quick.href}
-                className={classNames(
-                  "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-semibold transition-all hover:-translate-y-px",
-                  quick.on
-                    ? "border-brand-600 bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300"
-                    : "border-[var(--border-subtle)] text-body hover:border-brand-300 hover:text-brand-600"
-                )}
+                href="/stores"
+                className="group inline-flex items-center gap-1.5 rounded-full border border-[var(--border-subtle)] bg-[var(--surface)] px-4 py-2 text-sm font-semibold shadow-[var(--shadow-card)] transition-all hover:-translate-y-px hover:border-brand-300 hover:text-brand-600"
               >
-                <quick.Icon aria-hidden className="size-4" />
-                {quick.label}
+                Browse Stores
+                <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
-            ))}
+            </div>
           </div>
         </div>
 
         {chips.length ? (
-          <div className="relative mt-5 flex flex-wrap items-center gap-2 border-t border-[var(--border-subtle)] pt-4">
+          <div className="relative mt-5 flex flex-wrap items-center gap-2 border-t border-brand-200/60 pt-4 dark:border-brand-700/40">
             <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-faint">
               <Filter aria-hidden className="size-3.5" />
               Filters
@@ -209,17 +265,14 @@ export default async function CouponsPage({
               <Link
                 key={chip.label}
                 href={chip.href}
-                className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-700 transition hover:bg-brand-100 dark:bg-brand-950/60 dark:text-brand-300"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[var(--surface)] px-3 py-1.5 text-xs font-bold text-brand-700 shadow-[var(--shadow-card)] transition hover:bg-brand-100 dark:text-brand-300"
               >
                 {chip.label}
                 <X aria-hidden className="size-3" />
               </Link>
             ))}
 
-            <Link
-              href="/coupons"
-              className="ml-auto text-xs font-bold text-faint transition hover:text-brand-600"
-            >
+            <Link href="/coupons" className="ml-auto text-xs font-bold text-faint transition hover:text-brand-600">
               Clear all
             </Link>
           </div>
@@ -246,7 +299,13 @@ export default async function CouponsPage({
               />
             </summary>
 
-            <div className="space-y-3">
+            <div className="surface overflow-hidden rounded-2xl border border-[var(--border-subtle)] shadow-[var(--shadow-card)]">
+              <h2 className="hidden items-center gap-2.5 px-4 py-3.5 font-display text-base font-extrabold lg:flex">
+                <span className="flex size-8 items-center justify-center rounded-xl bg-brand-100 text-brand-700 dark:bg-brand-950/70 dark:text-brand-300">
+                  <SlidersHorizontal aria-hidden className="size-4" />
+                </span>
+                Filter Offers
+              </h2>
           <FilterGroup
             title="Offer type"
             clearHref={type || withCode ? hrefWith(params, { type: undefined, withCode: undefined }) : undefined}
@@ -310,11 +369,19 @@ export default async function CouponsPage({
                   </FilterLink>
                 ))}
               </div>
+              <Link
+                href="/categories"
+                className="mt-1 inline-flex items-center gap-1 px-2.5 py-2 text-[13px] font-bold text-brand-600 hover:underline"
+              >
+                View all categories
+                <ArrowRight aria-hidden className="size-3.5" />
+              </Link>
             </FilterGroup>
           ) : null}
 
           {stores.length ? (
             <FilterGroup
+              collapsed
               title="Store"
               clearHref={store ? hrefWith(params, { store: undefined }) : undefined}
             >
@@ -338,6 +405,9 @@ export default async function CouponsPage({
             </FilterGroup>
           ) : null}
 
+            </div>
+
+            <div className="mt-3">
               <AdSlot position="sidebar" />
             </div>
           </details>
@@ -346,24 +416,24 @@ export default async function CouponsPage({
         {/* ---- results ---- */}
         <div>
           <div className="surface mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border-subtle)] px-4 py-3 shadow-[var(--shadow-card)]">
-            <p className="text-sm text-faint">
+            <p className="text-sm text-body">
               Showing{" "}
               <strong className="text-[var(--text-primary)]">
                 {start}–{(page - 1) * PER_PAGE + feed.items.length}
               </strong>{" "}
-              of {formatCount(feed.pagination.total)}
+              of {formatCount(feed.pagination.total)} offers
             </p>
 
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {Object.entries(COUPON_SORT_LABELS).map(([value, label]) => (
                 <Link
                   key={value}
                   href={hrefWith(params, { sort: value === "best" ? undefined : value })}
                   className={classNames(
-                    "rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition",
+                    "rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all hover:-translate-y-px",
                     sort === value
-                      ? "border-brand-600 bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300"
-                      : "border-[var(--border-subtle)] text-body hover:border-brand-300"
+                      ? "border-brand-600 bg-brand-600 text-white shadow-[var(--shadow-glow)]"
+                      : "border-[var(--border-subtle)] text-body hover:border-brand-300 hover:text-brand-600"
                   )}
                 >
                   {label}
@@ -378,7 +448,7 @@ export default async function CouponsPage({
                   of cards with empty space either side. */}
               <div className="space-y-3">
                 {feed.items.slice(0, 6).map((coupon) => (
-                  <CouponCard key={coupon._id} coupon={coupon} />
+                  <OfferRow key={coupon._id} coupon={coupon} />
                 ))}
               </div>
 
@@ -386,7 +456,7 @@ export default async function CouponsPage({
 
               <div className="space-y-3">
                 {feed.items.slice(6).map((coupon) => (
-                  <CouponCard key={coupon._id} coupon={coupon} />
+                  <OfferRow key={coupon._id} coupon={coupon} />
                 ))}
               </div>
             </>
@@ -417,7 +487,7 @@ export default async function CouponsPage({
                   </h2>
                   <div className="space-y-3">
                     {fallback.map((coupon) => (
-                      <CouponCard key={coupon._id} coupon={coupon} />
+                      <OfferRow key={coupon._id} coupon={coupon} />
                     ))}
                   </div>
                 </section>
@@ -469,76 +539,5 @@ export default async function CouponsPage({
         </section>
       ) : null}
     </div>
-  );
-}
-
-function FilterGroup({
-  title,
-  clearHref,
-  children,
-}: {
-  title: string;
-  /** Shown when this group has something selected. */
-  clearHref?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="surface overflow-hidden rounded-2xl border border-[var(--border-subtle)] shadow-[var(--shadow-card)]">
-      <h2 className="flex items-center gap-2 border-b border-[var(--border-subtle)] px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.14em] text-faint">
-        {title}
-        {clearHref ? (
-          <Link
-            href={clearHref}
-            className="ml-auto text-[10px] font-bold tracking-normal text-brand-600 normal-case transition hover:underline"
-          >
-            Clear
-          </Link>
-        ) : null}
-      </h2>
-      <div className="p-1.5">{children}</div>
-    </section>
-  );
-}
-
-function FilterLink({
-  href,
-  active,
-  count,
-  children,
-}: {
-  href: string;
-  active?: boolean;
-  count?: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      aria-pressed={active}
-      className={classNames(
-        "flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition",
-        active
-          ? "bg-brand-50 font-semibold text-brand-700 dark:bg-brand-950/60 dark:text-brand-300"
-          : "text-body hover:surface-sunken"
-      )}
-    >
-      {/* A tick box, so the sidebar reads as a set of filters rather than a
-          list of links that might go somewhere else. */}
-      <span
-        aria-hidden
-        className={classNames(
-          "flex size-4 shrink-0 items-center justify-center rounded-[5px] border transition",
-          active ? "border-brand-600 bg-brand-600 text-white" : "border-[var(--border-strong)]"
-        )}
-      >
-        {active ? <Check className="size-3" strokeWidth={3} /> : null}
-      </span>
-
-      <span className="min-w-0 flex-1 truncate">{children}</span>
-
-      {count !== undefined ? (
-        <span className="shrink-0 text-xs text-faint tabular-nums">{formatCount(count)}</span>
-      ) : null}
-    </Link>
   );
 }
