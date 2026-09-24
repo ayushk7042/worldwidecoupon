@@ -34,6 +34,7 @@ const categoryCore = {
 
   image: z.union([z.string(), z.record(z.unknown()), z.null()]).optional(),
   banner: z.union([z.string(), z.record(z.unknown()), z.null()]).optional(),
+  headerImage: z.union([z.string(), z.record(z.unknown()), z.null()]).optional(),
   ogImage: z.union([z.string(), z.record(z.unknown()), z.null()]).optional(),
 
   parent: z.union([objectId, z.null()]).optional(),
