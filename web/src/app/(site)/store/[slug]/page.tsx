@@ -192,7 +192,7 @@ export default async function StorePage({
       <div className="shell pt-8">
         {/* ================= header ================= */}
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_17rem]">
-          <section className="relative overflow-hidden rounded-3xl border border-brand-200/60 bg-gradient-to-r from-amber-50/70 via-brand-50 to-brand-100/70 p-5 sm:p-7 dark:border-brand-700/40 dark:from-brand-900/45 dark:via-brand-950/60 dark:to-brand-900/30">
+          <section className="relative overflow-hidden rounded-3xl border border-brand-200/60 bg-gradient-to-r from-amber-50/70 via-brand-50 to-brand-100/70 p-5 text-ink-900 sm:p-7">
             {/* The store's own artwork: starts from the middle and fills the right
                 half, feathered on every edge so it has no frame. */}
             {store.banner?.url ? (
@@ -204,7 +204,7 @@ export default async function StorePage({
                   src={store.banner.url}
                   alt=""
                   aria-hidden
-                  className="h-full w-full object-contain object-right-bottom mix-blend-multiply dark:brightness-[0.8]"
+                  className="h-full w-full object-contain object-right-bottom mix-blend-multiply"
                   style={{
                     maskImage: "var(--feather-store)",
                     WebkitMaskImage: "var(--feather-store)",
@@ -228,7 +228,7 @@ export default async function StorePage({
                     <BadgeCheck aria-label="Verified store" className="size-6 shrink-0 fill-brand-600 text-white" />
                   ) : null}
                 </h1>
-                {store.domain ? <p className="text-sm text-body">{store.domain}</p> : null}
+                {store.domain ? <p className="text-sm text-ink-700">{store.domain}</p> : null}
 
                 {tagline ? (
                   <p className="mt-2 font-display text-2xl font-extrabold leading-tight">
@@ -241,7 +241,7 @@ export default async function StorePage({
                 )}
 
                 {store.description ? (
-                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-body">{store.description}</p>
+                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-ink-700">{store.description}</p>
                 ) : null}
               </div>
             </div>
