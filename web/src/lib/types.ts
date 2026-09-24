@@ -53,6 +53,7 @@ export interface Category {
   color?: string;
   image?: ImageRef | null;
   banner?: ImageRef | null;
+  headerImage?: ImageRef | null;
   parent?: string | null;
   order: number;
   priority: number;
@@ -296,6 +297,10 @@ export interface HomepagePayload {
   };
   banners: HomepageBanner[];
   featured: CouponView[];
+  bestOffers: { main: CouponView | null; side: CouponView[] };
+  /** Editor picks; empty means the site falls back to its automatic feeds. */
+  trending: CouponView[];
+  promoCodes: CouponView[];
   newest: CouponView[];
   expiring: CouponView[];
   stores: Store[];
@@ -315,6 +320,10 @@ export interface HomepageConfig {
   featuredCoupons: string[];
   featuredStores: string[];
   featuredCategories: string[];
+  bestOffersMain?: string | null;
+  bestOffersCoupons: string[];
+  trendingCoupons: string[];
+  promoCoupons: string[];
   categorySections: {
     category: string;
     heading?: string;
