@@ -451,7 +451,13 @@ export function CouponForm({ coupon }: { coupon?: Coupon }) {
             hint="Free text — tags are created on save."
           />
 
-          <ImagePicker label="Image" value={form.image} onChange={(value) => set("image", value)} />
+          <ImagePicker
+            label="Offer image (shown on the homepage and the All offers list)"
+            hint="One picture used everywhere this offer is shown big: the homepage rails, the All offers list and this offer's own page. Best: 1600 × 720 px (20:9), a wide product photo — or a transparent PNG/WebP of just the product, up to 1200 × 1200. It is shown whole (never cropped) and faded into the card, so no border or frame needed."
+            value={form.image}
+            onChange={(value) => set("image", value)}
+            folder="coupons"
+          />
         </FormSection>
 
         {coupon ? (
