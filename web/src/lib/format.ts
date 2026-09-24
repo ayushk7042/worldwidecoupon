@@ -180,3 +180,89 @@ export function splitBadge(badge: string): { lead: string; tail: string } {
   const match = badge.trim().match(/^(\S+)\s+(.*)$/);
   return match ? { lead: match[1] ?? badge, tail: match[2] ?? "" } : { lead: badge, tail: "" };
 }
+
+/**
+ * The artwork for a category page header: the editor's own header image when
+ * there is one, otherwise the right-hand ~47% of the category's homepage
+ * banner (its products, without the headline drawn on the left) — cut by
+ * Cloudinary at delivery time, so an uploaded banner works with no re-crop.
+ */
+export function categoryHeaderArt(category: {
+  headerImage?: ImageRef | null;
+  banner?: ImageRef | null;
+}): { url: string; ratio: number } | null {
+  const own = category.headerImage;
+  if (own?.url) {
+    return { url: own.url, ratio: own.width && own.height ? own.width / own.height : 10 / 3 };
+  }
+
+  const banner = category.banner;
+  if (banner?.url && banner.url.includes("/upload/")) {
+    const ratio = banner.width && banner.height ? (banner.width * 0.47) / banner.height : 1.4;
+    return { url: banner.url.replace("/upload/", "/upload/c_crop,g_east,w_0.47,h_1.0/"), ratio };
+  }
+
+  return null;
+}
+
+/**
+ * A colour per category, grouped the way the site owner wants them to read —
+ * accessories/clothing/shipping green, electronics/travel/sport/medical blue,
+ * jewellery/movies/food amber, gift cards/beauty pink. An editor's own colour
+ * (Admin → Categories → Colour) always wins; anything outside every group
+ * falls back to one picked from its name.
+ */
+export const CATEGORY_COLOR_GROUPS: { match: RegExp; color: string }[] = [
+  { match: /access|cloth|shipping/i, color: "#1f9059" },
+  { match: /electronic|travel|sport|medical/i, color: "#2f7dd8" },
+  { match: /jewel|movie|food/i, color: "#e8a010" },
+  { match: /gift|beauty/i, color: "#ec4899" },
+];
+
+/** Swatches offered in the admin colour picker. */
+export const CATEGORY_PALETTE = [
+  "#1f9059",
+  "#14b8a6",
+  "#2f7dd8",
+  "#8b5cf6",
+  "#ec4899",
+  "#ef4444",
+  "#f97316",
+  "#e8a010",
+  "#64748b",
+];
+
+export function defaultCategoryColor(name: string): string {
+  return CATEGORY_COLOR_GROUPS.find((group) => group.match.test(name))?.color ?? tileColour(name);
+}
+
+export function categoryColor(category: { name: string; color?: string | null }): string {
+  return category.color || defaultCategoryColor(category.name);
+}
+
+/**
+ * Re-points the whole `brand` colour ramp (and its glow shadows) at one colour,
+ * for a subtree. Every `bg-brand-*` / `text-brand-*` / gradient / ring inside
+ * it — filters, tabs, coupon rows, buttons — then wears that colour with no
+ * per-component changes. Set it as an inline `style` on a wrapper.
+ */
+export function brandThemeVars(color: string): Record<string, string> {
+  const mix = (amount: number, other: string) =>
+    `color-mix(in srgb, ${color} ${amount}%, ${other})`;
+
+  return {
+    "--color-brand-50": mix(7, "#ffffff"),
+    "--color-brand-100": mix(15, "#ffffff"),
+    "--color-brand-200": mix(30, "#ffffff"),
+    "--color-brand-300": mix(48, "#ffffff"),
+    "--color-brand-400": mix(72, "#ffffff"),
+    "--color-brand-500": mix(90, "#ffffff"),
+    "--color-brand-600": color,
+    "--color-brand-700": mix(80, "#000000"),
+    "--color-brand-800": mix(64, "#000000"),
+    "--color-brand-900": mix(48, "#000000"),
+    "--color-brand-950": mix(30, "#000000"),
+    "--shadow-glow": `0 10px 30px -10px color-mix(in srgb, ${color} 60%, transparent)`,
+    "--shadow-glow-strong": `0 18px 46px -14px color-mix(in srgb, ${color} 75%, transparent)`,
+  };
+}
