@@ -27,12 +27,12 @@ import { useShopper } from "./ShopperProvider";
 
 /** The strip under the search bar — the paths shoppers actually use. */
 const PRIMARY_LINKS = [
-  { href: "/coupons", label: "All offers", Icon: Tag },
-  { href: "/coupons?withCode=true", label: "Promo codes", Icon: Ticket },
-  { href: "/stores", label: "Stores", Icon: Store },
-  { href: "/coupons?type=freeshipping", label: "Free delivery", Icon: Truck },
-  { href: "/coupons?exclusive=true", label: "Exclusives", Icon: Star },
-  { href: "/coupons?expiringSoon=true", label: "Ending soon", Icon: Clock3 },
+  { href: "/coupons", label: "All offers", Icon: Tag, chip: "bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300" },
+  { href: "/coupons?withCode=true", label: "Promo codes", Icon: Ticket, chip: "bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300" },
+  { href: "/stores", label: "Stores", Icon: Store, chip: "bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300" },
+  { href: "/coupons?type=freeshipping", label: "Free delivery", Icon: Truck, chip: "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300" },
+  { href: "/coupons?exclusive=true", label: "Exclusives", Icon: Star, chip: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300" },
+  { href: "/coupons?expiringSoon=true", label: "Ending soon", Icon: Clock3, chip: "bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300" },
 ];
 
 export function Header({ categories }: { categories: Category[] }) {
@@ -66,12 +66,18 @@ export function Header({ categories }: { categories: Category[] }) {
   return (
     <header
       className={classNames(
-        "sticky top-0 z-50 bg-[var(--surface)]/90 backdrop-blur-xl transition-shadow duration-300",
+        "sticky top-0 z-50 bg-gradient-to-r from-[var(--surface)]/95 via-brand-50/90 to-accent-50/80 backdrop-blur-xl transition-shadow duration-300 dark:via-brand-950/60 dark:to-accent-600/10",
         scrolled
           ? "shadow-[0_10px_30px_-18px_rgba(31,41,55,0.45)] dark:shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)]"
           : "shadow-[0_1px_0_0_var(--border-subtle)]"
       )}
     >
+      {/* A thin colour bar that slowly drifts along the very top. */}
+      <div
+        aria-hidden
+        className="h-1 w-full bg-[linear-gradient(90deg,var(--color-brand-500),var(--color-accent-300),var(--color-brand-300),var(--color-brand-600),var(--color-accent-200),var(--color-brand-500))] bg-[length:200%_100%] motion-safe:animate-[gradient-pan_9s_linear_infinite]"
+      />
+
       {/* ---- row one: brand, search, account ---- */}
       <div
         className={classNames(
@@ -108,8 +114,9 @@ export function Header({ categories }: { categories: Category[] }) {
               </Link>
               <Link
                 href="/account/register"
-                className="hidden h-10 items-center rounded-full bg-brand-gradient px-5 text-sm font-bold text-white shadow-[var(--shadow-glow)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-glow-strong)] hover:brightness-110 sm:inline-flex"
+                className="relative hidden h-10 items-center overflow-hidden rounded-full bg-brand-gradient px-5 text-sm font-bold text-white shadow-[var(--shadow-glow)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-glow-strong)] hover:brightness-110 sm:inline-flex"
               >
+                <span aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-transparent via-white/40 to-transparent motion-safe:animate-[shine_4.5s_ease-in-out_infinite]" />
                 Join free
               </Link>
             </>
@@ -131,9 +138,10 @@ export function Header({ categories }: { categories: Category[] }) {
         </div>
       </div>
 
-      {/* ---- row two: the category strip ---- */}
-      <div className="hidden border-t border-[var(--border-subtle)] bg-brand-50/60 dark:bg-brand-950/25 lg:block">
-        <div className="shell flex h-12 items-center gap-1">
+      {/* ---- row two: the category strip, a rich green band with a slow
+          glint sweeping across it ---- */}
+      <div className="relative hidden border-t border-[var(--border-subtle)] bg-gradient-to-r from-brand-50/80 via-[var(--surface)] to-accent-50/70 lg:block dark:from-brand-950/50 dark:via-[var(--surface)] dark:to-accent-600/10">
+        <div className="shell relative flex h-13 items-center gap-1">
           {categories.length ? (
             <div
               className="relative"
@@ -145,13 +153,13 @@ export function Header({ categories }: { categories: Category[] }) {
                 onClick={() => setCatsOpen((open) => !open)}
                 aria-expanded={catsOpen}
                 className={classNames(
-                  "mr-3 flex h-9 items-center gap-2 rounded-full px-4 text-sm font-bold transition",
+                  "mr-3 flex h-10 items-center gap-2 rounded-full px-5 text-sm font-extrabold text-white transition-all duration-200 hover:-translate-y-px",
                   catsOpen
-                    ? "bg-brand-600 text-white shadow-[var(--shadow-glow)]"
-                    : "bg-brand-gradient text-white hover:brightness-110"
+                    ? "bg-brand-700 shadow-[var(--shadow-glow-strong)]"
+                    : "bg-brand-gradient shadow-[var(--shadow-glow)] hover:brightness-110"
                 )}
               >
-                <LayoutGrid aria-hidden className="size-4" strokeWidth={2.2} />
+                <LayoutGrid aria-hidden className="size-4" strokeWidth={2.4} />
                 Categories
               </button>
 
@@ -201,44 +209,50 @@ export function Header({ categories }: { categories: Category[] }) {
             </div>
           ) : null}
 
-          <nav className="flex min-w-0 items-center gap-0.5 overflow-x-auto no-scrollbar">
+          <nav className="flex min-w-0 items-center gap-1 overflow-x-auto no-scrollbar">
             {PRIMARY_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={classNames(
-                  "group/link relative flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all duration-200",
+                  "group/link relative flex shrink-0 items-center gap-2 rounded-full py-1 pl-1 pr-3.5 text-sm font-semibold transition-all duration-200",
                   active(link.href)
-                    ? "bg-[var(--surface)] text-brand-700 shadow-[var(--shadow-card)] dark:text-brand-300"
-                    : "text-[var(--text-secondary)] hover:-translate-y-px hover:bg-[var(--surface)] hover:text-brand-700 hover:shadow-[var(--shadow-card)] dark:hover:text-brand-300"
+                    ? "bg-[var(--surface)] text-[var(--text-primary)] shadow-[var(--shadow-card)] ring-1 ring-brand-300/60"
+                    : "text-[var(--text-secondary)] hover:-translate-y-px hover:bg-[var(--surface)] hover:text-[var(--text-primary)] hover:shadow-[var(--shadow-card)]"
                 )}
               >
-                <link.Icon
-                  aria-hidden
-                  className="size-4 transition-transform duration-200 group-hover/link:scale-110"
-                  strokeWidth={2}
-                />
-                {link.label}
                 <span
-                  aria-hidden
                   className={classNames(
-                    "absolute inset-x-4 -bottom-0.5 h-0.5 origin-left rounded-full bg-brand-gradient transition-transform duration-300",
-                    active(link.href) ? "scale-x-100" : "scale-x-0 group-hover/link:scale-x-100"
+                    "flex size-7 items-center justify-center rounded-full transition-transform duration-200 group-hover/link:-rotate-12 group-hover/link:scale-110",
+                    link.chip
                   )}
-                />
+                >
+                  <link.Icon aria-hidden className="size-3.5" strokeWidth={2.3} />
+                </span>
+                {link.label}
               </Link>
             ))}
           </nav>
 
           <Link
             href="/coupons?sort=discount"
-            className="ml-auto flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-accent-300 px-4 text-sm font-bold text-accent-600 transition hover:brightness-95 dark:bg-accent-600/20 dark:text-accent-400"
+            className="group/hot ml-auto flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-accent-400 to-accent-500 px-5 text-sm font-extrabold text-white shadow-[0_8px_20px_-6px_rgba(240,95,95,0.75)] ring-2 ring-white/40 transition-all duration-200 hover:-translate-y-px hover:brightness-110"
           >
-            <Flame aria-hidden className="size-4" strokeWidth={2.2} />
+            <Flame
+              aria-hidden
+              className="size-4 motion-safe:animate-[flame-wiggle_1.8s_ease-in-out_infinite]"
+              strokeWidth={2.4}
+            />
             Biggest savings today
           </Link>
         </div>
       </div>
+
+      {/* a living hairline under the whole header */}
+      <div
+        aria-hidden
+        className="hidden h-px w-full bg-[linear-gradient(90deg,transparent,var(--color-brand-400),var(--color-accent-300),var(--color-brand-400),transparent)] bg-[length:200%_100%] opacity-70 motion-safe:animate-[gradient-pan_8s_linear_infinite] lg:block"
+      />
 
       {/* ---- mobile search ---- */}
       <div className="border-t border-[var(--border-subtle)] px-4 py-2.5 md:hidden">
