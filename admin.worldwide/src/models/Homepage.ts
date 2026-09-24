@@ -57,6 +57,17 @@ export interface Homepage {
   featuredStores: Types.ObjectId[];
   featuredCategories: Types.ObjectId[];
 
+  /** The "Today's best offers" grid: up to 5 hand-picked coupons, one of
+   *  them (`bestOffersMain`) shown big with its own image; the rest shown
+   *  small, store logo only. Falls back to `featuredCoupons` when empty. */
+  bestOffersMain?: Types.ObjectId | null;
+  bestOffersCoupons: Types.ObjectId[];
+
+  /** "Trending right now" (up to 6, ranked in this order) and "Fresh promo
+   *  codes" (up to 10). Each falls back to its automatic feed when empty. */
+  trendingCoupons: Types.ObjectId[];
+  promoCoupons: Types.ObjectId[];
+
   categorySections: HomepageCategorySection[];
   customBlocks: HomepageBlock[];
 
@@ -124,6 +135,12 @@ const homepageSchema = new Schema<Homepage>(
     featuredCoupons: [{ type: Schema.Types.ObjectId, ref: "Coupon" }],
     featuredStores: [{ type: Schema.Types.ObjectId, ref: "Store" }],
     featuredCategories: [{ type: Schema.Types.ObjectId, ref: "Category" }],
+
+    bestOffersMain: { type: Schema.Types.ObjectId, ref: "Coupon", default: null },
+    bestOffersCoupons: [{ type: Schema.Types.ObjectId, ref: "Coupon" }],
+
+    trendingCoupons: [{ type: Schema.Types.ObjectId, ref: "Coupon" }],
+    promoCoupons: [{ type: Schema.Types.ObjectId, ref: "Coupon" }],
 
     categorySections: { type: [categorySectionSchema], default: [] },
     customBlocks: { type: [blockSchema], default: [] },
