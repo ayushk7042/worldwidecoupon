@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { Pause, Play } from "lucide-react";
 import { classNames } from "@/lib/format";
 import type { HomepageBanner } from "@/lib/types";
 
@@ -36,7 +37,10 @@ export function HeroBanners({
   const slides = banners.filter((banner) => banner.image?.url || banner.title);
 
   const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [hover, setHover] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [userPaused, setUserPaused] = useState(false);
+  const paused = hover || hidden || userPaused;
   const container = useRef<HTMLDivElement>(null);
   const touchStart = useRef<number | null>(null);
 
@@ -64,7 +68,7 @@ export function HeroBanners({
 
   // A carousel spinning in a background tab is wasted work.
   useEffect(() => {
-    const onVisibility = () => setPaused(document.hidden);
+    const onVisibility = () => setHidden(document.hidden);
     document.addEventListener("visibilitychange", onVisibility);
     return () => document.removeEventListener("visibilitychange", onVisibility);
   }, []);
@@ -74,10 +78,10 @@ export function HeroBanners({
   const frame = (
       <div
         ref={container}
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-        onFocusCapture={() => setPaused(true)}
-        onBlurCapture={() => setPaused(false)}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        onFocusCapture={() => setHover(true)}
+        onBlurCapture={() => setHover(false)}
         onTouchStart={(event) => {
           touchStart.current = event.touches[0]?.clientX ?? null;
         }}
@@ -106,6 +110,7 @@ export function HeroBanners({
               key={`${banner.image?.url ?? banner.title ?? "slide"}-${position}`}
               banner={banner}
               hidden={position !== index}
+              active={position === index}
               height={height}
             />
           ))}
@@ -116,7 +121,15 @@ export function HeroBanners({
             <Arrow side="left" onClick={() => go(index - 1)} />
             <Arrow side="right" onClick={() => go(index + 1)} />
 
-            <div className="absolute inset-x-0 bottom-2.5 flex items-center justify-center gap-1.5 sm:bottom-3">
+            {/* counter, top right */}
+            <div className="pointer-events-none absolute right-3 top-3 hidden items-center gap-2 rounded-full bg-ink-950/45 px-3 py-1 text-[11px] font-bold tracking-wider text-white backdrop-blur sm:flex">
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <span className="h-px w-4 bg-white/50" />
+              <span className="text-white/60">{String(count).padStart(2, "0")}</span>
+            </div>
+
+            {/* progress bars: the running one fills over the slide's time */}
+            <div className="absolute bottom-3 right-4 flex items-center justify-end gap-2 sm:right-5">
               {slides.map((_, position) => (
                 <button
                   key={position}
@@ -124,14 +137,34 @@ export function HeroBanners({
                   aria-label={`Go to slide ${position + 1}`}
                   aria-current={position === index}
                   onClick={() => go(position)}
-                  className={classNames(
-                    "h-2 rounded-full backdrop-blur transition-all duration-300",
-                    position === index
-                      ? "w-7 bg-brand-gradient shadow-[var(--shadow-glow)]"
-                      : "w-2 bg-white/70 ring-1 ring-ink-900/10 hover:w-3 hover:bg-white"
-                  )}
-                />
+                  className="group/bar relative h-1.5 w-8 overflow-hidden rounded-full bg-white/60 backdrop-blur transition-all hover:h-2 sm:w-12"
+                >
+                  <span
+                    className={classNames(
+                      "absolute inset-0 origin-left rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)]",
+                      position < index && "scale-x-100",
+                      position > index && "scale-x-0"
+                    )}
+                    style={
+                      position === index
+                        ? {
+                            animation: `hero-progress ${INTERVAL}ms linear forwards`,
+                            animationPlayState: paused ? "paused" : "running",
+                          }
+                        : undefined
+                    }
+                  />
+                </button>
               ))}
+
+              <button
+                type="button"
+                onClick={() => setUserPaused((value) => !value)}
+                aria-label={userPaused ? "Play slideshow" : "Pause slideshow"}
+                className="ml-1 flex size-7 items-center justify-center rounded-full bg-ink-950/45 text-white backdrop-blur transition hover:bg-ink-950/65"
+              >
+                {userPaused ? <Play aria-hidden className="size-3 fill-current" /> : <Pause aria-hidden className="size-3 fill-current" />}
+              </button>
             </div>
           </>
         ) : null}
@@ -159,10 +192,12 @@ export function HeroBanners({
 function Slide({
   banner,
   hidden,
+  active,
   height,
 }: {
   banner: HomepageBanner;
   hidden: boolean;
+  active: boolean;
   height: "default" | "tall" | "ratio";
 }) {
   const desktop = banner.image?.url;
@@ -181,7 +216,10 @@ function Slide({
           <img
             src={mobile}
             alt={banner.image?.alt ?? banner.title ?? ""}
-            className="h-full w-full object-cover"
+            className={classNames(
+              "h-full w-full object-cover",
+              active && "motion-safe:animate-[hero-zoom_7s_ease-out_forwards]"
+            )}
             loading="eager"
             decoding="async"
           />
@@ -245,7 +283,7 @@ function Arrow({ side, onClick }: { side: "left" | "right"; onClick: () => void 
       aria-label={side === "left" ? "Previous slide" : "Next slide"}
       className={classNames(
         "absolute top-1/2 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full",
-        "bg-white/85 text-ink-800 shadow-[var(--shadow-lift)] ring-1 ring-ink-900/5 backdrop-blur transition-all duration-200",
+        "bg-white/90 text-ink-800 shadow-[var(--shadow-lift)] ring-1 ring-ink-900/5 backdrop-blur transition-all duration-200",
         "opacity-0 hover:scale-105 hover:bg-white group-hover:opacity-100 focus-visible:opacity-100 sm:flex",
         side === "left" ? "left-3" : "right-3"
       )}
