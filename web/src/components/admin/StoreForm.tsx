@@ -370,7 +370,12 @@ export function StoreForm({ store }: { store?: Store }) {
 
         <FormSection title="Artwork">
           <ImagePicker label="Logo" value={form.logo} onChange={(value) => set("logo", value)} />
-          <ImagePicker label="Banner" value={form.banner} onChange={(value) => set("banner", value)} />
+          <ImagePicker
+            label="Header artwork (right side of the store page header)"
+            hint="Starts from the middle of the header and fills the right half, so make it wide: 1400 × 400 px (3.5:1), PNG or WebP. Products, a plane, a headline sticker — whatever says this brand. Keep the left ~12% and the edges plain/soft (pale green works best); it fades into the header, so no frame or border. Shown whole, never cropped."
+            value={form.banner}
+            onChange={(value) => set("banner", value)}
+          />
           <Input
             label="Brand colour"
             value={form.brandColor}
