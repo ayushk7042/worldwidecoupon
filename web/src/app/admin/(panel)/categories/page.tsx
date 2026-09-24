@@ -11,7 +11,7 @@ import { Input, Select, Textarea, Toggle } from "@/components/ui/form";
 import { ConfirmDialog, Modal } from "@/components/ui/Modal";
 import { Skeleton } from "@/components/ui/primitives";
 import { categories as categoriesApi } from "@/lib/endpoints";
-import { formatCount } from "@/lib/format";
+import { CATEGORY_PALETTE, categoryColor, defaultCategoryColor, formatCount } from "@/lib/format";
 import { readToken } from "@/lib/session";
 import type { Category, ImageRef } from "@/lib/types";
 
@@ -94,7 +94,7 @@ export default function AdminCategoriesPage() {
               <span
                 aria-hidden
                 className="flex size-10 shrink-0 items-center justify-center rounded-xl text-lg"
-                style={{ backgroundColor: category.color ? `${category.color}20` : "var(--surface-sunken)" }}
+                style={{ backgroundColor: `${categoryColor(category)}26`, boxShadow: `inset 0 0 0 2px ${categoryColor(category)}` }}
               >
                 {category.icon ?? "🗂"}
               </span>
@@ -225,6 +225,7 @@ interface CategoryFormState {
   status: string;
   image: ImageRef | null;
   banner: ImageRef | null;
+  headerImage: ImageRef | null;
   metaTitle: string;
   metaDescription: string;
 }
@@ -247,6 +248,7 @@ const BLANK: CategoryFormState = {
   status: "active",
   image: null,
   banner: null,
+  headerImage: null,
   metaTitle: "",
   metaDescription: "",
 };
@@ -290,6 +292,7 @@ function CategoryModal({
             status: category.status,
             image: category.image ?? null,
             banner: category.banner ?? null,
+            headerImage: category.headerImage ?? null,
             metaTitle: category.metaTitle ?? "",
             metaDescription: category.metaDescription ?? "",
           }
@@ -318,6 +321,7 @@ function CategoryModal({
     status: form.status,
     image: form.image,
     banner: form.banner,
+    headerImage: form.headerImage,
     metaTitle: form.metaTitle.trim() || undefined,
     metaDescription: form.metaDescription.trim() || undefined,
   });
@@ -379,11 +383,10 @@ function CategoryModal({
             onChange={(event) => set("shortLabel", event.target.value)}
             placeholder="Fashion"
           />
-          <Input
-            label="Colour"
+          <ColorField
             value={form.color}
-            onChange={(event) => set("color", event.target.value)}
-            placeholder="#ec4899"
+            fallback={defaultCategoryColor(form.name)}
+            onChange={(value) => set("color", value)}
           />
         </div>
 
@@ -421,8 +424,27 @@ function CategoryModal({
           </div>
         </FormSection>
 
-        <ImagePicker label="Tile image" value={form.image} onChange={(value) => set("image", value)} />
-        <ImagePicker label="Banner" value={form.banner} onChange={(value) => set("banner", value)} />
+        <ImagePicker
+          label="Tile image"
+          hint="Used on category grids and cards. About 400×400 — square."
+          value={form.image}
+          onChange={(value) => set("image", value)}
+          folder="categories"
+        />
+        <ImagePicker
+          label="Banner"
+          hint="The wide banner at the top of this category's offer rail on the homepage. Crop it to 1800×600 (a wide 3:1 strip) — it's shown at that exact shape full-width, so anything else gets cropped or padded to fit."
+          value={form.banner}
+          onChange={(value) => set("banner", value)}
+          folder="categories"
+        />
+        <ImagePicker
+          label="Category page header artwork"
+          hint="Fills the right half of this category's own page header. Best: 1400 × 420 px (10:3), PNG or WebP — products only, on a pale or transparent background, no text (the page adds its own headline). It fades into the header, so no frame is needed and nothing is cropped. Leave empty to reuse the right side of the Banner above automatically."
+          value={form.headerImage}
+          onChange={(value) => set("headerImage", value)}
+          folder="categories"
+        />
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Input
@@ -438,5 +460,61 @@ function CategoryModal({
         </div>
       </div>
     </Modal>
+  );
+}
+
+
+/** Pick the colour this category wears on the homepage tabs and its own page header. */
+function ColorField({
+  value,
+  fallback,
+  onChange,
+}: {
+  value: string;
+  fallback: string;
+  onChange: (value: string) => void;
+}) {
+  const current = value || fallback;
+
+  return (
+    <div className="space-y-2">
+      <p className="text-sm font-semibold">Colour</p>
+      <div className="flex flex-wrap items-center gap-2">
+        {CATEGORY_PALETTE.map((swatch) => (
+          <button
+            key={swatch}
+            type="button"
+            aria-label={`Use ${swatch}`}
+            onClick={() => onChange(swatch)}
+            className="size-8 rounded-full border-2 transition hover:scale-110"
+            style={{
+              backgroundColor: swatch,
+              borderColor: current.toLowerCase() === swatch ? "var(--text-primary)" : "transparent",
+            }}
+          />
+        ))}
+        <input
+          type="color"
+          value={/^#[0-9a-f]{6}$/i.test(current) ? current : "#1f9059"}
+          onChange={(event) => onChange(event.target.value)}
+          aria-label="Custom colour"
+          className="size-8 cursor-pointer rounded-full border border-[var(--border-subtle)] bg-transparent p-0"
+        />
+      </div>
+      <div className="flex flex-wrap items-center gap-3 text-xs text-faint">
+        <span className="flex items-center gap-1.5">
+          <span className="size-3.5 rounded-full" style={{ backgroundColor: current }} />
+          {value ? value : `Automatic (${fallback})`}
+        </span>
+        {value ? (
+          <button type="button" onClick={() => onChange("")} className="font-bold text-brand-600 hover:underline">
+            Back to automatic
+          </button>
+        ) : null}
+      </div>
+      <p className="text-xs text-faint">
+        The category&#39;s page header, homepage tab and its tiles use this colour, so pick one that suits its banner.
+      </p>
+    </div>
   );
 }
