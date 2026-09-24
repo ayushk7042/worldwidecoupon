@@ -22,7 +22,9 @@ export const STORE_CARD_FIELDS =
   "activeCouponCount codeCount dealCount bestOffer";
 
 export const SORTERS: Record<CouponSort, Record<string, 1 | -1>> = {
-  best: { priority: -1, verified: -1, discountValue: -1, createdAt: -1 },
+  // An offer with its own picture outranks one without at equal priority, so
+  // the All offers page opens on the rows that have artwork to show.
+  best: { priority: -1, "image.url": -1, verified: -1, discountValue: -1, createdAt: -1 },
   newest: { createdAt: -1 },
   expiring: { expiresAt: 1 },
   popular: { uses: -1, clicks: -1, views: -1 },
