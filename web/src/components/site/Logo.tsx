@@ -68,12 +68,15 @@ export function Logo({
   className,
   priority,
   showTagline = false,
+  onDark = false,
 }: {
   href?: string | null;
   height?: number;
   className?: string;
   priority?: boolean;
   showTagline?: boolean;
+  /** Always the light-on-dark artwork, for a permanently dark surface (the footer). */
+  onDark?: boolean;
 }) {
   const width = Math.round((height * LOGO.width) / LOGO.height);
 
@@ -86,7 +89,7 @@ export function Logo({
           width={width * RETINA}
           height={height * RETINA}
           priority={priority}
-          className="block h-full w-auto object-contain dark:hidden"
+          className={classNames("block h-full w-auto object-contain", onDark ? "hidden" : "dark:hidden")}
         />
         <Image
           src="/brand/logo-dark.png"
@@ -95,12 +98,12 @@ export function Logo({
           width={width * RETINA}
           height={height * RETINA}
           priority={priority}
-          className="hidden h-full w-auto object-contain dark:block"
+          className={classNames("h-full w-auto object-contain", onDark ? "block" : "hidden dark:block")}
         />
       </span>
 
       {showTagline ? (
-        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-faint">
+        <span className={classNames("text-[10px] font-semibold uppercase tracking-[0.2em]", onDark ? "text-white/60" : "text-faint")}>
           Better deals. Bigger savings. Worldwide.
         </span>
       ) : null}
