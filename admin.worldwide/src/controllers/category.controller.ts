@@ -52,7 +52,7 @@ function buildCategoryPatch(body: CreateCategoryBody | UpdateCategoryBody): Cate
     if (source[key] !== undefined) patch[key] = sanitizePlain(source[key]);
   }
 
-  for (const key of ["image", "banner", "ogImage"] as const) {
+  for (const key of ["image", "banner", "headerImage", "ogImage"] as const) {
     if (source[key] !== undefined) patch[key] = normalizeImage(source[key]);
   }
 
