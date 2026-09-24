@@ -26,11 +26,16 @@ export function RevealButton({
   size = "md",
   full,
   label,
+  pill,
+  className,
 }: {
   coupon: Pick<CouponView, "_id" | "type" | "hasCode" | "isExpired" | "status">;
   size?: "sm" | "md" | "lg";
   full?: boolean;
   label?: string;
+  /** Fully rounded ends instead of the default rounded rectangle. */
+  pill?: boolean;
+  className?: string;
 }) {
   const toast = useToast();
   const [revealed, setRevealed] = useState<RevealResponse | null>(null);
@@ -102,6 +107,8 @@ export function RevealButton({
         full={full}
         variant={dead ? "secondary" : "primary"}
         className={classNames(
+          pill && "!rounded-full",
+          className,
           !dead && isCode &&
             // The dashed right edge reads as a torn-off voucher stub.
             "relative before:absolute before:inset-y-1 before:right-8 before:w-px before:border-l-2 before:border-dashed before:border-white/30"
