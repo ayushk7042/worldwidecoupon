@@ -24,12 +24,33 @@ interface SectionState {
   order: number;
 }
 
+/** Tells the public site to drop its cached homepage — best-effort. */
+function refreshPublicHomepage() {
+  void fetch("/api/revalidate-home", { method: "POST" }).catch(() => undefined);
+}
+
 export default function AdminHomepagePage() {
   const config = useAdminData((token) => homepageApi.getConfig(token));
   const { busy, run } = useAction();
+  /** Separate from the main save — an image uploads and saves itself right away. */
+  const imageAction = useAction();
 
-  const couponOptions = useAdminData((token) =>
-    couponsApi.list({ limit: 100, status: "active", sort: "newest" }, { token })
+  /** Narrows the "Featured offers" picker below — a store with hundreds of
+   *  live coupons across every category is otherwise unbrowsable in one
+   *  flat list. */
+  const [couponCategory, setCouponCategory] = useState("");
+  const couponOptions = useAdminData(
+    (token) =>
+      couponsApi.list(
+        {
+          limit: 100,
+          status: "active",
+          sort: "newest",
+          ...(couponCategory ? { category: couponCategory } : {}),
+        },
+        { token }
+      ),
+    [couponCategory]
   );
   const storeOptions = useAdminData((token) =>
     storesApi.list({ limit: 300, sort: "name" }, { token })
@@ -43,6 +64,10 @@ export default function AdminHomepagePage() {
   const [featuredCoupons, setFeaturedCoupons] = useState<string[]>([]);
   const [featuredStores, setFeaturedStores] = useState<string[]>([]);
   const [featuredCategories, setFeaturedCategories] = useState<string[]>([]);
+  const [bestOffersCoupons, setBestOffersCoupons] = useState<string[]>([]);
+  const [bestOffersMain, setBestOffersMain] = useState("");
+  const [trendingCoupons, setTrendingCoupons] = useState<string[]>([]);
+  const [promoCoupons, setPromoCoupons] = useState<string[]>([]);
   const [sections, setSections] = useState<SectionState[]>([]);
   const [blocks, setBlocks] = useState<HomepageBlock[]>([]);
   const [banners, setBanners] = useState<HomepageBanner[]>([]);
@@ -60,6 +85,10 @@ export default function AdminHomepagePage() {
     setFeaturedCoupons(data.featuredCoupons ?? []);
     setFeaturedStores(data.featuredStores ?? []);
     setFeaturedCategories(data.featuredCategories ?? []);
+    setBestOffersCoupons(data.bestOffersCoupons ?? []);
+    setBestOffersMain(data.bestOffersMain ?? "");
+    setTrendingCoupons(data.trendingCoupons ?? []);
+    setPromoCoupons(data.promoCoupons ?? []);
     setSections(
       (data.categorySections ?? []).map((section, index) => ({
         category: section.category,
@@ -95,6 +124,10 @@ export default function AdminHomepagePage() {
       featuredCoupons,
       featuredStores,
       featuredCategories,
+      trendingCoupons,
+      promoCoupons,
+      bestOffersCoupons,
+      bestOffersMain: bestOffersCoupons.includes(bestOffersMain) ? bestOffersMain : null,
       categorySections: sections
         .filter((section) => section.category)
         .map((section, index) => ({ ...section, order: index })),
@@ -113,6 +146,7 @@ export default function AdminHomepagePage() {
     void run(() => homepageApi.updateConfig(payload, readToken("admin")), {
       success: "Homepage saved",
       onDone: async () => {
+        refreshPublicHomepage();
         setDirty(false);
         await config.reload();
       },
@@ -142,6 +176,33 @@ export default function AdminHomepagePage() {
     value: item._id,
     label: item.name,
   }));
+
+  /** The coupon list filter below the "Featured offers" picker needs a
+   *  slug, not the id every other category picker on this page uses. */
+  const categorySlugChoices = (categoryOptions.data ?? []).map((item) => ({
+    value: item.slug,
+    label: item.name,
+  }));
+
+  const updateCouponImage = (id: string, image: ImageRef | null) => {
+    void imageAction.run(() => couponsApi.update(id, { image }, readToken("admin")), {
+      success: "Offer image saved",
+      onDone: () => {
+        refreshPublicHomepage();
+        return couponOptions.reload();
+      },
+    });
+  };
+
+  const updateCategoryBanner = (id: string, banner: ImageRef | null) => {
+    void imageAction.run(() => categoriesApi.update(id, { banner }, readToken("admin")), {
+      success: "Category banner saved",
+      onDone: () => {
+        refreshPublicHomepage();
+        return categoryOptions.reload();
+      },
+    });
+  };
 
   return (
     <>
@@ -360,7 +421,135 @@ export default function AdminHomepagePage() {
           </div>
         </FormSection>
 
+        <FormSection
+          title="Today's best offers"
+          description="The big card plus four small ones under the 'Today's Best Offers' header. Pick up to 5, then choose which one is the big card. Leave empty to use the featured offers below."
+          className="lg:col-span-2"
+        >
+          <Select
+            label="Filter the list below by category"
+            hint="Narrows which offers show up to pick from — it does not change what is saved."
+            value={couponCategory}
+            onChange={(event) => setCouponCategory(event.target.value)}
+            options={[{ value: "", label: "Every category" }, ...categorySlugChoices]}
+          />
+          <MultiSelect
+            label={`Offers in this section (${bestOffersCoupons.length}/5)`}
+            hint="Up to 5. Picks are shown in the order you tick them."
+            value={bestOffersCoupons}
+            onChange={(value) => {
+              setBestOffersCoupons(value.slice(0, 5));
+              touch();
+            }}
+            options={couponChoices}
+          />
+
+          {bestOffersCoupons.length ? (
+            <div className="mt-4 space-y-3 border-t border-[var(--border-subtle)] pt-4">
+              <Select
+                label="Big card"
+                hint="This one is shown large with its own image; the rest are small, store logo only."
+                value={bestOffersCoupons.includes(bestOffersMain) ? bestOffersMain : bestOffersCoupons[0]}
+                onChange={(event) => {
+                  setBestOffersMain(event.target.value);
+                  touch();
+                }}
+                options={bestOffersCoupons.map((id) => ({
+                  value: id,
+                  label:
+                    couponOptions.data?.items.find((coupon) => coupon._id === id)?.title ?? "Selected offer",
+                }))}
+              />
+
+              {(() => {
+                const mainId = bestOffersCoupons.includes(bestOffersMain)
+                  ? bestOffersMain
+                  : bestOffersCoupons[0];
+                const item = couponOptions.data?.items.find((coupon) => coupon._id === mainId);
+                if (!item) return null;
+
+                return (
+                  <ImagePicker
+                    label={`Big card image — ${item.title}`}
+                    hint="Best: 1200×1200 px (square), a transparent PNG/WebP of just the product — no white or coloured background, so it sits straight on the card. Shown in full, never cropped, and faded into the text side. Saves itself the moment you upload it — this does not wait for “Save changes” below."
+                    value={item.image ?? null}
+                    onChange={(value) => updateCouponImage(item._id, value)}
+                    folder="coupons"
+                  />
+                );
+              })()}
+            </div>
+          ) : null}
+        </FormSection>
+
+        <FormSection
+          title="Trending right now"
+          description="The ranked 1–6 cards under 'Trending right now'. They show the store logo, not a coupon image. Leave empty to rank automatically by use."
+          className="lg:col-span-2"
+        >
+          <MultiSelect
+            label={`Offers in this section (${trendingCoupons.length}/6)`}
+            hint="Up to 6. Rank 1 is the first you tick. Use the category filter in 'Today's best offers' above to narrow this list."
+            value={trendingCoupons}
+            onChange={(value) => {
+              setTrendingCoupons(value.slice(0, 6));
+              touch();
+            }}
+            options={couponChoices}
+          />
+        </FormSection>
+
+        <FormSection
+          title="Fresh promo codes"
+          description="The row of pastel cards, each with its product image sitting on the card. Leave empty to show the newest codes automatically."
+          className="lg:col-span-2"
+        >
+          <MultiSelect
+            label={`Offers in this section (${promoCoupons.length}/10)`}
+            hint="Up to 10. The row shows 6 at a time; the category pills above it are built from the categories of your picks and swap in the matching ones."
+            value={promoCoupons}
+            onChange={(value) => {
+              setPromoCoupons(value.slice(0, 10));
+              touch();
+            }}
+            options={couponChoices}
+          />
+
+          {promoCoupons.length ? (
+            <div className="mt-4 space-y-3 border-t border-[var(--border-subtle)] pt-4">
+              <p className="text-sm font-bold">Card images</p>
+              <p className="text-xs text-faint">
+                Best: <strong>800 × 800 px (square)</strong>, a transparent PNG/WebP of just the
+                product — no background, no border. It sits in the bottom-right of the card, shown
+                whole and never cropped, on the card&#39;s own pastel colour. Each one saves itself
+                the moment you upload it — this does not wait for &#34;Save changes&#34; below.
+              </p>
+              {promoCoupons.map((id) => {
+                const item = couponOptions.data?.items.find((coupon) => coupon._id === id);
+                if (!item) return null;
+
+                return (
+                  <ImagePicker
+                    key={id}
+                    label={item.title}
+                    value={item.image ?? null}
+                    onChange={(value) => updateCouponImage(id, value)}
+                    folder="coupons"
+                  />
+                );
+              })}
+            </div>
+          ) : null}
+        </FormSection>
+
         <FormSection title="Featured offers" className="lg:col-span-2">
+          <Select
+            label="Filter the list below by category"
+            hint="Narrows which offers show up to pick from — it does not change what is saved."
+            value={couponCategory}
+            onChange={(event) => setCouponCategory(event.target.value)}
+            options={[{ value: "", label: "Every category" }, ...categorySlugChoices]}
+          />
           <MultiSelect
             label="Offers in the featured rail"
             hint="Leave empty to rank automatically by priority and discount."
@@ -371,6 +560,31 @@ export default function AdminHomepagePage() {
             }}
             options={couponChoices}
           />
+
+          {featuredCoupons.length ? (
+            <div className="mt-4 space-y-3 border-t border-[var(--border-subtle)] pt-4">
+              <p className="text-sm font-bold">Offer images</p>
+              <p className="text-xs text-faint">
+                Shown small, beside the offer&#39;s details on the homepage&#39;s category rail.
+                About 800×360 (2.2:1). Each one saves itself the moment you upload it — this
+                does not wait for &#34;Save changes&#34; below.
+              </p>
+              {featuredCoupons.map((id) => {
+                const item = couponOptions.data?.items.find((coupon) => coupon._id === id);
+                if (!item) return null;
+
+                return (
+                  <ImagePicker
+                    key={id}
+                    label={item.title}
+                    value={item.image ?? null}
+                    onChange={(value) => updateCouponImage(id, value)}
+                    folder="coupons"
+                  />
+                );
+              })}
+            </div>
+          ) : null}
         </FormSection>
 
         <FormSection title="Featured stores">
@@ -397,6 +611,31 @@ export default function AdminHomepagePage() {
             }}
             options={categoryChoices}
           />
+
+          {featuredCategories.length ? (
+            <div className="mt-4 space-y-3 border-t border-[var(--border-subtle)] pt-4">
+              <p className="text-sm font-bold">Category banners</p>
+              <p className="text-xs text-faint">
+                The wide banner at the top of the category rail, full-width. Crop it to
+                1800×600 (3:1) so it fills that shape with nothing cropped off. Saves
+                itself on upload.
+              </p>
+              {featuredCategories.map((id) => {
+                const item = categoryOptions.data?.find((category) => category._id === id);
+                if (!item) return null;
+
+                return (
+                  <ImagePicker
+                    key={id}
+                    label={item.name}
+                    value={item.banner ?? null}
+                    onChange={(value) => updateCategoryBanner(id, value)}
+                    folder="categories"
+                  />
+                );
+              })}
+            </div>
+          ) : null}
         </FormSection>
 
         <FormSection
