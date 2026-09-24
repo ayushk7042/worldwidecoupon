@@ -17,6 +17,8 @@ export interface Category extends SeoFields {
 
   image?: ImageRef | null;
   banner?: ImageRef | null;
+  /** Artwork for the category page header; falls back to the banner's right side. */
+  headerImage?: ImageRef | null;
 
   parent?: Types.ObjectId | null;
 
@@ -65,6 +67,7 @@ const categorySchema = new Schema<Category>(
 
     image: { type: imageSchema, default: null },
     banner: { type: imageSchema, default: null },
+    headerImage: { type: imageSchema, default: null },
 
     parent: {
       type: Schema.Types.ObjectId,
