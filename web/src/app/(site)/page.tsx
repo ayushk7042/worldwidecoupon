@@ -277,8 +277,8 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-            {data.stores.slice(0, 12).map((store) => (
+          <div className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
+            {data.stores.slice(0, 16).map((store) => (
               <BrandCard key={store._id} store={store} />
             ))}
           </div>
@@ -824,28 +824,23 @@ function HomeHero({
 
 function BrandCard({ store }: { store: Store }) {
   return (
-    <Link
-      href={`/store/${store.slug}`}
-      className="surface group flex items-center gap-3 rounded-2xl border border-[var(--border-subtle)] p-3 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-[var(--shadow-lift)]"
-    >
-      <span className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-[var(--border-subtle)] bg-white p-1">
-        <StoreLogo name={store.name} logo={store.logo} size={48} rounded="rounded-lg" className="border-0" />
+    <Link href={`/store/${store.slug}`} className="group flex flex-col items-center gap-2 text-center">
+      {/* Just the store: a big white square, no box around it. */}
+      <span className="relative flex size-[7.25rem] items-center justify-center overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-white p-1.5 shadow-[var(--shadow-card)] transition-all duration-300 group-hover:-translate-y-1 group-hover:border-brand-400 group-hover:shadow-[var(--shadow-lift)] group-hover:ring-4 group-hover:ring-brand-500/15">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-brand-100/70 to-transparent opacity-0 group-hover:opacity-100 group-hover:motion-safe:animate-[shine_0.9s_ease-out]"
+        />
+        <span className="relative flex size-full items-center justify-center transition-transform duration-300 group-hover:scale-105">
+          <StoreLogo name={store.name} logo={store.logo} size={104} rounded="rounded-2xl" className="border-0" />
+        </span>
       </span>
 
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-bold transition-colors group-hover:text-brand-700 dark:group-hover:text-brand-300">
+      <span className="w-full min-w-0">
+        <span className="block truncate text-[13px] font-extrabold transition-colors group-hover:text-brand-700 dark:group-hover:text-brand-300">
           {store.name}
         </span>
-        <span className="mt-0.5 block text-xs font-semibold text-faint">
-          {formatCount(store.activeCouponCount)} offers
-        </span>
-        {store.bestOffer ? (
-          <span className="block truncate text-xs font-bold text-brand-600">{store.bestOffer}</span>
-        ) : null}
-      </span>
-
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-full border border-[var(--border-subtle)] text-body transition-all group-hover:border-brand-300 group-hover:bg-brand-50 group-hover:text-brand-700 dark:group-hover:bg-brand-950/60">
-        <ArrowRight aria-hidden className="size-4" />
+        <span className="block text-[11px] font-semibold text-faint">{formatCount(store.activeCouponCount)} offers</span>
       </span>
     </Link>
   );
