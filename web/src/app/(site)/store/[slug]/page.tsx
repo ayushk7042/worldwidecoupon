@@ -86,8 +86,8 @@ const PRICE_RANGES = [
 ] as const;
 
 const SORTS = [
-  { value: "best", label: "Best match" },
   { value: "newest", label: "Newest first" },
+  { value: "best", label: "Best match" },
   { value: "expiring", label: "Ending soonest" },
   { value: "popular", label: "Most used" },
 ];
@@ -109,7 +109,7 @@ export default async function StorePage({
   const show = oneOf(query.show);
   const offer = oneOf(query.offer);
   const price = oneOf(query.price);
-  const sort = oneOf(query.sort) ?? "best";
+  const sort = oneOf(query.sort) ?? "newest";
   const expiringSoon = oneOf(query.expiringSoon);
   const exclusive = oneOf(query.exclusive);
   const top = oneOf(query.top);
@@ -389,7 +389,7 @@ export default async function StorePage({
                 {SORTS.map((option) => (
                   <Link
                     key={option.value}
-                    href={href({ sort: option.value === "best" ? undefined : option.value })}
+                    href={href({ sort: option.value === "newest" ? undefined : option.value })}
                     className={classNames(
                       "rounded-full border px-2.5 py-1.5 text-[11px] font-semibold transition",
                       sort === option.value
