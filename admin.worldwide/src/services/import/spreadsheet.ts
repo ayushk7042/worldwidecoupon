@@ -23,7 +23,7 @@ export function isLegacyExcel(file: { originalname: string; mimetype: string }):
 }
 
 /** Everything Excel can put in a cell, flattened to the text a human sees. */
-function cellText(value: ExcelJS.CellValue): string {
+export function cellText(value: ExcelJS.CellValue): string {
   if (value === null || value === undefined) return "";
   if (typeof value === "string") return value;
   if (typeof value === "number" || typeof value === "boolean") return String(value);
