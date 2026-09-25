@@ -1,4 +1,7 @@
-import { CheckCircle2, ChevronDown, Clock3, Copy, Users } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { CheckCircle2, ChevronDown, Clock3, Copy, FileText, ListChecks, Users } from "lucide-react";
 import Link from "next/link";
 import {
   COUPON_TYPE_LABELS,
@@ -42,6 +45,7 @@ function ribbonFor(coupon: CouponView): { label: string; className: string } | n
  * which is what records the click), so the dashed box shows a masked stub.
  */
 export function OfferRow({ coupon }: { coupon: CouponView }) {
+  const [open, setOpen] = useState(false);
   const store = storeOf(coupon);
   const expiry = expiryLabel(coupon);
   const ribbon = ribbonFor(coupon);
@@ -140,46 +144,20 @@ export function OfferRow({ coupon }: { coupon: CouponView }) {
             ) : null}
           </p>
 
-          <details className="group/details mt-2">
-            <summary className="flex cursor-pointer list-none flex-wrap items-center gap-2.5 marker:hidden">
-              <span className="rounded-md bg-brand-50 px-2.5 py-1 text-[11px] font-semibold text-brand-700 dark:bg-brand-950/60 dark:text-brand-300">
-                {chip}
-              </span>
-              <span className="inline-flex items-center gap-1 text-[13px] font-bold text-brand-600">
-                Show details
-                <ChevronDown aria-hidden className="size-3.5 transition-transform group-open/details:rotate-180" />
-              </span>
-            </summary>
-
-            <div className="mt-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-sunken)]/60 p-3">
-              {lines.length ? (
-                <>
-                  <p className="mb-1.5 text-[11px] font-extrabold uppercase tracking-wider text-faint">Key points</p>
-                  <ul className="space-y-1.5">
-                    {lines.map((line, index) => (
-                      <li key={index} className="flex gap-2 text-[13px] leading-relaxed text-body">
-                        <CheckCircle2 aria-hidden className="mt-0.5 size-3.5 shrink-0 text-brand-500" />
-                        <span>{line}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              ) : (
-                <p className="text-[13px] text-body">No extra details for this offer — open it for the full terms.</p>
-              )}
-
-              {coupon.terms ? (
-                <div className="prose-offer mt-2 text-[12px]" dangerouslySetInnerHTML={{ __html: coupon.terms }} />
-              ) : null}
-
-              <Link
-                href={`/coupon/${coupon.slug}`}
-                className="mt-2 inline-block text-[13px] font-bold text-brand-600 hover:underline"
-              >
-                Open the full offer →
-              </Link>
-            </div>
-          </details>
+          <div className="mt-2 flex flex-wrap items-center gap-2.5">
+            <span className="rounded-md bg-brand-50 px-2.5 py-1 text-[11px] font-semibold text-brand-700 dark:bg-brand-950/60 dark:text-brand-300">
+              {chip}
+            </span>
+            <button
+              type="button"
+              onClick={() => setOpen((value) => !value)}
+              aria-expanded={open}
+              className="inline-flex items-center gap-1 text-[13px] font-bold text-brand-600 transition hover:text-brand-700"
+            >
+              {open ? "Hide details" : "Show details"}
+              <ChevronDown aria-hidden className={classNames("size-3.5 transition-transform", open && "rotate-180")} />
+            </button>
+          </div>
         </div>
 
         {/* ---- the offer's own picture: no box, faded into the row ---- */}
@@ -229,6 +207,44 @@ export function OfferRow({ coupon }: { coupon: CouponView }) {
           <SaveButton couponId={coupon._id} />
         </div>
       </div>
+      {open ? (
+        <div className="border-t border-dashed border-brand-300/70 bg-[var(--surface-sunken)]/50 px-4 py-4 dark:border-brand-700/50">
+          <div className={classNames("grid gap-5", coupon.terms && "@3xl:grid-cols-2")}>
+            <div>
+              <p className="mb-2 flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-faint">
+                <ListChecks aria-hidden className="size-4 text-brand-600" />
+                Key points
+              </p>
+              {lines.length ? (
+                <ul className="space-y-2">
+                  {lines.map((line, index) => (
+                    <li key={index} className="flex gap-2 text-[13px] leading-relaxed text-body">
+                      <CheckCircle2 aria-hidden className="mt-0.5 size-4 shrink-0 text-brand-500" />
+                      <span className="break-words">{line}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-[13px] text-body">No extra points for this offer.</p>
+              )}
+            </div>
+
+            {coupon.terms ? (
+              <div>
+                <p className="mb-2 flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-faint">
+                  <FileText aria-hidden className="size-4 text-brand-600" />
+                  Terms
+                </p>
+                <div className="prose-offer text-[12px]" dangerouslySetInnerHTML={{ __html: coupon.terms }} />
+              </div>
+            ) : null}
+          </div>
+
+          <Link href={`/coupon/${coupon.slug}`} className="mt-4 inline-flex items-center gap-1 text-[13px] font-bold text-brand-600 hover:underline">
+            Open the full offer →
+          </Link>
+        </div>
+      ) : null}
     </article>
   );
 }
