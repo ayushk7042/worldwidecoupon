@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { CategoryIcon } from "@/components/ui/icons";
 import { StoreLogo } from "@/components/ui/primitives";
-import { categoryColor, classNames, expiryLabel, formatCount, isUrgent, splitBadge, storeOf, tileColour } from "@/lib/format";
+import { brandThemeVars, categoryColor, classNames, expiryLabel, formatCount, isUrgent, splitBadge, storeOf, tileColour } from "@/lib/format";
 import type { Category, CouponView } from "@/lib/types";
 import { RevealButton } from "./RevealButton";
 import { SaveButton } from "./SaveButton";
@@ -312,79 +312,85 @@ export function CategoryOffers({ groups }: { groups: CategoryGroup[] }) {
           onPointerMove={onPointerMove}
           onPointerUp={endDrag}
           onPointerLeave={endDrag}
-          className="no-scrollbar flex min-w-0 flex-1 cursor-grab gap-2 overflow-x-auto scroll-smooth py-1 active:cursor-grabbing"
+          className="no-scrollbar flex min-w-0 flex-1 cursor-grab gap-2.5 overflow-x-auto scroll-smooth px-1 py-2 active:cursor-grabbing"
         >
-          {groups.map((group, index) =>
-            group.category.banner?.url ? (
-              /* Image only, no label — the banner has to carry the name on
-                 its own. Sized to the same 12:5 ratio as the big banner, so
-                 nothing gets stretched or cropped oddly at this scale. A
-                 colour-matched ring plus a small check badge marks the
-                 active one, since there is no text to bold or underline. */
+          {groups.map((group, index) => {
+            const tint = colorForCategory(group.category);
+            const on = index === active;
+
+            return (
               <button
                 key={group.category._id}
                 type="button"
-                aria-label={group.category.name}
-                aria-pressed={index === active}
                 onClick={() => {
                   if (drag.current?.moved) return;
                   setActive(index);
                 }}
+                aria-pressed={on}
                 className={classNames(
-                  "relative aspect-[12/5] h-14 shrink-0 select-none overflow-hidden rounded-xl ring-offset-2 ring-offset-[var(--surface)] transition-all duration-200",
-                  index === active
-                    ? "ring-[3px]"
-                    : "opacity-75 ring-0 hover:-translate-y-px hover:opacity-100"
+                  "group/tab relative flex shrink-0 select-none items-center gap-2.5 overflow-hidden rounded-2xl border py-2 pl-2 pr-4 text-left transition-all duration-300",
+                  on ? "-translate-y-0.5 text-white" : "hover:-translate-y-1 hover:shadow-[var(--shadow-card)]"
                 )}
-                style={index === active ? { boxShadow: `0 0 0 3px ${colorForCategory(group.category)}` } : undefined}
+                style={
+                  on
+                    ? {
+                        backgroundColor: tint,
+                        borderColor: tint,
+                        boxShadow: `0 14px 26px -12px ${tint}`,
+                        backgroundImage: "linear-gradient(135deg, rgba(255,255,255,0.22), transparent 60%)",
+                      }
+                    : {
+                        borderColor: `color-mix(in srgb, ${tint} 30%, transparent)`,
+                        backgroundColor: `color-mix(in srgb, ${tint} 9%, var(--surface))`,
+                      }
+                }
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={group.category.banner.url}
-                  alt={group.category.name}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                  decoding="async"
+                {/* a glint sweeps across whichever tab the pointer is on */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-transparent via-white/45 to-transparent opacity-0 group-hover/tab:opacity-100 group-hover/tab:motion-safe:animate-[shine_0.9s_ease-out]"
                 />
-                {index === active ? (
+
+                <span
+                  className={classNames(
+                    "relative flex size-9 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover/tab:-rotate-6 group-hover/tab:scale-110",
+                    on ? "bg-white/25 text-white" : "text-white"
+                  )}
+                  style={on ? undefined : { backgroundColor: tint }}
+                >
+                  <CategoryIcon name={group.category.name} className="size-[18px]" />
+                </span>
+
+                <span className="relative min-w-0">
                   <span
-                    aria-hidden
-                    className="absolute right-1 top-1 flex size-4 items-center justify-center rounded-full text-white shadow-[var(--shadow-card)]"
-                    style={{ backgroundColor: colorForCategory(group.category) }}
+                    className="block whitespace-nowrap text-[13px] font-extrabold leading-tight"
+                    style={on ? undefined : { color: "var(--text-primary)" }}
                   >
-                    <CheckCircle2 aria-hidden className="size-3" />
+                    {group.category.name}
+                  </span>
+                  <span
+                    className={classNames("block text-[10px] font-bold leading-tight", on ? "text-white/80" : "text-faint")}
+                  >
+                    {formatCount(group.category.activeCouponCount)} offers
+                  </span>
+                </span>
+
+                {/* the running tab fills a thin bar over the time it stays */}
+                {on ? (
+                  <span aria-hidden className="absolute inset-x-0 bottom-0 h-[3px] bg-white/25">
+                    <span
+                      key={`${index}-${count}`}
+                      className="block h-full origin-left bg-white"
+                      style={{
+                        animation: "hero-progress 5000ms linear forwards",
+                        animationPlayState: paused ? "paused" : "running",
+                      }}
+                    />
                   </span>
                 ) : null}
               </button>
-            ) : (
-              <button
-                key={group.category._id}
-                type="button"
-                onClick={() => {
-                  if (drag.current?.moved) return;
-                  setActive(index);
-                }}
-                aria-pressed={index === active}
-                className={classNames(
-                  "flex shrink-0 select-none items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-bold transition-all duration-200",
-                  index === active
-                    ? "border-transparent bg-brand-gradient text-white shadow-[var(--shadow-glow)]"
-                    : "surface border-[var(--border-subtle)] text-body hover:-translate-y-px hover:border-brand-300 hover:text-brand-600"
-                )}
-              >
-                <CategoryIcon name={group.category.name} className="size-4" />
-                {group.category.name}
-                <span
-                  className={classNames(
-                    "rounded-full px-1.5 py-0.5 text-[10px] font-extrabold",
-                    index === active ? "bg-white/20" : "bg-[var(--surface-sunken)] text-faint"
-                  )}
-                >
-                  {formatCount(group.category.activeCouponCount)}
-                </span>
-              </button>
-            )
-          )}
+            );
+          })}
         </div>
 
         <button
@@ -401,9 +407,10 @@ export function CategoryOffers({ groups }: { groups: CategoryGroup[] }) {
       <div
         key={current.category._id}
         className="mt-4 grid animate-[rise_0.3s_ease-out] grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
+        style={brandThemeVars(categoryTint)}
       >
         {current.coupons.slice(0, 6).map((coupon, index) => (
-          <CompactOffer key={coupon._id} coupon={coupon} featured={index === 0} />
+          <CompactOffer key={coupon._id} coupon={coupon} featured={index === 0} tint={categoryTint} />
         ))}
       </div>
     </section>
@@ -421,7 +428,16 @@ export function CategoryOffers({ groups }: { groups: CategoryGroup[] }) {
  * With no image uploaded, the store's mark stands in on a soft tint —
  * never a stock photo for a product the offer may not cover.
  */
-export function CompactOffer({ coupon, featured = false }: { coupon: CouponView; featured?: boolean }) {
+export function CompactOffer({
+  coupon,
+  featured = false,
+  tint,
+}: {
+  coupon: CouponView;
+  featured?: boolean;
+  /** The category colour, when the card sits inside a category's own rail. */
+  tint?: string;
+}) {
   const store = storeOf(coupon);
   const expiry = expiryLabel(coupon);
   const discount = splitBadge(coupon.badge);
@@ -432,17 +448,30 @@ export function CompactOffer({ coupon, featured = false }: { coupon: CouponView;
     <article
       className={classNames(
         "group relative flex overflow-hidden rounded-2xl border shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]",
-        featured
-          ? "border-accent-200/70 bg-gradient-to-r from-accent-100/70 to-[var(--surface)] hover:border-accent-300 dark:border-accent-600/40 dark:from-accent-600/20 dark:to-[var(--surface)]"
-          : "surface border-[var(--border-subtle)] hover:border-brand-300"
+        !tint &&
+          (featured
+            ? "border-accent-200/70 bg-gradient-to-r from-accent-100/70 to-[var(--surface)] hover:border-accent-300 dark:border-accent-600/40 dark:from-accent-600/20 dark:to-[var(--surface)]"
+            : "surface border-[var(--border-subtle)] hover:border-brand-300")
       )}
+      style={
+        tint
+          ? {
+              borderColor: `color-mix(in srgb, ${tint} ${featured ? 45 : 28}%, transparent)`,
+              backgroundColor: `color-mix(in srgb, ${tint} ${featured ? 13 : 8}%, var(--surface))`,
+              backgroundImage: `linear-gradient(115deg, color-mix(in srgb, ${tint} ${featured ? 20 : 12}%, transparent), transparent 62%)`,
+            }
+          : undefined
+      }
     >
       <div className="relative z-10 flex w-[60%] min-w-0 flex-col gap-2 p-4">
         <div className="flex flex-wrap items-center gap-2">
           <StoreLogo name={store?.name ?? coupon.title} logo={store?.logo} size={32} rounded="rounded-lg" className="border-0" />
           <span className="truncate text-sm font-bold text-body">{store?.name ?? "Featured"}</span>
           {featured ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-accent-600 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-white">
+            <span
+              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-white"
+              style={{ backgroundColor: tint ?? "var(--color-accent-600)" }}
+            >
               <Crown aria-hidden className="size-3" />
               Most popular
             </span>
