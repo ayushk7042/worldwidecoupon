@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { PageHeader } from "@/components/admin/AdminShell";
 import { DataTable, Pager, StatusPill, type Column } from "@/components/admin/DataTable";
 import { useAction, useAdminData } from "@/components/admin/hooks";
+import { PartnerSheetImport } from "@/components/admin/PartnerSheetImport";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/form";
 import { ConfirmDialog, Modal } from "@/components/ui/Modal";
@@ -148,8 +149,10 @@ export default function AdminImportPage() {
     <>
       <PageHeader
         title="Sheet import"
-        subtitle="Drop the WordPress export straight in. Preview first, then commit."
+        subtitle="Partner coupon sheets and the WordPress export. Preview first, then commit."
       />
+
+      <PartnerSheetImport onImported={() => void jobs.reload()} />
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
