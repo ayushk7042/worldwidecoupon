@@ -72,7 +72,7 @@ export default async function CouponsPage({
   const params = await searchParams;
 
   const page = Math.max(1, Number(one(params.page) ?? 1) || 1);
-  const sort = one(params.sort) ?? "best";
+  const sort = one(params.sort) ?? "newest";
   const type = one(params.type);
   const store = one(params.store);
   const category = one(params.category);
@@ -428,7 +428,7 @@ export default async function CouponsPage({
               {Object.entries(COUPON_SORT_LABELS).map(([value, label]) => (
                 <Link
                   key={value}
-                  href={hrefWith(params, { sort: value === "best" ? undefined : value })}
+                  href={hrefWith(params, { sort: value === "newest" ? undefined : value })}
                   className={classNames(
                     "rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all hover:-translate-y-px",
                     sort === value
