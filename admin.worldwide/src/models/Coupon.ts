@@ -111,6 +111,15 @@ export interface Coupon extends SeoFields {
   legacyId?: number;
   source?: string;
 
+  /** From a partner sheet: how many times the code can be redeemed in total. */
+  codeQuantity?: number;
+  /** From a partner sheet: the share of orders the code typically saves (0–1). */
+  discountRate?: number;
+  /** "All", "New buyer", "App"… — who the code is meant for. */
+  device?: string;
+  /** The partner's internal grouping for the code. */
+  department?: string;
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -204,6 +213,11 @@ const couponSchema = new Schema<Coupon>(
     clicks: { type: Number, default: 0 },
     uses: { type: Number, default: 0 },
     saves: { type: Number, default: 0 },
+    codeQuantity: Number,
+    discountRate: Number,
+    device: { type: String, trim: true },
+    department: { type: String, trim: true },
+
 
     legacyId: { type: Number, index: true, sparse: true },
     source: { type: String, default: "manual" },
