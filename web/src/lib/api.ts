@@ -93,7 +93,7 @@ export async function apiRaw<T>(
     if (revalidate === false || revalidate === undefined) {
       init.cache = "no-store";
     } else {
-      init.next = { revalidate, ...(tags ? { tags } : {}) };
+      init.next = { revalidate, tags: [...(tags ?? []), "catalog"] };
     }
   }
 
