@@ -4,6 +4,7 @@ import { CouponModel } from "../models/Coupon.js";
 import { StoreModel } from "../models/Store.js";
 import { CategoryModel } from "../models/Category.js";
 import { importWordpressCsv } from "../services/import/importer.js";
+import { buildPartnerTemplate, importPartnerSheet } from "../services/import/partnerSheet.js";
 import {
   isLegacyExcel,
   isSpreadsheetUpload,
@@ -182,4 +183,52 @@ export const rollback = asyncHandler(async (req, res) => {
     },
     { message: "Import rolled back" }
   );
+});
+
+/* ---------------- partner coupon sheets (.xlsx) ---------------- */
+
+const partnerOptions = (req: Express.Request) => {
+  const file = uploadedFile(req);
+  if (!isSpreadsheetUpload(file)) {
+    throw ApiError.badRequest("Upload the partner sheet as an .xlsx file");
+  }
+  const body = ((req as { body?: Record<string, string> }).body ?? {}) as Record<string, string>;
+  if (!body.category) throw ApiError.badRequest("Choose the category first");
+
+  return {
+    buffer: file.buffer,
+    categoryId: body.category,
+    storeId: body.store || null,
+    fileName: file.originalname,
+  };
+};
+
+/** POST /api/import/partner-sheet/preview — reads the sheet, writes nothing. */
+export const partnerPreview = asyncHandler(async (req, res) => {
+  const { buffer, ...options } = partnerOptions(req);
+  const result = await importPartnerSheet(buffer, { ...options, dryRun: true });
+  sendOk(res, result);
+});
+
+/** POST /api/import/partner-sheet */
+export const partnerImport = asyncHandler(async (req, res) => {
+  const { buffer, ...options } = partnerOptions(req);
+  const result = await importPartnerSheet(buffer, {
+    ...options,
+    adminId: req.admin ? String(req.admin._id) : null,
+  });
+  sendOk(res, result, {
+    message: `${result.created} created, ${result.updated} updated, ${result.skipped} skipped`,
+  });
+});
+
+/** GET /api/import/partner-sheet/template — the blank sheet, ready to fill. */
+export const partnerTemplate = asyncHandler(async (_req, res) => {
+  const buffer = await buildPartnerTemplate();
+  res.setHeader(
+    "Content-Type",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  );
+  res.setHeader("Content-Disposition", 'attachment; filename="partner-coupon-template.xlsx"');
+  res.send(buffer);
 });
