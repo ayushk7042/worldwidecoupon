@@ -27,7 +27,7 @@ export interface ImportJob {
 
   fileName?: string;
   fileType: "csv" | "xlsx" | "json";
-  source: "wordpress" | "generic";
+  source: "wordpress" | "generic" | "partner-sheet";
 
   mode: "create" | "upsert" | "replace";
   status: ImportStatus;
@@ -75,7 +75,7 @@ const importJobSchema = new Schema<ImportJob>(
 
     fileName: String,
     fileType: { type: String, enum: ["csv", "xlsx", "json"], default: "csv" },
-    source: { type: String, enum: ["wordpress", "generic"], default: "wordpress" },
+    source: { type: String, enum: ["wordpress", "generic", "partner-sheet"], default: "wordpress" },
 
     mode: { type: String, enum: ["create", "upsert", "replace"], default: "upsert" },
     status: { type: String, enum: IMPORT_STATUSES, default: "validated", index: true },
