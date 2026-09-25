@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
  *  shows it now instead of when the 5-minute cache next expires. */
 export async function POST() {
   revalidateTag("homepage");
+  revalidateTag("catalog");
   revalidatePath("/");
   revalidatePath("/coupons");
   revalidatePath("/store/[slug]", "page");
