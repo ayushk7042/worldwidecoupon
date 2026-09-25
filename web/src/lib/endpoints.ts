@@ -429,6 +429,19 @@ export const media = {
    IMPORT
 ========================================================= */
 
+export interface PartnerSheetResult {
+  batchId: string;
+  totalRows: number;
+  created: number;
+  updated: number;
+  skipped: number;
+  store: { id: string; name: string; slug: string } | null;
+  category: { id: string; name: string } | null;
+  sample: { code: string; title: string; discount: string; validFrom: string | null; validTo: string | null; audience: string }[];
+  issues: { row: number; field?: string; message: string; value?: string }[];
+  dryRun: boolean;
+}
+
 export const importer = {
   /** Dry run — parses and reports without writing a thing. */
   preview: (file: File, token?: string | null) => {
@@ -444,6 +457,24 @@ export const importer = {
       method: "POST",
       body: form,
       query: { mode },
+      token,
+    });
+  },
+
+  /** A partner coupon sheet (.xlsx) into one category. `dry` reads it and writes nothing. */
+  partnerSheet: (
+    file: File,
+    options: { category: string; store?: string },
+    dry: boolean,
+    token?: string | null
+  ) => {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("category", options.category);
+    if (options.store) form.append("store", options.store);
+    return api<PartnerSheetResult>(dry ? "/import/partner-sheet/preview" : "/import/partner-sheet", {
+      method: "POST",
+      body: form,
       token,
     });
   },
