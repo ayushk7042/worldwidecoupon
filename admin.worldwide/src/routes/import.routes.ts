@@ -11,6 +11,10 @@ router.use(...canImport);
 router.post("/preview", importController.csvUpload, importController.preview);
 router.post("/wordpress", importController.csvUpload, importController.runImport);
 
+router.get("/partner-sheet/template", importController.partnerTemplate);
+router.post("/partner-sheet/preview", importController.csvUpload, importController.partnerPreview);
+router.post("/partner-sheet", importController.csvUpload, importController.partnerImport);
+
 router.get("/jobs", importController.listJobs);
 router.get("/jobs/:id", validate({ params: idParam }), importController.getJob);
 router.post(
