@@ -103,8 +103,8 @@ export const COUPON_TYPE_LABELS: Record<Coupon["type"], string> = {
 };
 
 export const COUPON_SORT_LABELS: Record<string, string> = {
-  best: "Best match",
   newest: "Newest first",
+  best: "Best match",
   expiring: "Ending soonest",
   popular: "Most used",
   discount: "Biggest saving",
