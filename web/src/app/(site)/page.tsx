@@ -26,6 +26,7 @@ import {
   Zap,
 } from "lucide-react";
 import { CouponCard } from "@/components/site/CouponCard";
+import { StoreHeart } from "@/components/site/StoreHeart";
 import { RevealButton } from "@/components/site/RevealButton";
 import { BestOfferMain, BestOfferSide, CategoryOffers } from "@/components/site/CategoryOffers";
 import { PromoCodes } from "@/components/site/PromoCodes";
@@ -42,6 +43,7 @@ import {
   formatCount,
   splitBadge,
   storeOf,
+  tileColour,
   timeAgo,
 } from "@/lib/format";
 import type { Category, CouponFeed, CouponView, HomepagePayload, Store } from "@/lib/types";
@@ -253,37 +255,78 @@ export default async function HomePage() {
 
       {data.stores.length ? (
         <section className="shell pt-14">
-          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-            <div className="flex items-start gap-3">
-              <Star aria-hidden className="mt-1 size-6 shrink-0 text-brand-600" />
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-600">
-                  Reader favourites
-                </p>
-                <h2 className="font-display text-2xl font-extrabold sm:text-3xl">
-                  Stores people are saving at
+          <div className="relative overflow-hidden rounded-[2rem] border border-brand-200/50 bg-gradient-to-br from-brand-50 via-[#fff8f2] to-brand-50 p-4 sm:p-6 dark:border-brand-700/40 dark:from-brand-900/40 dark:via-brand-950/50 dark:to-brand-900/30">
+            {/* soft blobs, like the artwork's own washes */}
+            <span aria-hidden className="pointer-events-none absolute -left-24 top-16 size-72 rounded-full bg-brand-200/60 blur-3xl dark:bg-brand-600/15" />
+            <span aria-hidden className="pointer-events-none absolute -right-16 top-40 size-64 rounded-full bg-accent-200/50 blur-3xl dark:bg-accent-600/10" />
+
+            {/* ---------- header ---------- */}
+            <div className="relative flex flex-wrap items-start gap-x-6 gap-y-4 lg:min-h-[8.5rem] lg:flex-nowrap">
+              <div className="min-w-0 flex-1">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3.5 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em] shadow-[var(--shadow-card)] dark:bg-white/10">
+                  <Star aria-hidden className="size-3.5 text-brand-600" />
+                  Readers&#39; favourites
+                </span>
+                <h2 className="mt-2 font-display text-3xl font-extrabold leading-tight sm:text-[2.6rem]">
+                  Stores people are <span className="text-brand-500">saving at</span>
                 </h2>
-                <p className="mt-1 text-sm text-body">
-                  The shops our readers open most often this week.
+                <p className="mt-1 text-sm text-body sm:text-[15px]">
+                  Discover top stores and grab the latest coupons, deals and discounts.
                 </p>
               </div>
+
+              {/* tag + the bags from the artwork, then the button */}
+              <div className="relative hidden shrink-0 items-start gap-3 lg:flex">
+                <div className="mt-2 flex items-start gap-2 pt-1">
+                  <span className="flex size-12 -rotate-6 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-[var(--shadow-glow)]">
+                    <Percent aria-hidden className="size-6" strokeWidth={2.6} />
+                  </span>
+                  <span className="mt-1 -rotate-3 rounded-2xl bg-white/70 px-3.5 py-2 font-display text-[13px] font-bold italic leading-tight text-ink-700 shadow-[var(--shadow-card)] dark:bg-white/10 dark:text-ink-200">
+                    Top Brands
+                    <br />
+                    Bigger Savings
+                  </span>
+                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/banners/stores-bags.png"
+                  alt=""
+                  aria-hidden
+                  className="pointer-events-none -mb-6 h-[8.5rem] w-auto self-end mix-blend-multiply dark:opacity-70 dark:mix-blend-normal"
+                  style={{
+                    maskImage: "linear-gradient(to right, transparent 0%, #000 14%, #000 86%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 12%, #000 100%)",
+                    WebkitMaskImage: "linear-gradient(to right, transparent 0%, #000 14%, #000 86%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 12%, #000 100%)",
+                    maskComposite: "intersect",
+                    WebkitMaskComposite: "source-in",
+                  }}
+                />
+                <Link
+                  href="/stores"
+                  className="group ml-1 mt-3 inline-flex items-center gap-2 rounded-full bg-brand-gradient px-6 py-3 text-sm font-extrabold text-white shadow-[var(--shadow-glow)] transition-all hover:-translate-y-0.5 hover:brightness-110"
+                >
+                  All Stores
+                  <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </div>
+
+              <Link
+                href="/stores"
+                className="group inline-flex items-center gap-2 rounded-full bg-brand-gradient px-5 py-2.5 text-sm font-extrabold text-white shadow-[var(--shadow-glow)] lg:hidden"
+              >
+                All Stores
+                <ArrowRight aria-hidden className="size-4" />
+              </Link>
             </div>
-            <Link
-              href="/stores"
-              className="group inline-flex items-center gap-1.5 rounded-full border border-[var(--border-subtle)] bg-[var(--surface)] px-4 py-2 text-sm font-semibold transition-all hover:-translate-y-px hover:border-brand-300 hover:text-brand-600 hover:shadow-[var(--shadow-card)]"
-            >
-              All stores
-              <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </div>
 
-          <div className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
-            {data.stores.slice(0, 16).map((store) => (
-              <BrandCard key={store._id} store={store} />
-            ))}
-          </div>
+            {/* ---------- the stores ---------- */}
+            <div className="relative mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
+              {data.stores.slice(0, 16).map((store) => (
+                <BrandCard key={store._id} store={store} />
+              ))}
+            </div>
 
-          <SavingsPromises />
+            <SavingsPromises />
+          </div>
         </section>
       ) : null}
 
@@ -823,26 +866,35 @@ function HomeHero({
 }
 
 function BrandCard({ store }: { store: Store }) {
+  const tint = tileColour(store.name);
+
   return (
-    <Link href={`/store/${store.slug}`} className="group flex flex-col items-center gap-2 text-center">
-      {/* Just the store: a big white square, no box around it. */}
-      <span className="relative flex size-[7.25rem] items-center justify-center overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-white p-1.5 shadow-[var(--shadow-card)] transition-all duration-300 group-hover:-translate-y-1 group-hover:border-brand-400 group-hover:shadow-[var(--shadow-lift)] group-hover:ring-4 group-hover:ring-brand-500/15">
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-brand-100/70 to-transparent opacity-0 group-hover:opacity-100 group-hover:motion-safe:animate-[shine_0.9s_ease-out]"
-        />
-        <span className="relative flex size-full items-center justify-center transition-transform duration-300 group-hover:scale-105">
-          <StoreLogo name={store.name} logo={store.logo} size={104} rounded="rounded-2xl" className="border-0" />
-        </span>
+    <div className="group relative flex flex-col items-center rounded-3xl border border-white/80 bg-white/90 px-3 pb-3 pt-4 text-center shadow-[var(--shadow-card)] backdrop-blur transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-300 hover:shadow-[var(--shadow-lift)] dark:border-white/10 dark:bg-[var(--surface)]">
+      {/* the whole card opens the store; the heart sits above it */}
+      <Link href={`/store/${store.slug}`} aria-label={`${store.name} offers`} className="absolute inset-0 z-0 rounded-3xl" />
+      <StoreHeart storeId={store._id} storeName={store.name} />
+
+      {/* the logo on a soft round wash of its own colour */}
+      <span
+        className="relative flex size-[6.25rem] items-center justify-center rounded-full transition-transform duration-300 group-hover:scale-105"
+        style={{
+          backgroundImage: `radial-gradient(circle at 50% 45%, color-mix(in srgb, ${tint} 20%, #fff), color-mix(in srgb, ${tint} 6%, #fff) 72%)`,
+        }}
+      >
+        <StoreLogo name={store.name} logo={store.logo} size={76} rounded="rounded-xl" className="border-0 bg-transparent" />
       </span>
 
-      <span className="w-full min-w-0">
-        <span className="block truncate text-[13px] font-extrabold transition-colors group-hover:text-brand-700 dark:group-hover:text-brand-300">
-          {store.name}
+      <span className="pointer-events-none mt-2 block w-full truncate text-[14px] font-bold">{store.name}</span>
+
+      <span className="pointer-events-none mt-2 flex w-full items-center justify-between gap-1.5">
+        <span className="min-w-0 flex-1 truncate rounded-full bg-brand-50 px-2.5 py-1 text-[11px] font-bold text-body dark:bg-brand-950/60">
+          {store.activeCouponCount.toLocaleString("en-US")} offers
         </span>
-        <span className="block text-[11px] font-semibold text-faint">{formatCount(store.activeCouponCount)} offers</span>
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700 transition-all duration-300 group-hover:bg-brand-600 group-hover:text-white dark:bg-brand-950/70 dark:text-brand-300">
+          <ArrowRight aria-hidden className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+        </span>
       </span>
-    </Link>
+    </div>
   );
 }
 
@@ -856,24 +908,28 @@ function SavingsPromises() {
   ];
 
   return (
-    <div className="mt-5 grid gap-x-4 gap-y-4 rounded-3xl border border-brand-200/60 bg-brand-50 p-5 sm:grid-cols-2 lg:grid-cols-[repeat(4,1fr)_auto] lg:items-center dark:border-brand-700/40 dark:bg-brand-900/35">
+    <div className="relative mt-4 grid items-center gap-x-4 gap-y-3 rounded-3xl border border-white/80 bg-white/70 p-3 shadow-[var(--shadow-card)] backdrop-blur sm:grid-cols-2 lg:grid-cols-[repeat(4,1fr)_auto] dark:border-white/10 dark:bg-white/5">
       {items.map((item) => (
-        <div key={item.title} className="flex items-center gap-3 lg:border-r lg:border-brand-200/70 lg:last:border-r-0 dark:lg:border-brand-900/60">
-          <span className={`flex size-11 shrink-0 items-center justify-center rounded-full ${item.circle}`}>
+        <div key={item.title} className="flex items-center gap-3 px-2 lg:border-r lg:border-brand-200/70 lg:last:border-r-0 dark:lg:border-brand-900/60">
+          <span className={`flex size-12 shrink-0 items-center justify-center rounded-full ${item.circle}`}>
             {item.icon}
           </span>
           <span className="min-w-0">
-            <span className="block text-sm font-bold">{item.title}</span>
+            <span className="block text-sm font-extrabold">{item.title}</span>
             <span className="block text-xs text-faint">{item.body}</span>
           </span>
         </div>
       ))}
 
-      <p className="hidden -rotate-6 font-display text-xl font-extrabold italic leading-tight text-brand-700 lg:block dark:text-brand-300">
-        Shop Smart,
-        <br />
-        Save More
-      </p>
+      <div className="relative hidden items-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 px-6 py-3.5 text-white shadow-[var(--shadow-glow)] lg:flex">
+        <span aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-transparent via-white/30 to-transparent motion-safe:animate-[shine_5s_ease-in-out_infinite]" />
+        <Crown aria-hidden className="relative size-9 shrink-0" strokeWidth={1.6} />
+        <p className="relative font-display text-lg font-extrabold leading-tight">
+          Shop Smart,
+          <br />
+          Save More
+        </p>
+      </div>
     </div>
   );
 }
