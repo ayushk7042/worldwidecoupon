@@ -216,21 +216,6 @@ export default async function HomePage() {
 
       <TrendingBrands stores={data.stores} />
 
-      <CategoryOffers groups={categoryGroups} />
-
-      <TopBrands stores={data.stores} storeCount={storeCount} />
-
-      <StatBar
-        offerCount={offerCount || totalOffers}
-        storeCount={storeCount}
-        categoryCount={categoryCount || data.categories.length}
-        codeCount={codeCount}
-      />
-
-      <div className="shell">
-        <AdSlot position="home-top" className="mt-8" minHeight={0} />
-      </div>
-
       {data.featured.length ? (
         <section className="shell pt-14">
           <TodaysBestOffersHeader topPick={data.featured[0]!} />
@@ -248,6 +233,21 @@ export default async function HomePage() {
           ) : null}
         </section>
       ) : null}
+
+      <CategoryOffers groups={categoryGroups} />
+
+      <TopBrands stores={data.stores} storeCount={storeCount} />
+
+      <StatBar
+        offerCount={offerCount || totalOffers}
+        storeCount={storeCount}
+        categoryCount={categoryCount || data.categories.length}
+        codeCount={codeCount}
+      />
+
+      <div className="shell">
+        <AdSlot position="home-top" className="mt-8" minHeight={0} />
+      </div>
 
       <div className="shell">
         <AdSlot position="home-infeed" className="mt-12" />
