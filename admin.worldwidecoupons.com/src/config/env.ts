@@ -29,7 +29,7 @@ const csv = (fallback: string[] = []) =>
 
 const schema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  PORT: z.coerce.number().int().positive().default(5000),
+  PORT: z.coerce.number().int().positive().default(4040),
 
   /** Public origin of the storefront — used to build canonical + redirect URLs. */
   SITE_URL: z.string().url().default("https://worldwidecoupons.com"),

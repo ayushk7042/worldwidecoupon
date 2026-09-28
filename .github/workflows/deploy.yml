@@ -1,0 +1,80 @@
+name: CI & Deploy
+
+# Every push and PR gets the CI job (install, typecheck, build — both apps).
+# Only a push to main additionally runs the deploy job, which SSHes into the
+# production server and rolls out that build.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Build & typecheck (${{ matrix.app }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [admin.worldwidecoupons.com, worldwidecoupons.com]
+    defaults:
+      run:
+        working-directory: ${{ matrix.app }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ${{ matrix.app }}/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+  deploy:
+    name: Deploy to production
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: SSH and roll out
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          # Password auth to start (matches the server as it is today).
+          # Switch to key-based auth when convenient: add a `key: ${{ secrets.SSH_KEY }}`
+          # line here instead, and drop SSH_PASSWORD — see DEPLOY.md.
+          password: ${{ secrets.SSH_PASSWORD }}
+          script_stop: true
+          script: |
+            set -e
+            cd /var/www/worldwidecoupon
+
+            git fetch origin main
+            git reset --hard origin/main
+
+            cd admin.worldwidecoupons.com
+            npm ci
+            npm run build
+            cd ..
+
+            cd worldwidecoupons.com
+            npm ci
+            npm run build
+            cd ..
+
+            pm2 reload ecosystem.config.cjs --update-env
+            pm2 save
