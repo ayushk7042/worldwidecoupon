@@ -54,27 +54,30 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          # Password auth to start (matches the server as it is today).
-          # Switch to key-based auth when convenient: add a `key: ${{ secrets.SSH_KEY }}`
-          # line here instead, and drop SSH_PASSWORD — see DEPLOY.md.
-          password: ${{ secrets.SSH_PASSWORD }}
+          # A dedicated deploy key, installed on the server for this pipeline
+          # only — see DEPLOY.md for how it was generated and installed.
+          key: ${{ secrets.SSH_KEY }}
           script_stop: true
+          # The server is CloudPanel: each app is its own Linux user with its
+          # own home, its own pm2 daemon, and nginx already pointed at its
+          # port. This root session pulls the code into a shared staging
+          # clone, hands each app's own files to its own user (never
+          # touching .env, which only ever exists on the server), then asks
+          # that user's own pm2 to rebuild and reload — so a deploy can never
+          # reach outside these two apps into any other site on the box.
           script: |
             set -e
-            cd /var/www/worldwidecoupon
-
+            cd /root/wwc-src
             git fetch origin main
             git reset --hard origin/main
 
-            cd admin.worldwidecoupons.com
-            npm ci
-            npm run build
-            cd ..
+            rsync -a --exclude='.git' --exclude='.env' --exclude='.env.local' \
+              admin.worldwidecoupons.com/ /home/worldwidecoupons-admin/htdocs/admin.worldwidecoupons.com/
+            rsync -a --exclude='.git' --exclude='.env' --exclude='.env.local' \
+              worldwidecoupons.com/ /home/worldwidecoupons/htdocs/worldwidecoupons.com/
 
-            cd worldwidecoupons.com
-            npm ci
-            npm run build
-            cd ..
+            chown -R worldwidecoupons-admin:worldwidecoupons-admin /home/worldwidecoupons-admin/htdocs/admin.worldwidecoupons.com
+            chown -R worldwidecoupons:worldwidecoupons /home/worldwidecoupons/htdocs/worldwidecoupons.com
 
-            pm2 reload ecosystem.config.cjs --update-env
-            pm2 save
+            su - worldwidecoupons-admin -c 'cd htdocs/admin.worldwidecoupons.com && npm ci && npm run build && pm2 reload admin-worldwidecoupons'
+            su - worldwidecoupons -c 'cd htdocs/worldwidecoupons.com && npm ci && npm run build && pm2 reload worldwidecoupons-web'
