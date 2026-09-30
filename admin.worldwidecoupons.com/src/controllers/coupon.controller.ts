@@ -207,8 +207,10 @@ export const getRelated = asyncHandler(async (req, res) => {
 /**
  * POST /api/coupons/:id/reveal
  *
- * The shopper clicked "Get code". Hand back the code and the deal link, and
- * count the reveal — that number is the "used 2,431 times" line on the card.
+ * Hands back the code text (and the destination, as a fallback link for the
+ * "store did not open?" button) so the modal has something to show. Opening
+ * the merchant tab, and counting the click, is `/go`'s job now — see the
+ * note there for why this split exists.
  */
 export const revealCoupon = asyncHandler(async (req, res) => {
   const { id } = req.params as { id: string };
@@ -233,14 +235,6 @@ export const revealCoupon = asyncHandler(async (req, res) => {
 
   const destinationUrl = resolveDestination(coupon as never, store as never);
 
-  void recordClick({
-    req,
-    kind: "reveal",
-    storeId: store?._id,
-    couponId: coupon._id,
-    destinationUrl,
-  });
-
   sendOk(res, {
     id: String(coupon._id),
     code: CODE_BEARING_TYPES.includes(coupon.type) ? coupon.code ?? null : null,
@@ -255,9 +249,18 @@ export const revealCoupon = asyncHandler(async (req, res) => {
 /**
  * GET /api/coupons/:id/go
  *
- * The deal link for offers with no code. Redirects rather than returning
- * JSON so the browser carries a real referrer to the merchant, which some
- * affiliate networks require for attribution.
+ * The one place a shopper's click actually sends them to the merchant, for
+ * both a plain deal and a code — a redirect, not JSON, so the browser
+ * carries a real referrer, which some affiliate networks require.
+ *
+ * A code coupon used to open a blank tab up front and fill in its address
+ * once `/reveal` answered — the standard trick for surviving an `await`
+ * without the browser's popup blocker stepping in. It was never reliable
+ * everywhere (Safari and some in-app browsers kill or ignore that deferred
+ * navigation), which is exactly the "store did not open" case working only
+ * on the manual retry. Routing the click straight through this endpoint
+ * instead — the same direct, synchronous `window.open` a deal coupon
+ * already used — means there is no gap for a browser to distrust.
  */
 export const goToDeal = asyncHandler(async (req, res) => {
   const { id } = req.params as { id: string };
@@ -281,9 +284,12 @@ export const goToDeal = asyncHandler(async (req, res) => {
     throw ApiError.badRequest("This offer has no link attached");
   }
 
+  // A code counts as a use as well as a click; a plain deal is only a click.
+  const kind = CODE_BEARING_TYPES.includes(coupon.type) ? "reveal" : "deal";
+
   void recordClick({
     req,
-    kind: "deal",
+    kind,
     storeId: store?._id,
     couponId: coupon._id,
     destinationUrl,

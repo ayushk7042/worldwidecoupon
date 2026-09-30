@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { apiBase } from "@/lib/api";
 import { coupons } from "@/lib/endpoints";
 import { classNames } from "@/lib/format";
@@ -13,13 +13,17 @@ import { useToast } from "@/components/ui/Toast";
 /**
  * The button the whole site exists for.
  *
- * A **deal** just goes: the redirect endpoint records the click and bounces
- * the shopper to the merchant.
- *
- * A **code** has to do two things at once — put the code on screen and open
- * the merchant — so it opens the tab *first*, synchronously inside the click
- * handler, then fills it in once the reveal call returns. Opening it after
- * the `await` would be a popup the browser blocks.
+ * Both a deal and a code open the merchant the same way now: a direct,
+ * synchronous `window.open` to `/go`, which redirects and records the
+ * click/use server-side. That used to be true only for a deal — a code
+ * opened a *blank* tab up front and pointed it at the destination once the
+ * `/reveal` call answered, the standard trick for surviving an `await`
+ * without a popup blocker stepping in. It was never reliable everywhere
+ * (Safari and some in-app browsers silently drop that deferred navigation,
+ * leaving the shopper on a blank tab — "store did not open" — while the
+ * manual "click here" retry worked because it was its own fresh, direct
+ * open). `/reveal` now only fetches the code text to show on screen; it no
+ * longer controls where the tab goes.
  */
 export function RevealButton({
   coupon,
@@ -41,7 +45,6 @@ export function RevealButton({
   const [revealed, setRevealed] = useState<RevealResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-  const pendingTab = useRef<Window | null>(null);
 
   const isCode = coupon.hasCode && (coupon.type === "code" || coupon.type === "printable");
   const dead = coupon.isExpired || coupon.status !== "active";
@@ -66,31 +69,21 @@ export function RevealButton({
   const onClick = async () => {
     if (dead) return;
 
-    if (!isCode) {
-      window.open(coupons.goUrl(coupon._id, apiBase()), "_blank", "noopener,noreferrer");
-      return;
-    }
+    // Direct and synchronous — inside the click gesture, not after an
+    // `await` — for both a deal and a code, so no browser has a reason to
+    // treat it as a popup.
+    window.open(coupons.goUrl(coupon._id, apiBase()), "_blank", "noopener,noreferrer");
 
-    // Claim the tab now, while we are still inside the user gesture.
-    pendingTab.current = window.open("", "_blank", "noopener,noreferrer");
+    if (!isCode) return;
+
     setLoading(true);
-
     try {
       const result = await coupons.reveal(coupon._id);
       setRevealed(result);
-
       if (result.code) void copy(result.code);
-
-      if (pendingTab.current && result.url) {
-        pendingTab.current.location.href = result.url;
-      } else if (result.url) {
-        window.open(result.url, "_blank", "noopener,noreferrer");
-      }
     } catch (error) {
-      pendingTab.current?.close();
       toast.error(error instanceof Error ? error.message : "Could not load that code");
     } finally {
-      pendingTab.current = null;
       setLoading(false);
     }
   };
