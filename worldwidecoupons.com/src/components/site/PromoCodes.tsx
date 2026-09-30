@@ -101,7 +101,7 @@ export function PromoCodes({ coupons }: { coupons: CouponView[] }) {
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visible.slice(0, 6).map((coupon, index) => (
             <PromoCard key={coupon._id} coupon={coupon} tint={PASTELS[index % PASTELS.length]!} />
           ))}

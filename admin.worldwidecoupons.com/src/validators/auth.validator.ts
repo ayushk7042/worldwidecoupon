@@ -58,6 +58,17 @@ export const shopperUpdateBody = z.object({
   newsletter: z.boolean().optional(),
 });
 
+export const shopperForgotBody = z.object({ email });
+
+export const shopperResetBody = z.object({
+  email,
+  otp: z
+    .string({ required_error: "Enter the code from your email" })
+    .trim()
+    .length(6, "That code should be 6 digits"),
+  newPassword: password,
+});
+
 export const contactBody = z.object({
   name: requiredText("Name", 120),
   email,

@@ -217,7 +217,13 @@ function Slide({
             src={mobile}
             alt={banner.image?.alt ?? banner.title ?? ""}
             className={classNames(
-              "h-full w-full object-cover",
+              // Even an uploaded "mobile" image isn't guaranteed to match this
+              // slide's forced aspect ratio (2:1 here, 3:1 from sm up), so
+              // object-cover can still crop it. object-contain guarantees the
+              // whole banner is visible, letterboxed by the slide's own
+              // background instead of cut. sm and up already reads correctly
+              // as object-cover, so it's untouched there.
+              "h-full w-full object-contain sm:object-cover",
               active && "motion-safe:animate-[hero-zoom_7s_ease-out_forwards]"
             )}
             loading="eager"

@@ -21,6 +21,7 @@ interface ShopperState {
   favouriteIds: Set<string>;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string, newsletter: boolean) => Promise<void>;
+  resetPassword: (email: string, otp: string, newPassword: string) => Promise<void>;
   logout: () => Promise<void>;
   toggleSaved: (couponId: string) => Promise<boolean>;
   toggleFavourite: (storeId: string) => Promise<boolean>;
@@ -95,6 +96,16 @@ export function ShopperProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  const resetPassword = useCallback(
+    async (email: string, otp: string, newPassword: string) => {
+      const result = await account.resetPassword({ email, otp, newPassword });
+      writeToken("shopper", result.token);
+      setShopper(result.user);
+      await loadCollections();
+    },
+    [loadCollections]
+  );
+
   const logout = useCallback(async () => {
     await account.logout().catch(() => undefined);
     clearToken("shopper");
@@ -137,12 +148,25 @@ export function ShopperProvider({ children }: { children: ReactNode }) {
       favouriteIds,
       login,
       register,
+      resetPassword,
       logout,
       toggleSaved,
       toggleFavourite,
       refresh,
     }),
-    [shopper, loading, savedIds, favouriteIds, login, register, logout, toggleSaved, toggleFavourite, refresh]
+    [
+      shopper,
+      loading,
+      savedIds,
+      favouriteIds,
+      login,
+      register,
+      resetPassword,
+      logout,
+      toggleSaved,
+      toggleFavourite,
+      refresh,
+    ]
   );
 
   return <ShopperContext.Provider value={value}>{children}</ShopperContext.Provider>;

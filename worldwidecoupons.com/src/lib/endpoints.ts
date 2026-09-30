@@ -328,6 +328,15 @@ export const account = {
 
   logout: () => api<{ ok: boolean }>("/account/logout", { method: "POST" }),
 
+  forgotPassword: (email: string) =>
+    api<{ ok: boolean }>("/account/forgot-password", { method: "POST", body: { email } }),
+
+  resetPassword: (body: { email: string; otp: string; newPassword: string }) =>
+    api<{ token: string; user: Shopper }>("/account/reset-password", {
+      method: "POST",
+      body,
+    }),
+
   me: (token?: string | null): Promise<Shopper> => api<Shopper>("/account/me", { token }),
 
   updateProfile: (body: Record<string, unknown>, token?: string | null) =>

@@ -63,7 +63,7 @@ export default async function SearchPage({
           {results.stores.length ? (
             <section>
               <SectionHeading title={`Stores (${results.stores.length})`} />
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {results.stores.map((store) => (
                   <StoreCard key={store._id} store={store} />
                 ))}

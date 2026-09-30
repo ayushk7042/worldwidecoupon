@@ -54,7 +54,11 @@ export function TrendingNow({ coupons }: { coupons: CouponView[] }) {
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {/* grid-cols-1 up front matters: without it, below md the grid has no
+            defined column and sizes itself to its widest card's natural
+            width instead of the viewport, pushing cards off the edge of the
+            screen on mobile. */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {coupons.slice(0, 6).map((coupon, index) => (
             <TrendingCard key={coupon._id} coupon={coupon} rank={index + 1} />
           ))}
@@ -103,7 +107,10 @@ function TrendingCard({ coupon, rank }: { coupon: CouponView; rank: number }) {
           </p>
         ) : null}
 
-        <div className="mt-auto flex items-center justify-between gap-2 pt-2">
+        {/* flex-wrap: "Verified · expiry" plus the button don't both fit on
+            one line in a narrow card — without it the button pushed past the
+            card's own right edge instead of dropping to its own line. */}
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-2">
           <span className="flex items-center gap-2.5 whitespace-nowrap text-[11px] font-semibold text-faint">
             {coupon.verified ? (
               <span className="flex items-center gap-1 text-success-600 dark:text-success-500">

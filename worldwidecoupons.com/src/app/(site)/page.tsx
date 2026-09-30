@@ -394,7 +394,7 @@ export default async function HomePage() {
 
       {data.blocks.length ? (
         <section className="shell pt-14">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {data.blocks.map((block) => (
               <Card key={block.title} hover className="flex flex-col gap-2">
                 {block.image?.url ? (
@@ -964,25 +964,36 @@ function TrendingBrands({ stores }: { stores: HomepagePayload["stores"] }) {
         </div>
 
         <div className="relative">
-          {/* The edges fade out, so chips enter and leave rather than pop. */}
+          {/* The edges fade out, so chips enter and leave rather than pop.
+              Only on larger screens — on a touch-scrolled mobile row the fade
+              would hide part of the first/last card the shopper controls. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r from-[var(--surface)] via-[var(--surface)]/80 to-transparent"
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-20 bg-gradient-to-r from-[var(--surface)] via-[var(--surface)]/80 to-transparent sm:block"
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-[var(--surface)] via-[var(--surface)]/80 to-transparent"
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-20 bg-gradient-to-l from-[var(--surface)] via-[var(--surface)]/80 to-transparent sm:block"
           />
 
-          <div className="marquee-track gap-3">
+          {/* Below sm: a plain swipeable row the shopper controls — the
+              auto-scrolling marquee covered the same distance in the same
+              42s regardless of viewport, so on a narrow phone it raced past
+              far faster than on desktop. Sm and up: the original marquee,
+              with the list doubled for a seamless loop. */}
+          <div className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-1 sm:marquee-track sm:overflow-visible sm:px-0 sm:pb-0">
             {[0, 1].map((copy) => (
-              <div key={copy} className="flex shrink-0 gap-3 pr-3" aria-hidden={copy === 1}>
+              <div
+                key={copy}
+                className={classNames("flex shrink-0 gap-3 pr-3", copy === 1 && "hidden sm:flex")}
+                aria-hidden={copy === 1}
+              >
                 {lane.map((item) => (
                   <Link
                     key={`${copy}-${item._id}`}
                     href={`/store/${item.slug}`}
                     tabIndex={copy === 1 ? -1 : undefined}
-                    className="group flex shrink-0 items-center gap-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] py-2.5 pl-2.5 pr-5 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-[var(--shadow-lift)] dark:hover:bg-brand-950/40"
+                    className="group flex shrink-0 snap-start items-center gap-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] py-2.5 pl-2.5 pr-5 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-[var(--shadow-lift)] dark:hover:bg-brand-950/40"
                   >
                     <StoreLogo name={item.name} logo={item.logo} size={60} rounded="rounded-2xl" />
                     <span className="min-w-0">
@@ -1150,7 +1161,7 @@ function StatBar({
 
   return (
     <section className="shell pt-12">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <Link
             key={stat.label}

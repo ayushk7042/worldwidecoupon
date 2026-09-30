@@ -271,7 +271,7 @@ export default function AccountPage() {
 
               {toFollow.length ? (
                 <Panel title="Stores worth following" Icon={StoreIcon} action={{ label: "All stores", href: "/stores" }}>
-                  <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {toFollow.map((store) => (
                       <StoreTile key={store._id} store={store} following={false} onToggle={toggleFavourite} />
                     ))}
@@ -298,7 +298,7 @@ export default function AccountPage() {
               {stores === null ? (
                 <div className="skeleton h-32" />
               ) : liveStores.length ? (
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {liveStores.map((store) => (
                     <StoreTile key={store._id} store={store} following onToggle={toggleFavourite} />
                   ))}

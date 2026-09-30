@@ -98,14 +98,14 @@ export function OfferRow({ coupon }: { coupon: CouponView }) {
           <Link
             href={`/store/${store.slug}`}
             aria-label={`${store.name} offers`}
-            className="flex size-24 shrink-0 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-2 shadow-[var(--shadow-card)] transition hover:scale-[1.03]"
+            className="order-1 flex size-24 shrink-0 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-2 shadow-[var(--shadow-card)] transition hover:scale-[1.03] @3xl:order-none"
           >
             <StoreLogo name={store.name} logo={store.logo} size={76} rounded="rounded-xl" className="border-0" />
           </Link>
         ) : null}
 
         {/* ---- the offer ---- */}
-        <div className="min-w-0 flex-1">
+        <div className="order-2 min-w-0 flex-1 @3xl:order-none">
           {store ? <p className="text-xs font-semibold text-body">{store.name}</p> : null}
 
           <h3 className="mt-0.5 break-words text-[17px] font-bold leading-snug">
@@ -160,10 +160,13 @@ export function OfferRow({ coupon }: { coupon: CouponView }) {
           </div>
         </div>
 
-        {/* ---- the offer's own picture: no box, faded into the row ---- */}
+        {/* ---- the offer's own picture: no box, faded into the row ----
+            Below @3xl it sinks to order-4, after the code+button — a shopper
+            scans store, then offer, then can act immediately, with the
+            picture as a footnote rather than a wall between the two. */}
         {coupon.image?.url ? (
           <div
-            className="pointer-events-none relative h-32 w-full shrink-0 @3xl:w-52"
+            className="order-4 pointer-events-none relative h-32 w-full shrink-0 @3xl:order-none @3xl:w-52"
             style={{
               maskImage: feather,
               WebkitMaskImage: feather,
@@ -187,7 +190,7 @@ export function OfferRow({ coupon }: { coupon: CouponView }) {
         )}
 
         {/* ---- the code, then the button under it ---- */}
-        <div className="flex w-full shrink-0 flex-col gap-2 @3xl:w-56">
+        <div className="order-3 flex w-full shrink-0 flex-col gap-2 @3xl:order-none @3xl:w-56">
           {coupon.hasCode ? (
             <div className="flex h-11 items-center justify-between rounded-xl border-2 border-dashed border-brand-300 bg-brand-50/70 px-3.5 dark:border-brand-700 dark:bg-brand-950/40">
               <span className="font-mono text-sm font-bold tracking-[0.3em] text-brand-700 dark:text-brand-300">
@@ -200,7 +203,7 @@ export function OfferRow({ coupon }: { coupon: CouponView }) {
         </div>
 
         {/* ---- discount and wishlist ---- */}
-        <div className="flex shrink-0 items-center gap-3 @3xl:items-start @3xl:self-start @3xl:pt-2">
+        <div className="order-5 flex shrink-0 items-center gap-3 @3xl:order-none @3xl:items-start @3xl:self-start @3xl:pt-2">
           <span className="rounded-full bg-brand-100 px-4 py-1.5 text-sm font-extrabold text-brand-700 dark:bg-brand-950/70 dark:text-brand-300">
             {coupon.badge}
           </span>

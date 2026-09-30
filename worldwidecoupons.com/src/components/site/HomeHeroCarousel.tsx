@@ -183,12 +183,16 @@ function SlideBody({ slide, tint, decorative }: { slide: Slide; tint: string; de
         {desktop ? (
           <picture className="block h-full w-full">
             <source media="(min-width: 640px)" srcSet={desktop} />
-            {/* Editor-uploaded campaign artwork — a plain img, not a Cloudinary-only asset. */}
+            {/* Editor-uploaded campaign artwork — a plain img, not a Cloudinary-only asset.
+                object-contain below sm: a banner sized for a wide desktop box was
+                cropping its own text when object-cover forced it to fill a much
+                narrower, shorter mobile box. Cover still fits fine from sm up,
+                where the box's aspect ratio is closer to the artwork's. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={mobile}
               alt={banner.image?.alt ?? banner.title ?? ""}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain sm:object-cover"
               loading="eager"
               decoding="async"
             />

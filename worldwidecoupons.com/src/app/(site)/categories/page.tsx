@@ -126,7 +126,7 @@ export default async function CategoriesPage() {
                 <h2 className="font-display text-xl font-extrabold">Busiest aisles right now</h2>
               </div>
 
-              <div className="grid gap-3 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
                 {featured.map((item, index) => {
                   const tint = categoryColor(item);
                   const art = categoryHeaderArt(item);

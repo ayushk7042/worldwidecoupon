@@ -5,8 +5,10 @@ import { authLimiter } from "../middlewares/rateLimit.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { idParam } from "../validators/common.js";
 import {
+  shopperForgotBody,
   shopperLoginBody,
   shopperRegisterBody,
+  shopperResetBody,
   shopperUpdateBody,
 } from "../validators/auth.validator.js";
 
@@ -23,6 +25,19 @@ router.post(
 
 router.post("/login", authLimiter, validate({ body: shopperLoginBody }), account.login);
 router.post("/logout", account.logout);
+
+router.post(
+  "/forgot-password",
+  authLimiter,
+  validate({ body: shopperForgotBody }),
+  account.forgotPassword
+);
+router.post(
+  "/reset-password",
+  authLimiter,
+  validate({ body: shopperResetBody }),
+  account.resetPassword
+);
 
 /* ---------- everything below needs a signed-in shopper ---------- */
 

@@ -277,7 +277,7 @@ export default async function StoresPage({ searchParams }: { searchParams: Promi
               <h2 className="font-display text-xl font-extrabold">Stores with the most going on</h2>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {top.slice(0, 4).map((store, index) => {
                 const best = store.bestOffer ? splitBadge(store.bestOffer) : null;
                 return (

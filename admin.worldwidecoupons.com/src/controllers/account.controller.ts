@@ -1,10 +1,13 @@
+import crypto from "node:crypto";
+import bcrypt from "bcryptjs";
 import type { CookieOptions, Response } from "express";
 import type { z } from "zod";
-import { isProduction } from "../config/env.js";
+import { env, isProduction } from "../config/env.js";
 import { SHOPPER_COOKIE } from "../middlewares/auth.middleware.js";
 import { CouponModel } from "../models/Coupon.js";
 import { SiteUserModel } from "../models/SiteUser.js";
 import { StoreModel } from "../models/Store.js";
+import { sendMail } from "../services/mail.service.js";
 import { STORE_CARD_FIELDS } from "../services/coupon.service.js";
 import { liveCouponFilter } from "../services/counters.service.js";
 import { decorateCoupons } from "../services/couponView.service.js";
@@ -13,8 +16,10 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { signToken } from "../utils/jwt.js";
 import { sendCreated, sendOk } from "../utils/response.js";
 import type {
+  shopperForgotBody,
   shopperLoginBody,
   shopperRegisterBody,
+  shopperResetBody,
   shopperUpdateBody,
 } from "../validators/auth.validator.js";
 
@@ -88,6 +93,90 @@ export const login = asyncHandler(async (req, res) => {
 export const logout = asyncHandler(async (_req, res) => {
   res.clearCookie(SHOPPER_COOKIE, { ...cookieOptions(0), maxAge: undefined });
   sendOk(res, { ok: true }, { message: "Signed out" });
+});
+
+/* =========================================================
+   FORGOT / RESET PASSWORD
+
+   The OTP itself is never stored in the clear — only its bcrypt hash, in the
+   same `resetToken` field a reset-link design would have used — so a
+   database read alone can never hand out a working code.
+========================================================= */
+
+const OTP_TTL_MS = 10 * 60_000;
+
+function generateOtp(): string {
+  // crypto.randomInt, not Math.random: this is a credential, not a UI id.
+  return String(crypto.randomInt(0, 1_000_000)).padStart(6, "0");
+}
+
+/** POST /api/account/forgot-password */
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body as z.infer<typeof shopperForgotBody>;
+
+  // Same response whether or not the account exists — confirming an address
+  // by reply turns "forgot password" into an account-enumeration tool.
+  const genericMessage = "If that email has an account, we've sent a 6-digit code to it";
+
+  const user = await SiteUserModel.findOne({ email });
+  if (!user) {
+    sendOk(res, { ok: true }, { message: genericMessage });
+    return;
+  }
+
+  const otp = generateOtp();
+  user.resetToken = await bcrypt.hash(otp, 10);
+  user.resetTokenExpires = new Date(Date.now() + OTP_TTL_MS);
+  await user.save();
+
+  const result = await sendMail({
+    to: user.email,
+    subject: `Your ${env.SITE_NAME} password reset code`,
+    html: `
+      <p>Hi ${user.name},</p>
+      <p>Use this code to reset your ${env.SITE_NAME} password. It expires in 10 minutes.</p>
+      <p style="font-size:28px;font-weight:800;letter-spacing:0.3em;margin:24px 0;">${otp}</p>
+      <p>If you did not ask for this, you can ignore this email — your password will not change.</p>
+      <p>— ${env.SITE_NAME}</p>
+    `,
+    text: `Your ${env.SITE_NAME} password reset code is ${otp}. It expires in 10 minutes.`,
+  });
+
+  if (!result.sent) {
+    // The code is already saved — better to tell the shopper it did not
+    // arrive than to have them wait on an email that is never coming.
+    throw ApiError.internal("Could not send the reset email. Try again shortly.");
+  }
+
+  sendOk(res, { ok: true }, { message: genericMessage });
+});
+
+/** POST /api/account/reset-password */
+export const resetPassword = asyncHandler(async (req, res) => {
+  const { email, otp, newPassword } = req.body as z.infer<typeof shopperResetBody>;
+
+  const user = await SiteUserModel.findOne({ email }).select(
+    "+password +resetToken +resetTokenExpires"
+  );
+
+  const invalid = ApiError.badRequest("That code is incorrect or has expired");
+
+  if (!user?.resetToken || !user.resetTokenExpires) throw invalid;
+  if (user.resetTokenExpires.getTime() < Date.now()) throw invalid;
+  if (!(await bcrypt.compare(otp, user.resetToken))) throw invalid;
+
+  user.password = newPassword;
+  user.resetToken = null;
+  user.resetTokenExpires = null;
+  user.lastLoginAt = new Date();
+  await user.save();
+
+  // Straight back into a session — asking for a third form (after email and
+  // OTP) just to sign in with the password they only just set is friction
+  // with no security upside.
+  const token = issueSession(res, String(user._id));
+
+  sendOk(res, { token, user: publicUser(user) }, { message: "Password changed" });
 });
 
 /* =========================================================

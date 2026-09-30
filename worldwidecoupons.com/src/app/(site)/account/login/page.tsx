@@ -39,7 +39,17 @@ function LoginForm() {
     <form onSubmit={onSubmit} className="space-y-4">
       <FormError message={error} />
       <Input label="Email" name="email" type="email" required autoComplete="email" />
-      <Input label="Password" name="password" type="password" required autoComplete="current-password" />
+
+      <div>
+        <Input label="Password" name="password" type="password" required autoComplete="current-password" />
+        <Link
+          href="/account/forgot-password"
+          className="mt-1.5 inline-block text-xs font-semibold text-brand-600 hover:underline"
+        >
+          Forgot password?
+        </Link>
+      </div>
+
       <Button type="submit" full size="lg" loading={busy}>
         Sign in
       </Button>
