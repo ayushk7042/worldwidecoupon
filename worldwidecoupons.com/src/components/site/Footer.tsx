@@ -81,7 +81,7 @@ export function Footer({
       <div className="shell relative pb-8 pt-12">
         <AdSlot position="footer" className="mb-10" />
 
-        <div className="grid gap-10 lg:grid-cols-[1.5fr_repeat(3,1fr)]">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.5fr_repeat(3,1fr)]">
           <div>
             <Logo height={42} showTagline onDark />
 

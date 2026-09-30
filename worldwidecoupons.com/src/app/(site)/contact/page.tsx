@@ -37,7 +37,7 @@ export default async function ContactPage({
         subtitle="A real person reads every message. Usually a reply within one working day."
       />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_18rem]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_18rem]">
         <Card>
           <ContactForm
             defaultTopic={isTopic(topic) ? topic : "general"}

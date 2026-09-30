@@ -175,7 +175,7 @@ export default function AccountPage() {
             </div>
           </div>
 
-          <div className="relative mt-6 grid gap-3 sm:grid-cols-3">
+          <div className="relative mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {stats.map((stat) => (
               <button
                 key={stat.id}
@@ -203,7 +203,7 @@ export default function AccountPage() {
       </section>
 
       {/* ================= body ================= */}
-      <div className="shell mt-5 grid gap-5 lg:grid-cols-[15.5rem_minmax(0,1fr)]">
+      <div className="shell mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[15.5rem_minmax(0,1fr)]">
         <aside className="lg:sticky lg:top-28 lg:self-start">
           <nav className="surface flex gap-1 overflow-x-auto rounded-2xl border border-[var(--border-subtle)] p-2 shadow-[var(--shadow-card)] no-scrollbar lg:flex-col lg:overflow-visible">
             {NAV.map((item) => (
@@ -569,7 +569,7 @@ function SettingsPanel({
   };
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_18rem]">
+    <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_18rem]">
       <Panel title="Your details" Icon={Settings}>
         <div className="max-w-lg space-y-4">
           <Input label="Name" value={name} onChange={(event) => setName(event.target.value)} />

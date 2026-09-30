@@ -261,7 +261,7 @@ export function Header({ categories }: { categories: Category[] }) {
 
       {menuOpen ? (
         <div className="surface max-h-[75vh] overflow-y-auto border-t border-[var(--border-subtle)] px-4 py-3 lg:hidden">
-          <nav className="grid gap-1">
+          <nav className="grid grid-cols-1 gap-1">
             {PRIMARY_LINKS.map((link) => (
               <Link
                 key={link.href}

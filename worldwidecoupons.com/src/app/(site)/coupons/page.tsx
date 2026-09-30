@@ -166,7 +166,7 @@ export default async function CouponsPage({
       {/* ---- header: breadcrumb, two-tone title, four promises, and the
           artwork on the right ---- */}
       <section className="relative overflow-hidden rounded-3xl border border-brand-200/60 bg-gradient-to-r from-brand-50 via-brand-50 to-brand-100/70 p-5 sm:p-7 dark:border-brand-700/40 dark:from-brand-900/45 dark:via-brand-950/60 dark:to-brand-900/30">
-        <div className="relative grid items-center gap-6 lg:grid-cols-[1fr_38rem]">
+        <div className="relative grid grid-cols-1 items-center gap-6 lg:grid-cols-[1fr_38rem]">
           <div className="min-w-0">
             <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm text-body">
               <Link href="/" className="transition hover:text-brand-600">Home</Link>
@@ -281,7 +281,7 @@ export default async function CouponsPage({
 
       <AdSlot position="category-top" className="mt-6" />
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
         {/* ---- filters ---- */}
         <aside className="lg:sticky lg:top-28 lg:self-start">
           <details className="group/filters lg:open" open>

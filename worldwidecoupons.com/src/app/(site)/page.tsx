@@ -221,7 +221,7 @@ export default async function HomePage() {
           <TodaysBestOffersHeader topPick={data.featured[0]!} />
 
           {data.bestOffers.main ? (
-            <div className="grid gap-4 lg:grid-cols-[1.3fr_1fr] lg:items-stretch">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.3fr_1fr] lg:items-stretch">
               <BestOfferMain coupon={data.bestOffers.main} />
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
@@ -440,7 +440,7 @@ function TodaysBestOffersHeader({ topPick }: { topPick: CouponView }) {
 
   return (
     <div className="mb-6 overflow-hidden rounded-3xl border border-brand-200/60 bg-brand-50 p-6 dark:border-brand-700/40 dark:bg-brand-900/35 sm:p-7">
-      <div className="grid gap-6 lg:grid-cols-[1fr_32rem] lg:items-center xl:grid-cols-[1fr_36rem]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_32rem] lg:items-center xl:grid-cols-[1fr_36rem]">
         <div className="min-w-0">
           <span className="inline-flex w-fit items-center gap-1.5 whitespace-nowrap rounded-full bg-brand-gradient px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white shadow-[var(--shadow-glow)]">
             <Star aria-hidden className="size-3.5 fill-current" />
@@ -617,7 +617,7 @@ function HomeHero({
       />
 
       <div className="shell relative py-6 lg:py-9">
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22.5rem]">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_22.5rem]">
           <div className="relative flex min-w-0 flex-col justify-between gap-4">
             <div
               aria-hidden
@@ -908,7 +908,7 @@ function SavingsPromises() {
   ];
 
   return (
-    <div className="relative mt-4 grid items-center gap-x-4 gap-y-3 rounded-3xl border border-white/80 bg-white/70 p-3 shadow-[var(--shadow-card)] backdrop-blur sm:grid-cols-2 lg:grid-cols-[repeat(4,1fr)_auto] dark:border-white/10 dark:bg-white/5">
+    <div className="relative mt-4 grid grid-cols-1 items-center gap-x-4 gap-y-3 rounded-3xl border border-white/80 bg-white/70 p-3 shadow-[var(--shadow-card)] backdrop-blur sm:grid-cols-2 lg:grid-cols-[repeat(4,1fr)_auto] dark:border-white/10 dark:bg-white/5">
       {items.map((item) => (
         <div key={item.title} className="flex items-center gap-3 px-2 lg:border-r lg:border-brand-200/70 lg:last:border-r-0 dark:lg:border-brand-900/60">
           <span className={`flex size-12 shrink-0 items-center justify-center rounded-full ${item.circle}`}>
@@ -1232,7 +1232,7 @@ function HowItWorks() {
   return (
     <section className="shell pt-14">
       <div className="relative overflow-hidden rounded-3xl border border-brand-200/60 bg-gradient-to-br from-brand-50 via-brand-50 to-brand-100/70 p-6 sm:p-8 dark:border-brand-700/40 dark:from-brand-900/45 dark:via-brand-950/60 dark:to-brand-900/30">
-        <div className="grid items-center gap-8 lg:grid-cols-[18rem_1fr_15rem]">
+        <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-[18rem_1fr_15rem]">
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white">
               <Percent aria-hidden className="size-3.5" />
@@ -1246,7 +1246,7 @@ function HowItWorks() {
             </p>
           </div>
 
-          <ol className="grid items-center gap-6 sm:grid-cols-[1fr_auto_1fr_auto_1fr]">
+          <ol className="grid grid-cols-1 items-center gap-6 sm:grid-cols-[1fr_auto_1fr_auto_1fr]">
             {STEPS.map((step, index) => (
               <Fragment key={step.title}>
                 <li className="flex items-center gap-3">

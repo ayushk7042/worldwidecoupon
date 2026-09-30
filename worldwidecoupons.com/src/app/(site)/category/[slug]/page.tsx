@@ -312,7 +312,7 @@ export default async function CategoryPage({
           </section>
         ) : null}
 
-        <div className="grid gap-5 lg:grid-cols-[15.5rem_minmax(0,1fr)] xl:grid-cols-[15.5rem_minmax(0,1fr)_17rem]">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[15.5rem_minmax(0,1fr)] xl:grid-cols-[15.5rem_minmax(0,1fr)_17rem]">
           {/* ---- left: filters ---- */}
           <aside className="lg:sticky lg:top-28 lg:self-start">
             <details className="group/filters" open>

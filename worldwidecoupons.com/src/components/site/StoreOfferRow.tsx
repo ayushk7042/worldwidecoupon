@@ -65,7 +65,7 @@ export function StoreOfferRow({
         </span>
       ) : null}
 
-      <div className="grid gap-x-5 gap-y-4 p-4 @2xl:grid-cols-[auto_minmax(0,1fr)_auto] @2xl:items-center @3xl:grid-cols-[auto_minmax(0,1fr)_auto_auto]">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-4 p-4 @2xl:grid-cols-[auto_minmax(0,1fr)_auto] @2xl:items-center @3xl:grid-cols-[auto_minmax(0,1fr)_auto_auto]">
         {store ? (
           <Link
             href={`/store/${store.slug}`}

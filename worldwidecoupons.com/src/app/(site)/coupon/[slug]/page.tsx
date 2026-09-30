@@ -242,7 +242,7 @@ export default async function CouponPage({
         </nav>
 
         {/* ================= header ================= */}
-        <div className="mt-3 grid gap-4 lg:grid-cols-[minmax(0,1fr)_19rem]">
+        <div className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_19rem]">
           <section
             className="relative overflow-hidden rounded-3xl border p-5 text-ink-900 sm:p-7"
             style={{
@@ -363,7 +363,7 @@ export default async function CouponPage({
         <AdSlot position="coupon-top" store={store?._id} className="mt-4" />
 
         {/* ================= promises ================= */}
-        <div className="mt-4 grid gap-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-4 shadow-[var(--shadow-card)] sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-4 grid grid-cols-1 gap-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-4 shadow-[var(--shadow-card)] sm:grid-cols-2 lg:grid-cols-4">
           {promises.map((item) => (
             <div key={item.title} className="flex items-center gap-3">
               <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700 dark:bg-brand-950/70 dark:text-brand-300">
@@ -380,7 +380,7 @@ export default async function CouponPage({
 
       {/* ================= body ================= */}
       <div className="shell py-5">
-        <div className="grid gap-5 lg:grid-cols-[15.5rem_minmax(0,1fr)] xl:grid-cols-[15.5rem_minmax(0,1fr)_18rem]">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[15.5rem_minmax(0,1fr)] xl:grid-cols-[15.5rem_minmax(0,1fr)_18rem]">
           {/* ---- filters ---- */}
           <aside className="lg:sticky lg:top-28 lg:self-start">
             <details className="group/filters" open>

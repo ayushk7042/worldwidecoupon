@@ -122,7 +122,7 @@ export function CategoryOffers({ groups }: { groups: CategoryGroup[] }) {
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        <div className="grid gap-4 lg:grid-cols-[1fr_23rem]">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_23rem]">
           {current.category.banner?.url ? (
             <Link
               href={`/category/${current.category.slug}`}

@@ -191,7 +191,7 @@ export default async function StorePage({
 
       <div className="shell pt-8">
         {/* ================= header ================= */}
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_17rem]">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_17rem]">
           <section className="relative overflow-hidden rounded-3xl border border-brand-200/60 bg-gradient-to-r from-amber-50/70 via-brand-50 to-brand-100/70 p-5 text-ink-900 sm:p-7">
             {/* The store's own artwork: starts from the middle and fills the right
                 half, feathered on every edge so it has no frame. */}
@@ -260,7 +260,7 @@ export default async function StorePage({
         </div>
 
         {/* ================= stats ================= */}
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto]">
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto]">
           {stats.map((stat) => (
             <div
               key={stat.label}
@@ -291,7 +291,7 @@ export default async function StorePage({
       <div className="shell py-6">
         <AdSlot position="store-top" className="mb-6" store={store._id} />
 
-        <div className="grid gap-5 lg:grid-cols-[15.5rem_minmax(0,1fr)] xl:grid-cols-[15.5rem_minmax(0,1fr)_17rem]">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[15.5rem_minmax(0,1fr)] xl:grid-cols-[15.5rem_minmax(0,1fr)_17rem]">
           {/* ---- left: filters ---- */}
           <aside className="lg:sticky lg:top-28 lg:self-start">
             <details className="group/filters" open>
