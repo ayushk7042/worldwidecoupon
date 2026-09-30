@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Script from "next/script";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
@@ -7,6 +8,12 @@ import { apiSafe } from "@/lib/api";
 import type { Category, Store } from "@/lib/types";
 
 const GA_MEASUREMENT_ID = "G-HGX7J0GNSC";
+
+// Google Search Console ownership check — renders as the <meta
+// name="google-site-verification"> tag on every public page.
+export const metadata: Metadata = {
+  verification: { google: "luRTHr8g95DiYxvSEIOJXQ_qxPs8YVc6U4u1bDpfU7E" },
+};
 
 /**
  * The public shell.
