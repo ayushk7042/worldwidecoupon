@@ -1,9 +1,12 @@
+import Script from "next/script";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { ShopperProvider } from "@/components/site/ShopperProvider";
 import { StickyMobileAd } from "@/components/ads/AdSlot";
 import { apiSafe } from "@/lib/api";
 import type { Category, Store } from "@/lib/types";
+
+const GA_MEASUREMENT_ID = "G-HGX7J0GNSC";
 
 /**
  * The public shell.
@@ -23,6 +26,21 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
 
   return (
     <ShopperProvider>
+      {/* Public site only — kept out of the root layout so the admin panel
+          never reports its own traffic into the same analytics property. */}
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${GA_MEASUREMENT_ID}');
+        `}
+      </Script>
+
       <div className="flex min-h-dvh flex-col">
         <Header categories={categories} />
         <main className="flex-1">{children}</main>
