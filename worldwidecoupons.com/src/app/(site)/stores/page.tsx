@@ -216,9 +216,14 @@ export default async function StoresPage({ searchParams }: { searchParams: Promi
           </div>
         </div>
 
-        {/* ================= category chips + sort ================= */}
-        <div className="mt-4 flex flex-wrap items-start justify-between gap-3">
-          <div className="flex min-w-0 flex-1 flex-wrap gap-1.5">
+        {/* ================= category chips + sort =================
+            Below sm this stacks: side-by-side, the sort row's own natural
+            width (four padded pills, none of them wrapping) left the
+            flex-1 category list only the leftover sliver of a narrow
+            phone's row — one pixel in the worst case, which pushed every
+            chip onto its own line instead of wrapping normally. */}
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+          <div className="flex min-w-0 flex-wrap gap-1.5 sm:flex-1">
             <Link
               href={hrefWith({ category: undefined })}
               className={classNames(
@@ -249,7 +254,7 @@ export default async function StoresPage({ searchParams }: { searchParams: Promi
             })}
           </div>
 
-          <div className="flex shrink-0 items-center gap-1 rounded-full border border-[var(--border-subtle)] bg-[var(--surface)] p-1">
+          <div className="no-scrollbar flex shrink-0 items-center gap-1 overflow-x-auto rounded-full border border-[var(--border-subtle)] bg-[var(--surface)] p-1">
             {SORTS.map((option) => (
               <Link
                 key={option.value}
