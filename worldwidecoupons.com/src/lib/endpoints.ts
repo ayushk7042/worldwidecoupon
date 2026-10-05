@@ -488,6 +488,18 @@ export interface PartnerSheetResult {
   dryRun: boolean;
 }
 
+export interface BlogSheetResult {
+  batchId: string;
+  totalRows: number;
+  created: number;
+  updated: number;
+  skipped: number;
+  category: { id: string; name: string } | null;
+  sample: { title: string; slug: string; status: string }[];
+  issues: { row: number; field?: string; message: string; value?: string }[];
+  dryRun: boolean;
+}
+
 export const importer = {
   /** Dry run — parses and reports without writing a thing. */
   preview: (file: File, token?: string | null) => {
@@ -519,6 +531,18 @@ export const importer = {
     form.append("category", options.category);
     if (options.store) form.append("store", options.store);
     return api<PartnerSheetResult>(dry ? "/import/partner-sheet/preview" : "/import/partner-sheet", {
+      method: "POST",
+      body: form,
+      token,
+    });
+  },
+
+  /** A blog post sheet (.xlsx) into one category. `dry` reads it and writes nothing. */
+  blogSheet: (file: File, options: { category: string }, dry: boolean, token?: string | null) => {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("category", options.category);
+    return api<BlogSheetResult>(dry ? "/import/blog-sheet/preview" : "/import/blog-sheet", {
       method: "POST",
       body: form,
       token,
