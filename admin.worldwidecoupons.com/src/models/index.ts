@@ -1,5 +1,6 @@
 export { AdminModel } from "./Admin.js";
 export { AdvertisementModel } from "./Advertisement.js";
+export { BlogModel } from "./Blog.js";
 export { CategoryModel } from "./Category.js";
 export { ClickEventModel } from "./ClickEvent.js";
 export { ContactModel } from "./Contact.js";
@@ -13,6 +14,7 @@ export { TagModel } from "./Tag.js";
 
 export type { Admin, AdminDocument, AdminPermission, AdminRole } from "./Admin.js";
 export type { Advertisement, AdPosition } from "./Advertisement.js";
+export type { Blog, BlogDocument, BlogStatus } from "./Blog.js";
 export type { Category, CategoryDocument, CategoryStatus } from "./Category.js";
 export type { ClickEvent, ClickKind } from "./ClickEvent.js";
 export type { Contact, ContactTopic } from "./Contact.js";
