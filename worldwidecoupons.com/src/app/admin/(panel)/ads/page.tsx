@@ -30,6 +30,9 @@ const POSITION_NOTES: Record<AdPosition, string> = {
   "coupon-inline": "Inside the offer detail page, under the reveal button.",
   "category-top": "Banner at the top of every category page.",
   "category-infeed": "Between the cards on a category page.",
+  "blog-top": "Full-width banner at the top of a blog post.",
+  "blog-inline": "Inside a blog post, between sections of the body.",
+  "blog-sidebar": "Right column on the blog listing and post pages.",
   footer: "Above the site footer, every page.",
   "mobile-sticky-bottom": "Sticky strip pinned to the bottom on phones.",
 };
