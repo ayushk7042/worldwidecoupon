@@ -384,6 +384,9 @@ export const AD_POSITIONS = [
   "coupon-inline",
   "category-top",
   "category-infeed",
+  "blog-top",
+  "blog-inline",
+  "blog-sidebar",
   "footer",
   "mobile-sticky-bottom",
 ] as const;
@@ -642,4 +645,58 @@ export interface CategoryQuery {
   includeHidden?: boolean;
   search?: string;
   limit?: number;
+}
+
+/* =========================================================
+   BLOG
+========================================================= */
+
+export const BLOG_STATUSES = ["draft", "published", "archived"] as const;
+export type BlogStatus = (typeof BLOG_STATUSES)[number];
+
+export interface Blog {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  /** Omitted from list responses — present on the single-post read. */
+  body?: string;
+  image?: ImageRef | null;
+  imageLink?: string;
+  store?: Store | string | null;
+  categories?: (Category | string)[];
+  tags?: string[];
+  tagNames: string[];
+  author?: string | null;
+  authorName?: string;
+  status: BlogStatus;
+  publishedAt?: string | null;
+  featured: boolean;
+  views: number;
+  readingTime: number;
+  metaTitle?: string;
+  metaDescription?: string;
+  canonicalUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BlogDetail extends Blog {
+  body: string;
+  previous: Pick<Blog, "title" | "slug" | "image"> | null;
+  next: Pick<Blog, "title" | "slug" | "image"> | null;
+}
+
+export type BlogSort = "newest" | "oldest" | "popular";
+
+export interface BlogQuery {
+  page?: number;
+  limit?: number;
+  store?: string;
+  category?: string;
+  tag?: string;
+  status?: BlogStatus | "all";
+  search?: string;
+  featured?: boolean;
+  sort?: BlogSort;
 }
