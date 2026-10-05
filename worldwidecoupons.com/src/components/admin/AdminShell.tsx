@@ -29,6 +29,7 @@ const NAV: { section: string; items: NavItem[] }[] = [
       { href: "/admin/stores", label: "Stores", icon: "🏬", permission: "canManageStores" },
       { href: "/admin/categories", label: "Categories", icon: "🗂" },
       { href: "/admin/tags", label: "Tags", icon: "🏷" },
+      { href: "/admin/blog", label: "Blog", icon: "📝" },
     ],
   },
   {
