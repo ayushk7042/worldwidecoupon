@@ -1,4 +1,4 @@
-import type { CategoryDetail, CouponView, StoreDetail } from "./types";
+import type { BlogDetail, CategoryDetail, CouponView, StoreDetail } from "./types";
 import { storeOf } from "./format";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://worldwidecoupons.com";
@@ -104,6 +104,26 @@ export function couponSchema(coupon: CouponView) {
     availability: coupon.isExpired
       ? "https://schema.org/Discontinued"
       : "https://schema.org/InStock",
+  };
+}
+
+export function articleSchema(post: BlogDetail) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.excerpt ?? post.metaDescription ?? post.title,
+    url: abs(`/blog/${post.slug}`),
+    ...(post.image?.url ? { image: [post.image.url] } : {}),
+    datePublished: post.publishedAt ?? post.createdAt,
+    dateModified: post.updatedAt,
+    author: { "@type": "Person", name: post.authorName || SITE_NAME },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      logo: { "@type": "ImageObject", url: abs("/icon.png") },
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": abs(`/blog/${post.slug}`) },
   };
 }
 
