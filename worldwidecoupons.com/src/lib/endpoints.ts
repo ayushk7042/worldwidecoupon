@@ -3,6 +3,9 @@ import type {
   AdminUser,
   Advertisement,
   AttentionList,
+  Blog,
+  BlogDetail,
+  BlogQuery,
   Category,
   CategoryDetail,
   CategoryQuery,
@@ -214,6 +217,40 @@ export const tags = {
 
   refreshCounts: (token?: string | null) =>
     api<{ updated: number }>("/tags/refresh-counts", { method: "POST", token }),
+};
+
+/* =========================================================
+   BLOG
+========================================================= */
+
+export const blog = {
+  list: (query: BlogQuery = {}, options: Opts = {}): Promise<Paged<Blog>> =>
+    apiPaged<Blog>("/blog", { query: query as Record<string, unknown>, ...options }),
+
+  get: (idOrSlug: string, options: Opts = {}): Promise<BlogDetail> =>
+    api<BlogDetail>(`/blog/${encodeURIComponent(idOrSlug)}`, options),
+
+  create: (body: Record<string, unknown>, token?: string | null) =>
+    api<Blog>("/blog", { method: "POST", body, token }),
+
+  update: (id: string, body: Record<string, unknown>, token?: string | null) =>
+    api<Blog>(`/blog/${id}`, { method: "PUT", body, token }),
+
+  remove: (id: string, token?: string | null) =>
+    api<{ id: string }>(`/blog/${id}`, { method: "DELETE", token }),
+
+  setStatus: (id: string, status: string, token?: string | null) =>
+    api<Blog>(`/blog/${id}/status`, { method: "PATCH", body: { status }, token }),
+
+  bulkStatus: (ids: string[], status: string, token?: string | null) =>
+    api<{ updated: number }>("/blog/bulk/status", {
+      method: "POST",
+      body: { ids, status },
+      token,
+    }),
+
+  bulkDelete: (ids: string[], token?: string | null) =>
+    api<{ deleted: number }>("/blog/bulk/delete", { method: "POST", body: { ids }, token }),
 };
 
 /* =========================================================
