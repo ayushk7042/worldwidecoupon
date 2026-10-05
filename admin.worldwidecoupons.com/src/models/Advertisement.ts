@@ -16,6 +16,9 @@ export const AD_POSITIONS = [
   "coupon-inline",
   "category-top",
   "category-infeed",
+  "blog-top",
+  "blog-inline",
+  "blog-sidebar",
   "footer",
   "mobile-sticky-bottom",
 ] as const;
