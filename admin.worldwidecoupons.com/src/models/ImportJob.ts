@@ -27,7 +27,7 @@ export interface ImportJob {
 
   fileName?: string;
   fileType: "csv" | "xlsx" | "json";
-  source: "wordpress" | "generic" | "partner-sheet";
+  source: "wordpress" | "generic" | "partner-sheet" | "blog-sheet";
 
   mode: "create" | "upsert" | "replace";
   status: ImportStatus;
@@ -46,6 +46,7 @@ export interface ImportJob {
   createdCouponIds: Types.ObjectId[];
   createdStoreIds: Types.ObjectId[];
   createdCategoryIds: Types.ObjectId[];
+  createdBlogIds: Types.ObjectId[];
 
   startedAt?: Date | null;
   finishedAt?: Date | null;
@@ -75,7 +76,11 @@ const importJobSchema = new Schema<ImportJob>(
 
     fileName: String,
     fileType: { type: String, enum: ["csv", "xlsx", "json"], default: "csv" },
-    source: { type: String, enum: ["wordpress", "generic", "partner-sheet"], default: "wordpress" },
+    source: {
+      type: String,
+      enum: ["wordpress", "generic", "partner-sheet", "blog-sheet"],
+      default: "wordpress",
+    },
 
     mode: { type: String, enum: ["create", "upsert", "replace"], default: "upsert" },
     status: { type: String, enum: IMPORT_STATUSES, default: "validated", index: true },
@@ -94,6 +99,7 @@ const importJobSchema = new Schema<ImportJob>(
     createdCouponIds: [{ type: Schema.Types.ObjectId, ref: "Coupon" }],
     createdStoreIds: [{ type: Schema.Types.ObjectId, ref: "Store" }],
     createdCategoryIds: [{ type: Schema.Types.ObjectId, ref: "Category" }],
+    createdBlogIds: [{ type: Schema.Types.ObjectId, ref: "Blog" }],
 
     startedAt: { type: Date, default: null },
     finishedAt: { type: Date, default: null },
