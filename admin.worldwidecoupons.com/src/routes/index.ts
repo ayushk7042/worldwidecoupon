@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import accountRoutes from "./account.routes.js";
 import advertisementRoutes from "./advertisement.routes.js";
 import authRoutes from "./auth.routes.js";
+import blogRoutes from "./blog.routes.js";
 import categoryRoutes from "./category.routes.js";
 import contactRoutes from "./contact.routes.js";
 import couponRoutes from "./coupon.routes.js";
@@ -34,6 +35,7 @@ router.use("/categories", categoryRoutes);
 router.use("/tags", tagRoutes);
 router.use("/search", searchRoutes);
 router.use("/homepage", homepageRoutes);
+router.use("/blog", blogRoutes);
 
 /* ---------- people ---------- */
 router.use("/auth", authRoutes);
