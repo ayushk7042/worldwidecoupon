@@ -15,6 +15,10 @@ router.get("/partner-sheet/template", importController.partnerTemplate);
 router.post("/partner-sheet/preview", importController.csvUpload, importController.partnerPreview);
 router.post("/partner-sheet", importController.csvUpload, importController.partnerImport);
 
+router.get("/blog-sheet/template", importController.blogTemplate);
+router.post("/blog-sheet/preview", importController.csvUpload, importController.blogPreview);
+router.post("/blog-sheet", importController.csvUpload, importController.blogImport);
+
 router.get("/jobs", importController.listJobs);
 router.get("/jobs/:id", validate({ params: idParam }), importController.getJob);
 router.post(
