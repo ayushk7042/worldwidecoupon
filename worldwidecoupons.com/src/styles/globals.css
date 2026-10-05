@@ -490,6 +490,55 @@
     text-align: left;
   }
   .prose-offer th { background: var(--surface-sunken); font-weight: 600; }
+
+  /* A blog post reads as an article, not an offer blurb — bigger type,
+     more air between sections, a real blockquote. */
+  .prose-article {
+    color: var(--text-secondary);
+    font-size: 1.0625rem;
+    line-height: 1.8;
+  }
+  .prose-article > *:first-child { margin-top: 0; }
+  .prose-article p { margin: 0 0 1.25rem; }
+  .prose-article ul, .prose-article ol { margin: 1rem 0 1.25rem; padding-left: 1.5rem; }
+  .prose-article ul { list-style: disc; }
+  .prose-article ol { list-style: decimal; }
+  .prose-article li { margin-bottom: 0.5rem; }
+  .prose-article h2, .prose-article h3, .prose-article h4 {
+    color: var(--text-primary);
+    font-weight: 800;
+    margin: 2.25rem 0 0.75rem;
+    letter-spacing: -0.01em;
+  }
+  .prose-article h2 { font-size: 1.5rem; }
+  .prose-article h3 { font-size: 1.2rem; }
+  .prose-article h4 { font-size: 1.05rem; }
+  .prose-article a { color: var(--color-brand-600); text-decoration: underline; text-underline-offset: 2px; font-weight: 600; }
+  .prose-article strong { color: var(--text-primary); font-weight: 700; }
+  .prose-article img, .prose-article figure {
+    margin: 1.75rem 0;
+    border-radius: 1rem;
+    width: 100%;
+    height: auto;
+  }
+  .prose-article figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+  .prose-article blockquote {
+    margin: 1.75rem 0;
+    padding: 0.25rem 0 0.25rem 1.25rem;
+    border-left: 3px solid var(--color-brand-500);
+    font-style: italic;
+    color: var(--text-primary);
+  }
+  .prose-article hr {
+    margin: 2.5rem 0;
+    border: none;
+    border-top: 1px solid var(--border-subtle);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
