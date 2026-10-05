@@ -5,6 +5,7 @@ import { StoreModel } from "../models/Store.js";
 import { CategoryModel } from "../models/Category.js";
 import { importWordpressCsv } from "../services/import/importer.js";
 import { buildPartnerTemplate, importPartnerSheet } from "../services/import/partnerSheet.js";
+import { buildBlogTemplate, importBlogSheet } from "../services/import/blogSheet.js";
 import {
   isLegacyExcel,
   isSpreadsheetUpload,
@@ -230,5 +231,52 @@ export const partnerTemplate = asyncHandler(async (_req, res) => {
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
   );
   res.setHeader("Content-Disposition", 'attachment; filename="partner-coupon-template.xlsx"');
+  res.send(buffer);
+});
+
+/* ---------------- blog post sheets (.xlsx) ---------------- */
+
+const blogOptions = (req: Express.Request) => {
+  const file = uploadedFile(req);
+  if (!isSpreadsheetUpload(file)) {
+    throw ApiError.badRequest("Upload the blog sheet as an .xlsx file");
+  }
+  const body = ((req as { body?: Record<string, string> }).body ?? {}) as Record<string, string>;
+  if (!body.category) throw ApiError.badRequest("Choose the category first");
+
+  return {
+    buffer: file.buffer,
+    categoryId: body.category,
+    fileName: file.originalname,
+  };
+};
+
+/** POST /api/import/blog-sheet/preview — reads the sheet, writes nothing. */
+export const blogPreview = asyncHandler(async (req, res) => {
+  const { buffer, ...options } = blogOptions(req);
+  const result = await importBlogSheet(buffer, { ...options, dryRun: true });
+  sendOk(res, result);
+});
+
+/** POST /api/import/blog-sheet */
+export const blogImport = asyncHandler(async (req, res) => {
+  const { buffer, ...options } = blogOptions(req);
+  const result = await importBlogSheet(buffer, {
+    ...options,
+    adminId: req.admin ? String(req.admin._id) : null,
+  });
+  sendOk(res, result, {
+    message: `${result.created} post(s) created${result.skipped ? `, ${result.skipped} skipped` : ""}`,
+  });
+});
+
+/** GET /api/import/blog-sheet/template — the blank sheet, ready to fill. */
+export const blogTemplate = asyncHandler(async (_req, res) => {
+  const buffer = await buildBlogTemplate();
+  res.setHeader(
+    "Content-Type",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  );
+  res.setHeader("Content-Disposition", 'attachment; filename="blog-post-template.xlsx"');
   res.send(buffer);
 });
