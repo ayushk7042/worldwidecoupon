@@ -51,6 +51,9 @@ const MAX_WIDTH: Record<string, number> = {
   "coupon-inline": 728,
   "category-top": 970,
   "category-infeed": 728,
+  "blog-top": 970,
+  "blog-inline": 728,
+  "blog-sidebar": 336,
   footer: 970,
   "mobile-sticky-bottom": 480,
 };
