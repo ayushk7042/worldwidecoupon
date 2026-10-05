@@ -4,25 +4,6 @@ import { Logo } from "./Logo";
 import type { Category, Store } from "@/lib/types";
 import { AdSlot } from "@/components/ads/AdSlot";
 
-/** Brand marks, drawn inline so the footer costs no extra requests. */
-const SOCIALS = [
-  {
-    label: "Facebook",
-    href: "https://facebook.com",
-    path: "M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H8v3h2v7h3v-7h3l1-3h-4v-2c0-.6.4-1 1-1Z",
-  },
-  {
-    label: "X",
-    href: "https://x.com",
-    path: "M17.5 3h3l-6.6 7.5L21.8 21h-6l-4.7-6.1L5.7 21h-3l7-8L2.5 3h6.2l4.2 5.6L17.5 3Zm-1 16h1.6L7.6 4.7H5.9L16.5 19Z",
-  },
-  {
-    label: "Instagram",
-    href: "https://instagram.com",
-    path: "M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.3 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c0 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2 0-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c0-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4 1.3-.1 1.7-.1 4.9-.1Zm0 3.3a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13Zm0 10.7a4.2 4.2 0 1 1 0-8.4 4.2 4.2 0 0 1 0 8.4Zm6.8-10.9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z",
-  },
-];
-
 const COLUMNS = [
   {
     title: "Shop",
@@ -89,23 +70,6 @@ export function Footer({
               Hand-checked coupon codes and deals from the brands you already
               shop with. No sign-up needed, no fake countdowns.
             </p>
-
-            <div className="mt-5 flex gap-2">
-              {SOCIALS.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  aria-label={social.label}
-                  className="flex size-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/70 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-300 hover:bg-brand-500 hover:text-white"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="size-4">
-                    <path d={social.path} />
-                  </svg>
-                </a>
-              ))}
-            </div>
 
             <Link
               href="/coupons"
