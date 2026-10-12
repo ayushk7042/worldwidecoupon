@@ -172,9 +172,10 @@ export async function apiSafe<T>(
   try {
     return await api<T>(path, options);
   } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn(`[api] ${path} failed:`, (error as Error).message);
-    }
+    // Logged in every environment, production included — a swallowed
+    // failure here used to be invisible in `pm2 logs`, so a missing rail
+    // could never be told apart from a genuinely quiet backend.
+    console.error(`[api] ${path} failed:`, (error as Error).message);
     return fallback;
   }
 }
