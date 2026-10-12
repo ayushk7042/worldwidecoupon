@@ -182,9 +182,17 @@ export default async function HomePage() {
     // visitor until the next deploy — overwriting whatever good page was
     // there before. Throwing instead makes this revalidation fail, so ISR
     // keeps serving the last good cache (and retries on the next window)
-    // rather than publishing a broken one. Locally, with no data imported
-    // yet, the friendlier empty state still shows.
-    if (process.env.NODE_ENV === "production") {
+    // rather than publishing a broken one.
+    //
+    // Not during the build itself, though: `next build` has no backend to
+    // call at all (CI runs typecheck+build with nothing listening on
+    // API_URL), so this always comes back empty there — throwing would
+    // fail every build. NEXT_PHASE tells the two apart; only a live
+    // request on an already-running server gets the protective throw.
+    // Locally, with no data imported yet, the friendlier empty state
+    // shows either way.
+    const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
+    if (process.env.NODE_ENV === "production" && !isBuildPhase) {
       throw new Error("Homepage render got no featured offers, newest offers or stores — see the apiSafe failures logged just above this for why.");
     }
 
