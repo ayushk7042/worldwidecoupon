@@ -174,6 +174,20 @@ export default async function HomePage() {
   );
 
   if (!data.featured.length && !data.newest.length && !data.stores.length) {
+    // In production this almost never means the catalogue is actually
+    // empty — it means `/homepage` (or every one of these fallbacks) just
+    // failed, and `apiSafe` quietly swallowed it. Rendering the empty
+    // state anyway used to be the bug: it is a *successful* page render as
+    // far as ISR is concerned, so it got cached and then served to every
+    // visitor until the next deploy — overwriting whatever good page was
+    // there before. Throwing instead makes this revalidation fail, so ISR
+    // keeps serving the last good cache (and retries on the next window)
+    // rather than publishing a broken one. Locally, with no data imported
+    // yet, the friendlier empty state still shows.
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Homepage render got no featured offers, newest offers or stores — see the apiSafe failures logged just above this for why.");
+    }
+
     return (
       <div className="mx-auto max-w-3xl px-4 py-24">
         <EmptyState
