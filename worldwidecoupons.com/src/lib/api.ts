@@ -163,6 +163,12 @@ export async function apiPaged<T>(
 /**
  * For server components rendering public pages that must not explode when the
  * API hiccups — a missing rail is better than a 500 on the homepage.
+ *
+ * One retry, after a short pause, before giving up: right after a deploy the
+ * API process can still be re-connecting to the database for a second or
+ * two, and this is exactly the call the homepage's empty-state guard treats
+ * as "nothing came back, protect the cache" — worth not tripping over a
+ * blip that would have succeeded half a second later.
  */
 export async function apiSafe<T>(
   path: string,
@@ -171,11 +177,17 @@ export async function apiSafe<T>(
 ): Promise<T> {
   try {
     return await api<T>(path, options);
-  } catch (error) {
-    // Logged in every environment, production included — a swallowed
-    // failure here used to be invisible in `pm2 logs`, so a missing rail
-    // could never be told apart from a genuinely quiet backend.
-    console.error(`[api] ${path} failed:`, (error as Error).message);
-    return fallback;
+  } catch (firstError) {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    try {
+      return await api<T>(path, options);
+    } catch (error) {
+      // Logged in every environment, production included — a swallowed
+      // failure here used to be invisible in `pm2 logs`, so a missing rail
+      // could never be told apart from a genuinely quiet backend.
+      console.error(`[api] ${path} failed twice:`, (firstError as Error).message, "/", (error as Error).message);
+      return fallback;
+    }
   }
 }
