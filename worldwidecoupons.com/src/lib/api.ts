@@ -83,6 +83,12 @@ export async function apiRaw<T>(
     headers: finalHeaders,
     // The cookie carries the session when the browser calls the API directly.
     credentials: "include",
+    // Nothing here bounded how long a call could take — one slow request
+    // among the dozens the homepage fires in parallel held up the entire
+    // `Promise.all` indefinitely, which is what "the site just hangs" was.
+    // A page that waits this long has already failed either way; better to
+    // give up and let the caller's fallback take over.
+    signal: rest.signal ?? AbortSignal.timeout(10_000),
   };
 
   if (body !== undefined) {
