@@ -10,9 +10,19 @@ const base = (windowMs: number, limit: number, message: string): Partial<Options
   handler: (_req, res) => sendFail(res, 429, message),
 });
 
-/** Everything under /api, as a blanket safety net. */
+/**
+ * Everything under /api, as a blanket safety net.
+ *
+ * Counted per IP, which in practice means per the frontend's own server —
+ * every shopper's page view goes through it, not through their own address.
+ * A single homepage render alone fires well over a dozen of these calls, so
+ * 1,000/15min sounded generous but was actually only a few dozen real page
+ * views before the frontend started rate-limiting itself and the homepage
+ * started throwing. 8,000 leaves real headroom for that fan-out while still
+ * bounding an actual scraper.
+ */
 export const generalLimiter = rateLimit(
-  base(15 * 60_000, 1_000, "Slow down a moment and try again")
+  base(15 * 60_000, 8_000, "Slow down a moment and try again")
 );
 
 /** Sign-in and register — the endpoints worth brute-forcing. */
