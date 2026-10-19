@@ -7,7 +7,7 @@ import { StickyMobileAd } from "@/components/ads/AdSlot";
 import { apiSafe } from "@/lib/api";
 import type { Category, Store } from "@/lib/types";
 
-const GA_MEASUREMENT_ID = "G-HGX7J0GNSC";
+const GA_MEASUREMENT_ID = "G-NKHRCWNM8Y";
 
 // Google Search Console ownership check — renders as the <meta
 // name="google-site-verification"> tag on every public page.
