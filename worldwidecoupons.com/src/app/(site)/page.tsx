@@ -127,11 +127,13 @@ export default async function HomePage() {
 
   /*
    * The category strip shows real offers, so each aisle needs its own six —
-   * one backend round trip apiece. Capped at the top 8 by live offer count:
-   * uncapped, every category an editor has ever added fires its own request
-   * on every single homepage render, and that fan-out (on top of the handful
-   * of calls above it) is what was exhausting the backend's own rate limit
-   * under real traffic and taking the whole site down with it.
+   * one backend round trip apiece, for every category an editor turned on
+   * for the homepage (Admin → Homepage → Categories). That fan-out, on top
+   * of the handful of calls above it, is what exhausted the backend's own
+   * rate limit under real traffic and took the whole site down with it —
+   * fixed at the limiter itself (1,000 → 8,000 req/15min) rather than by
+   * capping this, which would just mean an editor's own picks silently
+   * stop showing once they turn on enough of them.
    */
   /*
    * An editor's "Featured offers" picks (Admin → Homepage → Featured
@@ -155,7 +157,6 @@ export default async function HomePage() {
     await Promise.all(
       [...data.categories]
         .sort((a, b) => b.activeCouponCount - a.activeCouponCount)
-        .slice(0, 8)
         .map((category) =>
           apiPaged<CouponView>("/coupons", {
             query: { category: category.slug, limit: 6, sort: "best" },
