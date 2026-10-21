@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import React from "react";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { ShopperProvider } from "@/components/site/ShopperProvider";
@@ -47,6 +48,33 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           gtag('config', '${GA_MEASUREMENT_ID}');
         `}
       </Script>
+
+      {/* Travelpayouts Emerald — their own script tag, verbatim (including
+          the WordPress-plugin compatibility flags: noptimize, cfasync,
+          wpfc-render…), so a plain <script> rather than next/script, whose
+          typed props don't allow non-"data-*" attributes like nowprocket.
+          Those same two (nowprocket, seraph-accel-crit) aren't in React's
+          own DOM attribute typing either, hence the cast. */}
+      {React.createElement("script", {
+        nowprocket: "",
+        "data-noptimize": "1",
+        "data-cfasync": "false",
+        "data-wpfc-render": "false",
+        "seraph-accel-crit": "1",
+        "data-no-defer": "1",
+        "data-cmp-ab": "2",
+        dangerouslySetInnerHTML: {
+          __html: `
+            (function () {
+                var script = document.createElement("script");
+                script.async = 1;
+                script.setAttribute("data-cmp-ab","2");
+                script.src = 'https://emrld.ltd/NTg4NTM1.js?t=588535';
+                document.head.appendChild(script);
+            })();
+          `,
+        },
+      } as React.ScriptHTMLAttributes<HTMLScriptElement>)}
 
       <div className="flex min-h-dvh flex-col">
         <Header categories={categories} />
